@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
-const cookieParser = require('cookie-parser') 
-const cors = require('cors')
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 const { connectToDb } = require("./config/mongodb");
 
@@ -9,25 +9,28 @@ const app = express();
 
 // imports routes
 
-const adminRoute = require("./routes/adminRoute")
+const adminRoute = require("./routes/adminRoute");
 
 // middleware
 
 // parse json data
-app.use(cors({
-     origin: ["http://localhost:5173" , "https://fanatasy-admin-panel.vercel.app"],
-     credentials:true
-}))
-app.use(express.json())
-app.use(cookieParser())
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://fanatasy-admin-panel.vercel.app",
+    ],
+    credentials: true,
+  })
+);
+app.use(express.json());
+app.use(cookieParser());
 
+app.get("/", (req, res) => {
+  res.send("api is working");
+});
 
-
-app.get("/",(req,res)=>{
-  res.send("api is working")
-})
-
-app.use("/api/admin",adminRoute)
+app.use("/api/admin", adminRoute);
 
 // db and server connection
 
