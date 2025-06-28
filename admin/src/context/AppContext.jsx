@@ -18,7 +18,6 @@ export const AppContextProvider = (props) => {
       }
     } catch (err) {
       console.log(err);
-      toast.error("Failed to fetch players");
     }
   };
 
