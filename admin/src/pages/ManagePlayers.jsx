@@ -156,7 +156,7 @@ const ManagePlayers = () => {
       
       if (data.success) {
         toast.success("Player added successfully");
-        fetchAllPlayers();
+      
         // Reset form
         setFormData({
           name: "",
