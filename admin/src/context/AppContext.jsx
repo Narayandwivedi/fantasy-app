@@ -6,18 +6,21 @@ import axios from "axios";
 export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
-  const BACKEND_URL = "https://fantasy-i3uytsgrm-narayan-dwivedis-projects.vercel.app";
+  // const BACKEND_URL = "https://fantasy-i3uytsgrm-narayan-dwivedis-projects.vercel.app";
+  const BACKEND_URL = 'http://localhost:4000'
   const [allPlayers, setAllPlayers] = useState([]);
 
   const fetchAllPlayers = async () => {
     try {
-      const { data } = await axios.get(`${BACKEND_URL}/api/admin/players`,{withCredentials:true});
+      const { data } = await axios.get(`${BACKEND_URL}/api/admin/players`, {
+        withCredentials: true,
+      });
       if (data.success) {
         setAllPlayers(data.allPlayers);
         console.log(data);
       }
     } catch (err) {
-      console.log(err);
+      console.log(err.message);
     }
   };
 
@@ -29,7 +32,6 @@ export const AppContextProvider = (props) => {
     BACKEND_URL,
     allPlayers,
   };
-
 
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>

@@ -19,7 +19,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://fanatasy-admin-panel.vercel.app"
+      "https://fantasy-app-73q4.vercel.app"
     ],
     credentials: true,
   })
