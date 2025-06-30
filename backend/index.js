@@ -12,7 +12,8 @@ const corsOptions = {
   origin: [
     "http://localhost:5173",
     "http://localhost:5174", 
-    "https://fantasy-app-73q4.vercel.app"
+    "https://fantasy-app-73q4.vercel.app",
+    "https://fantasy-i3uytsgrm-narayan-dwivedis-projects.vercel.app"
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
