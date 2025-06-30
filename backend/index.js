@@ -15,16 +15,11 @@ const corsOptions = {
     "https://fantasy-app-73q4.vercel.app",
     "https://fantasy-i3uytsgrm-narayan-dwivedis-projects.vercel.app"
   ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
-  optionsSuccessStatus: 200
+  credentials: true
 };
 
 app.use(cors(corsOptions));
 
-// Handle preflight requests
-app.options('*', cors(corsOptions));
 
 // Other middleware
 app.use(cookieParser());
