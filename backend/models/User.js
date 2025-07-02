@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   },
   dateOfBirth: {
     type: Date,
-    required:true
+    required: true,
   },
   mobile: {
     type: Number,
@@ -20,20 +20,24 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
 
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
+
   password: {
     type: String,
     required: true,
   },
 
-   
   // Role-based access control
   role: {
     type: String,
-    enum: ['user', 'admin', 'super_admin', 'moderator'],
-    default: 'user'
+    enum: ["user", "admin", "super_admin", "moderator"],
+    default: "user",
   },
 
-  
   balance: {
     type: Number,
     default: 0,
@@ -75,47 +79,46 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-   isMobileVerified: {
+  isMobileVerified: {
     type: Boolean,
-    default: false
+    default: false,
   },
   isEmailVerified: {
     type: Boolean,
-    default: false
+    default: false,
   },
   totalReferrals: {
     type: Number,
     default: 0,
   },
-  
 
-    // Verification Status
+  // Verification Status
 
   kycStatus: {
     type: String,
     enum: ["pending", "approved", "rejected"],
-    default: "pending"
+    default: "pending",
   },
 
   kycDocuments: {
     panCard: {
       number: String,
-      imageUrl: String
+      imageUrl: String,
     },
     aadharCard: {
       number: String,
-      imageUrl: String
-    }
+      imageUrl: String,
+    },
   },
 
-    // Gaming Statistics
+  // Gaming Statistics
   totalContestsJoined: {
     type: Number,
-    default: 0
+    default: 0,
   },
   totalContestsWon: {
     type: Number,
-    default: 0
+    default: 0,
   },
 
   resetOtp: String,

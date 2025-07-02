@@ -189,6 +189,7 @@ const TeamDetails = () => {
   const handleAddPlayerToSquad = async (player) => {
     
     try {
+      
       const { data } = await axios.post(`${BACKEND_URL}/api/admin/teams/${id}/add-player`, {
         playerId: player._id
       });
@@ -210,7 +211,10 @@ const TeamDetails = () => {
   const handleRemovePlayerFromSquad = async (playerId, playerName) => {
     if (window.confirm(`Are you sure you want to remove ${playerName} from the squad?`)) {
       try {
-        const { data } = await axios.delete(`${BACKEND_URL}/api/admin/teams/${id}/remove-player/${playerId}`);
+        
+        const { data } = await axios.delete(`${BACKEND_URL}/api/admin/teams/${id}/remove-player`,{
+          playerId
+        });
         
         if (data.success) {
           toast.success(`${playerName} removed from squad successfully`);

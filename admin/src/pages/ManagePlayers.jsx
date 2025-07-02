@@ -4,13 +4,14 @@ import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import { Plus, Search, Edit3, Trash2, Filter } from "lucide-react";
 
-// Move AddPlayerModal outside the main component
-const AddPlayerModal = ({ 
+// Updated PlayerModal to handle both Add and Edit modes
+const PlayerModal = ({ 
   showModal, 
   onClose, 
   formData, 
   setFormData, 
-  onSubmit 
+  onSubmit,
+  mode = "add" // "add" or "edit"
 }) => {
   if (!showModal) return null;
 
@@ -25,7 +26,9 @@ const AddPlayerModal = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Add New Player</h2>
+          <h2 className="text-xl font-bold">
+            {mode === "add" ? "Add New Player" : "Edit Player"}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -105,9 +108,13 @@ const AddPlayerModal = ({
             </button>
             <button
               onClick={onSubmit}
-              className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
+              className={`flex-1 text-white py-3 rounded-lg transition ${
+                mode === "add" 
+                  ? "bg-blue-600 hover:bg-blue-700" 
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
             >
-              Add Player
+              {mode === "add" ? "Add Player" : "Update Player"}
             </button>
           </div>
         </div>
@@ -121,8 +128,9 @@ const ManagePlayers = () => {
   const [filterSport, setFilterSport] = useState("all");
   const [filterPosition, setFilterPosition] = useState("all");
   const [showAddPlayerModal, setShowAddPlayerModal] = useState(false);
-  const { BACKEND_URL , allPlayers } = useContext(AppContext);
-
+  const [showEditPlayerModal, setShowEditPlayerModal] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState(null);
+  const { BACKEND_URL, allPlayers, setAllPlayers } = useContext(AppContext);
 
   // Combine all form data into one object
   const [formData, setFormData] = useState({
@@ -135,8 +143,20 @@ const ManagePlayers = () => {
     imgLink: ""
   });
 
+  // Reset form data
+  const resetFormData = () => {
+    setFormData({
+      name: "",
+      position: "",
+      sport: "cricket",
+      battingStyle: "",
+      bowlingStyle: "",
+      country: "",
+      imgLink: ""
+    });
+  };
 
-
+  // Handle Add Player
   const handleAddPlayer = async () => {
     if (!formData.name || !formData.position || !formData.country) {
       toast.error("Please fill in all required fields");
@@ -156,17 +176,11 @@ const ManagePlayers = () => {
       
       if (data.success) {
         toast.success("Player added successfully");
-      
-        // Reset form
-        setFormData({
-          name: "",
-          position: "",
-          sport: "cricket",
-          battingStyle: "",
-          bowlingStyle: "",
-          country: "",
-          imgLink: ""
-        });
+        
+        // Update the allPlayers state with the new player
+        setAllPlayers(prev => [...prev, data.player]);
+        
+        resetFormData();
         setShowAddPlayerModal(false);
       }
     } catch (err) {
@@ -175,10 +189,90 @@ const ManagePlayers = () => {
     }
   };
 
-  const handleCloseModal = () => {
+  // Handle Edit Player
+  const handleEditPlayer = async () => {
+    if (!formData.name || !formData.position || !formData.country) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const { data } = await axios.put(`${BACKEND_URL}/api/admin/update-player/${editingPlayer._id}`, {
+        name: formData.name,
+        sport: formData.sport,
+        position: formData.position,
+        battingStyle: formData.battingStyle,
+        bowlingStyle: formData.bowlingStyle,
+        country: formData.country,
+        image: formData.imgLink,
+      });
+      
+      if (data.success) {
+        toast.success("Player updated successfully");
+        
+        // Update the allPlayers state with the updated player
+        // setAllPlayers(prev => 
+        //   prev.map(player => 
+        //     player._id === editingPlayer._id ? data.player : player
+        //   )
+        // );
+        
+        resetFormData();
+        setShowEditPlayerModal(false);
+        setEditingPlayer(null);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update player");
+    }
+  };
+
+  // Handle Delete Player
+  const handleDeletePlayer = async (playerId) => {
+    if (!window.confirm("Are you sure you want to delete this player?")) {
+      return;
+    }
+
+    try {
+      const { data } = await axios.delete(`${BACKEND_URL}/api/admin/delete-player/${playerId}`);
+      
+      if (data.success) {
+        toast.success("Player deleted successfully");
+        
+        // Remove the player from allPlayers state
+        setAllPlayers(prev => prev.filter(player => player._id !== playerId));
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete player");
+    }
+  };
+
+  // Open Edit Modal
+  const openEditModal = (player) => {
+    setEditingPlayer(player);
+    setFormData({
+      name: player.name,
+      position: player.position,
+      sport: player.sport || "cricket",
+      battingStyle: player.battingStyle || "",
+      bowlingStyle: player.bowlingStyle || "",
+      country: player.country,
+      imgLink: player.image || ""
+    });
+    setShowEditPlayerModal(true);
+  };
+
+  // Handle Close Modals
+  const handleCloseAddModal = () => {
     setShowAddPlayerModal(false);
-    // Optionally reset form when closing
-    // setFormData({ name: "", position: "", sport: "cricket", battingStyle: "", bowlingStyle: "", country: "", imgLink: "" });
+    resetFormData();
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditPlayerModal(false);
+    setEditingPlayer(null);
+    resetFormData();
   };
 
   // Filter players based on search and filters
@@ -190,8 +284,6 @@ const ManagePlayers = () => {
     
     return matchesSearch && matchesSport && matchesPosition;
   });
-
-
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -295,10 +387,16 @@ const ManagePlayers = () => {
                     }}
                   />
                   <div className="absolute top-3 right-3 flex gap-2">
-                    <button className="bg-white bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition">
+                    <button 
+                      onClick={() => openEditModal(player)}
+                      className="bg-white bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition"
+                    >
                       <Edit3 size={16} className="text-gray-600" />
                     </button>
-                    <button className="bg-white bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition">
+                    <button 
+                      onClick={() => handleDeletePlayer(player._id)}
+                      className="bg-white bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition"
+                    >
                       <Trash2 size={16} className="text-red-600" />
                     </button>
                   </div>
@@ -326,12 +424,23 @@ const ManagePlayers = () => {
       </div>
 
       {/* Add Player Modal */}
-      <AddPlayerModal
+      <PlayerModal
         showModal={showAddPlayerModal}
-        onClose={handleCloseModal}
+        onClose={handleCloseAddModal}
         formData={formData}
         setFormData={setFormData}
         onSubmit={handleAddPlayer}
+        mode="add"
+      />
+
+      {/* Edit Player Modal */}
+      <PlayerModal
+        showModal={showEditPlayerModal}
+        onClose={handleCloseEditModal}
+        formData={formData}
+        setFormData={setFormData}
+        onSubmit={handleEditPlayer}
+        mode="edit"
       />
     </div>
   );

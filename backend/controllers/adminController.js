@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const Player = require("../models/Player");
 const Match = require("../models/Match");
 
+// team
+
 async function createTeam(req, res) {
   try {
     const { name, shortName, logo, sport, captain, viceCaptain, squad } =
@@ -236,14 +238,15 @@ async function getTeamById(req, res) {
   try {
     const { id } = req.params;
     console.log(id);
-    
- 
+
     if (!id) {
       return res
         .status(400)
         .json({ success: false, message: "provide team id" });
     }
-    const getTeam = await Team.findById(id).populate('squad captain viceCaptain');
+    const getTeam = await Team.findById(id).populate(
+      "squad captain viceCaptain"
+    );
     if (!getTeam) {
       return res
         .status(400)
@@ -255,13 +258,102 @@ async function getTeamById(req, res) {
   }
 }
 
-async function addNewPlayerToTeam(req,res) {
-  
-  console.log(req.params.id , req.body.playerId);
-  
-  res.json({success:true , message:"player added"})
+async function addNewPlayerToTeam(req, res) {
+  try {
+    const teamId = req.params.id;
+    const playerId = req.body.playerId;
 
+    // validate req body
+
+    if (!teamId || !playerId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid request" });
+    }
+
+    // validate mongoose object id
+
+    if (
+      !mongoose.isValidObjectId(teamId) ||
+      !mongoose.isValidObjectId(playerId)
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid request" });
+    }
+
+    // check player exist in db or not
+
+    const getPlayer = await Player.findById(playerId);
+    if (!getPlayer) {
+      return res.status.json({ success: false, message: "invalid playerid" });
+    }
+
+    // check team exist or not
+    const getTeam = await Team.findById(teamId);
+    if (!getTeam) {
+      return res
+        .status(400)
+        .json({ success: false, message: "team not found" });
+    }
+    getTeam.squad.push(playerId);
+    await getTeam.save();
+    return res.json({ success: true, message: "player added success" });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({ success: false, message: "server error" });
+  }
 }
+
+async function removePlayerFromTeam(req, res) {
+  try {
+    console.log(req.params.id, req.body.playerId);
+
+    // const teamId = req.params.id;
+    // const playerId = req.body.playerId;
+
+    // console.log(` teamid : ${teamId} , player id equal to ${playerId}`);
+
+    // // validate req body
+
+    // if (!teamId || !playerId) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "invalid request" });
+    // }
+
+    // // validate mongoose object id
+
+    // if (
+    //   !mongoose.isValidObjectId(teamId) ||
+    //   !mongoose.isValidObjectId(playerId)
+    // ) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "invalid request" });
+    // }
+
+    // // check player exist in db or not
+
+    // const getPlayer = await Player.findById(playerId);
+    // if (!getPlayer) {
+    //   return res.status.json({ success: false, message: "invalid playerid" });
+    // }
+
+    // // check team exist or not
+    // const getTeam = await Team.findById(teamId);
+    // if (!getTeam) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "team not found" });
+    // }
+
+    return res.json({ success: true, message: "player removed successfully" });
+  } catch (err) {}
+}
+
+// player
 
 async function createPlayer(req, res) {
   try {
@@ -371,6 +463,27 @@ async function createPlayer(req, res) {
   }
 }
 
+async function updatePlayer(req, res) {
+  try {
+    const playerId = req.params.id;
+    if (!playerId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid player id" });
+    }
+
+    const updatedPlayer = await Player.findByIdAndUpdate(playerId, req.body);
+    if (!updatePlayer) {
+      return res
+        .status(400)
+        .json({ success: false, message: "player not found" });
+    }
+    return res.json({ success: true, message: "player updated successfully" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "server error" });
+  }
+}
+
 async function getAllPlayers(req, res) {
   const allPlayers = await Player.find();
   return res.json({ success: true, allPlayers });
@@ -425,9 +538,11 @@ module.exports = {
   createTeam,
   getAllTeam,
   createPlayer,
+  updatePlayer,
+  getAllPlayers,
   createMatch,
   getAllMatch,
-  getAllPlayers,
   getTeamById,
-  addNewPlayerToTeam
+  addNewPlayerToTeam,
+  removePlayerFromTeam,
 };
