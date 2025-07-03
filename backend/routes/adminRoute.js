@@ -25,7 +25,7 @@ router.get("/players", getAllPlayers);
 router.get("/teams", getAllTeam);
 router.get("/teams/:id", getTeamById);
 router.post("/teams/:id/add-player", addNewPlayerToTeam);
-router.delete("/teams/:id/remove-player", removePlayerFromTeam);
+router.delete("/teams/:id/remove-player/:playerId", removePlayerFromTeam);
 router.post("/teams", createTeam);
 
 router.post("/create-match", createMatch);

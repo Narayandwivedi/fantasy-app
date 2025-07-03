@@ -9,7 +9,7 @@ const ContestSchema = new mongoose.Schema(
       required: true,
     },
 
-    contestType: {
+    contestFormat: {
       type: String,
       enum: ["h2h", "league", "mega-contest", "practice"],
       required: true,

@@ -57,11 +57,11 @@ const MatchSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Team'
   },
-   team1Playing11: [{
+   team1PlayingSquad: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Player'
   }],
-  team2Playing11: [{
+  team2PlayingSquad: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Player'
   }],

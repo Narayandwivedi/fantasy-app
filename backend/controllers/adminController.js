@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Player = require("../models/Player");
 const Match = require("../models/Match");
 
-// team
+// manage team
 
 async function createTeam(req, res) {
   try {
@@ -237,8 +237,6 @@ async function getAllTeam(req, res) {
 async function getTeamById(req, res) {
   try {
     const { id } = req.params;
-    console.log(id);
-
     if (!id) {
       return res
         .status(400)
@@ -308,56 +306,67 @@ async function addNewPlayerToTeam(req, res) {
 
 async function removePlayerFromTeam(req, res) {
   try {
-    console.log(req.params.id, req.body.playerId);
+    const teamId = req.params.id;
+    const playerIdToRemove = req.params.playerId;
 
-    // const teamId = req.params.id;
-    // const playerId = req.body.playerId;
+    // validate req body
 
-    // console.log(` teamid : ${teamId} , player id equal to ${playerId}`);
+    if (!teamId || !playerIdToRemove) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid request" });
+    }
 
-    // // validate req body
+    // validate mongoose object id
 
-    // if (!teamId || !playerId) {
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, message: "invalid request" });
-    // }
+    if (
+      !mongoose.isValidObjectId(teamId) ||
+      !mongoose.isValidObjectId(playerIdToRemove)
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid request" });
+    }
 
-    // // validate mongoose object id
+    // check player exist in db or not
 
-    // if (
-    //   !mongoose.isValidObjectId(teamId) ||
-    //   !mongoose.isValidObjectId(playerId)
-    // ) {
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, message: "invalid request" });
-    // }
+    const getPlayer = await Player.findById(playerIdToRemove);
+    if (!getPlayer) {
+      return res.status.json({ success: false, message: "invalid playerid" });
+    }
 
-    // // check player exist in db or not
+    // check team exist or not
+    const getTeam = await Team.findById(teamId);
 
-    // const getPlayer = await Player.findById(playerId);
-    // if (!getPlayer) {
-    //   return res.status.json({ success: false, message: "invalid playerid" });
-    // }
+    if (!getTeam) {
+      return res
+        .status(400)
+        .json({ success: false, message: "team not found" });
+    }
 
-    // // check team exist or not
-    // const getTeam = await Team.findById(teamId);
-    // if (!getTeam) {
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, message: "team not found" });
-    // }
+    getTeam.squad = getTeam.squad.filter((playerId) => {
+      return playerId.toString() !== playerIdToRemove;
+    });
+
+    if (getTeam.captain.toString() === playerIdToRemove) {
+      getTeam.captain = null;
+    }
+    if (getTeam.viceCaptain.toString() === playerIdToRemove) {
+      getTeam.viceCaptain = null;
+    }
+
+    await getTeam.save();
 
     return res.json({ success: true, message: "player removed successfully" });
   } catch (err) {}
 }
 
-// player
+// manage player
 
 async function createPlayer(req, res) {
   try {
     // 1) validate req body
+
     const {
       name,
       image,
@@ -367,6 +376,7 @@ async function createPlayer(req, res) {
       battingStyle,
       bowlingStyle,
     } = req.body;
+
     if ((!name || !image, !sport, !position)) {
       return res
         .status(400)
@@ -394,13 +404,7 @@ async function createPlayer(req, res) {
     const validPositions = {
       cricket: ["batsman", "bowler", "all-rounder", "wicket-keeper"],
       football: ["goalkeeper", "defender", "midfielder", "forward"],
-      basketball: [
-        "point-guard",
-        "shooting-guard",
-        "small-forward",
-        "power-forward",
-        "center",
-      ],
+      basketball: [ "point-guard","shooting-guard", "small-forward","power-forward","center",],
       kabaddi: ["raider", "defender", "all-rounder"],
     };
 
@@ -428,13 +432,15 @@ async function createPlayer(req, res) {
     // 6) Validate bowling style (only for cricket)
     if (sport.toLowerCase() === "cricket" && bowlingStyle) {
       const validBowlingStyles = [
-        "right-arm-fast",
-        "left-arm-fast",
-        "right-arm-medium-fast",
-        "left-arm-medium-fast",
-        "right-arm-spin",
-        "left-arm-spin",
-        "none",
+         "right-arm-fast",
+          "right-arm-medium",
+          "right-arm-medium-fast",
+          "left-arm-fast",
+          "left-arm-medium",
+          "left-arm-medium-fast",
+          "right-arm-spin",
+          "left-arm-spin",
+          "none",
       ];
       // Fix: Use validBowlingStyles instead of validBattingStyles
       if (!validBowlingStyles.includes(bowlingStyle.toLowerCase())) {
@@ -488,6 +494,8 @@ async function getAllPlayers(req, res) {
   const allPlayers = await Player.find();
   return res.json({ success: true, allPlayers });
 }
+
+// manage matches
 
 async function createMatch(req, res) {
   try {

@@ -74,12 +74,14 @@ const PlayerModal = ({
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select bowling style</option>
-            <option value="right-arm fast">Right-arm Fast</option>
-            <option value="right-arm-medium-fast">Right-arm Medium Fast</option>
-            <option value="left-arm fast">Left-arm Fast</option>
-            <option value="left-arm-medium-fast">Left-arm Medium Fast</option>
-            <option value="right-arm-spin">Right-arm Spin</option>
-            <option value="left-arm-spin">Left-arm Spin</option>
+            <option value="right-arm-fast">Right-arm-Fast</option>
+            <option value="right-arm-medium">Right-arm-medium</option>
+            <option value="right-arm-medium-fast">Right-arm-Medium-Fast</option>
+            <option value="left-arm-fast">Left-arm-Fast</option>
+            <option value="left-arm-medium">Left-arm-medium</option>
+            <option value="left-arm-medium-fast">Left-arm-Medium-Fast</option>
+            <option value="right-arm-spin">Right-arm-Spin</option>
+            <option value="left-arm-spin">Left-arm-Spin</option>
             <option value="none">None</option>
           </select>
 
@@ -176,15 +178,12 @@ const ManagePlayers = () => {
       
       if (data.success) {
         toast.success("Player added successfully");
-        
-        // Update the allPlayers state with the new player
-        setAllPlayers(prev => [...prev, data.player]);
-        
         resetFormData();
         setShowAddPlayerModal(false);
       }
     } catch (err) {
       console.log(err);
+      console.log(err.message);
       toast.error("Failed to add player");
     }
   };

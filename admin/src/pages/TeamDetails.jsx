@@ -211,10 +211,11 @@ const TeamDetails = () => {
   const handleRemovePlayerFromSquad = async (playerId, playerName) => {
     if (window.confirm(`Are you sure you want to remove ${playerName} from the squad?`)) {
       try {
+        console.log(playerId);
         
-        const { data } = await axios.delete(`${BACKEND_URL}/api/admin/teams/${id}/remove-player`,{
-          playerId
-        });
+        const { data } = await axios.delete(`${BACKEND_URL}/api/admin/teams/${id}/remove-player/${playerId}`);
+        console.log(data);
+        
         
         if (data.success) {
           toast.success(`${playerName} removed from squad successfully`);
