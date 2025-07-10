@@ -28,6 +28,10 @@ router.post("/teams/:id/add-player", addNewPlayerToTeam);
 router.delete("/teams/:id/remove-player/:playerId", removePlayerFromTeam);
 router.post("/teams", createTeam);
 
+
+
+// manage match 
+
 router.post("/create-match", createMatch);
 
 // players

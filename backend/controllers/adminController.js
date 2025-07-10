@@ -516,6 +516,17 @@ async function createMatch(req, res) {
         .json({ success: false, message: "missing details" });
     }
 
+    const sportsType = ['cricket' , 'football' , 'kabbadi']
+    if(!sportsType.includes(sport)){
+      return res.status(400).json({success:false , message:"invalid sports"})
+    }
+
+    // verify team1 and team2 object id
+
+    if(!mongoose.isValidObjectId(team1)||!mongoose.isValidObjectId(team2)){
+      return res.status(400).json({success:false , message:"invalid team id"})
+    }
+
     await Match.create({
       sport,
       matchType,
