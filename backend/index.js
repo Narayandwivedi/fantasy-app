@@ -9,6 +9,13 @@ const { connectToDb } = require("./config/mongodb");
 const upload = require("./config/multer")
 
 
+
+// import routes
+const playerRoute = require("./routes/playerRoute")
+const matchRoute = require("./routes/matchRoute")
+const teamRoute = require("./routes/teamRoute")
+const userRoute = require("./routes/userRoute")
+
 // imports
 
 const {handlePlayerImgUpload , handleTeamImgUpload} = require("./controllers/uploadController")
@@ -32,6 +39,8 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 
+
+
 // Routes
 app.get("/", (req, res) => {
   res.send("api is working");
@@ -54,10 +63,12 @@ app.post("/upload/team", upload.single("team"), handleTeamImgUpload)
 
 
 
-// admin controlled routes
+// use all routes
 
-const adminRoute = require("./routes/adminRoute");
-app.use("/api/admin", adminRoute);
+app.use("/api/players",playerRoute)
+app.use("/api/teams",teamRoute)
+app.use("/api/matches",matchRoute)
+app.use("/api/users",userRoute)
 
 
 

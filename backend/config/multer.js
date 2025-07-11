@@ -8,6 +8,7 @@ const storage = multer.diskStorage({
     if (file.fieldname === "player") folder = "players";
     else if (file.fieldname === "team") folder = "teams";
     else if (file.fieldname === "kyc") folder = "kyc";
+    
 
     const dir = `./upload/images/${folder}`;
     cb(null, dir);

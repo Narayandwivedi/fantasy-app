@@ -1,25 +1,46 @@
 import React, { useState, useEffect, useContext } from "react";
+import upload_area from "../assets/upload_area.svg";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import { Plus, Search, Edit3, Trash2, Filter } from "lucide-react";
 
 // Updated PlayerModal to handle both Add and Edit modes
-const PlayerModal = ({ 
-  showModal, 
-  onClose, 
-  formData, 
-  setFormData, 
+const PlayerModal = ({
+  showModal,
+  onClose,
+  formData,
+  setFormData,
   onSubmit,
-  mode = "add" // "add" or "edit"
+  mode = "add", // "add" or "edit"
+  existingImageUrl = "", // Add this prop for existing image
+  backendUrl = "", // Add this prop for backend URL
 }) => {
   if (!showModal) return null;
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
+  };
+
+  const [image, setImage] = useState(null);
+
+  const imageHandler = (e) => {
+    setImage(e.target.files[0]);
+    setFormData((prev) => ({ ...prev, image: e.target.files[0] }));
+  };
+
+  // Function to get the image source for display
+  const getImageSource = () => {
+    if (image) {
+      return URL.createObjectURL(image);
+    }
+    if (mode === "edit" && existingImageUrl) {
+      return `${backendUrl}${existingImageUrl}`;
+    }
+    return upload_area;
   };
 
   return (
@@ -36,11 +57,11 @@ const PlayerModal = ({
             ✕
           </button>
         </div>
-        
+
         <div className="flex flex-col gap-4">
           <input
             value={formData.name}
-            onChange={(e) => handleInputChange('name', e.target.value)}
+            onChange={(e) => handleInputChange("name", e.target.value)}
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Player name *"
             type="text"
@@ -48,7 +69,7 @@ const PlayerModal = ({
 
           <select
             value={formData.position}
-            onChange={(e) => handleInputChange('position', e.target.value)}
+            onChange={(e) => handleInputChange("position", e.target.value)}
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select player role *</option>
@@ -60,7 +81,7 @@ const PlayerModal = ({
 
           <select
             value={formData.battingStyle}
-            onChange={(e) => handleInputChange('battingStyle', e.target.value)}
+            onChange={(e) => handleInputChange("battingStyle", e.target.value)}
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select batting style</option>
@@ -70,7 +91,7 @@ const PlayerModal = ({
 
           <select
             value={formData.bowlingStyle}
-            onChange={(e) => handleInputChange('bowlingStyle', e.target.value)}
+            onChange={(e) => handleInputChange("bowlingStyle", e.target.value)}
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select bowling style</option>
@@ -87,20 +108,39 @@ const PlayerModal = ({
 
           <input
             value={formData.country}
-            onChange={(e) => handleInputChange('country', e.target.value)}
+            onChange={(e) => handleInputChange("country", e.target.value)}
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Player country *"
             type="text"
           />
-          
-          <input
-            value={formData.imgLink}
-            onChange={(e) => handleInputChange('imgLink', e.target.value)}
-            className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Player image URL"
-            type="text"
-          />
-          
+
+          {/* Image upload section - Updated size to 80x80 */}
+          <div className="w-full text-[#7b7b7b]">
+            <p className="mb-2 text-sm font-medium">
+              {mode === "edit" ? "Current Image / Upload New Image" : "Upload Player Image"}
+            </p>
+            <label className="cursor-pointer block" htmlFor="file-input">
+              <img
+                className="h-[80px] w-[80px] object-cover rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors"
+                src={getImageSource()}
+                alt="Player preview"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {mode === "edit" && existingImageUrl && !image
+                  ? "Click to change image"
+                  : "Click to upload image"}
+              </p>
+            </label>
+            <input
+              onChange={imageHandler}
+              className="hidden"
+              type="file"
+              name="image"
+              id="file-input"
+              accept="image/*"
+            />
+          </div>
+
           <div className="flex gap-3 mt-4">
             <button
               onClick={onClose}
@@ -111,8 +151,8 @@ const PlayerModal = ({
             <button
               onClick={onSubmit}
               className={`flex-1 text-white py-3 rounded-lg transition ${
-                mode === "add" 
-                  ? "bg-blue-600 hover:bg-blue-700" 
+                mode === "add"
+                  ? "bg-blue-600 hover:bg-blue-700"
                   : "bg-green-600 hover:bg-green-700"
               }`}
             >
@@ -142,7 +182,8 @@ const ManagePlayers = () => {
     battingStyle: "",
     bowlingStyle: "",
     country: "",
-    imgLink: ""
+    imgLink: "",
+    image: null, // Add image field
   });
 
   // Reset form data
@@ -154,7 +195,8 @@ const ManagePlayers = () => {
       battingStyle: "",
       bowlingStyle: "",
       country: "",
-      imgLink: ""
+      imgLink: "",
+      image: null,
     });
   };
 
@@ -166,20 +208,34 @@ const ManagePlayers = () => {
     }
 
     try {
-      const { data } = await axios.post(`${BACKEND_URL}/api/admin/create-player`, {
+      let imageUrl = "";
+      
+      // Upload image if provided
+      if (formData.image) {
+        let form = new FormData();
+        form.append("player", formData.image);
+        const res = await axios.post(`${BACKEND_URL}/upload/player`, form, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        imageUrl = res.data.image_url;
+      }
+
+      const { data } = await axios.post(`${BACKEND_URL}/api/players`, {
         name: formData.name,
         sport: formData.sport,
         position: formData.position,
         battingStyle: formData.battingStyle,
         bowlingStyle: formData.bowlingStyle,
         country: formData.country,
-        image: formData.imgLink,
+        image: imageUrl,
       });
-      
+
       if (data.success) {
         toast.success("Player added successfully");
         resetFormData();
         setShowAddPlayerModal(false);
+        // Refresh the players list if needed
+        // You might want to fetch updated players here
       }
     } catch (err) {
       console.log(err);
@@ -196,26 +252,34 @@ const ManagePlayers = () => {
     }
 
     try {
-      const { data } = await axios.put(`${BACKEND_URL}/api/admin/update-player/${editingPlayer._id}`, {
-        name: formData.name,
-        sport: formData.sport,
-        position: formData.position,
-        battingStyle: formData.battingStyle,
-        bowlingStyle: formData.bowlingStyle,
-        country: formData.country,
-        image: formData.imgLink,
-      });
+      let imageUrl = formData.imgLink; // Keep existing image URL by default
       
+      // Upload new image if provided
+      if (formData.image) {
+        let form = new FormData();
+        form.append("player", formData.image);
+        const res = await axios.post(`${BACKEND_URL}/upload/player`, form, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        imageUrl = res.data.image_url;
+      }
+
+      const { data } = await axios.put(
+        `${BACKEND_URL}/api/players/${editingPlayer._id}`,
+        {
+          name: formData.name,
+          sport: formData.sport,
+          position: formData.position,
+          battingStyle: formData.battingStyle,
+          bowlingStyle: formData.bowlingStyle,
+          country: formData.country,
+          image: imageUrl,
+        }
+      );
+
       if (data.success) {
         toast.success("Player updated successfully");
-        
-        // Update the allPlayers state with the updated player
-        // setAllPlayers(prev => 
-        //   prev.map(player => 
-        //     player._id === editingPlayer._id ? data.player : player
-        //   )
-        // );
-        
+
         resetFormData();
         setShowEditPlayerModal(false);
         setEditingPlayer(null);
@@ -233,13 +297,17 @@ const ManagePlayers = () => {
     }
 
     try {
-      const { data } = await axios.delete(`${BACKEND_URL}/api/admin/delete-player/${playerId}`);
-      
+      const { data } = await axios.delete(
+        `${BACKEND_URL}/api/admin/delete-player/${playerId}`
+      );
+
       if (data.success) {
         toast.success("Player deleted successfully");
-        
+
         // Remove the player from allPlayers state
-        setAllPlayers(prev => prev.filter(player => player._id !== playerId));
+        setAllPlayers((prev) =>
+          prev.filter((player) => player._id !== playerId)
+        );
       }
     } catch (err) {
       console.log(err);
@@ -257,7 +325,8 @@ const ManagePlayers = () => {
       battingStyle: player.battingStyle || "",
       bowlingStyle: player.bowlingStyle || "",
       country: player.country,
-      imgLink: player.image || ""
+      imgLink: player.image || "",
+      image: null, // Reset image field for new uploads
     });
     setShowEditPlayerModal(true);
   };
@@ -275,12 +344,14 @@ const ManagePlayers = () => {
   };
 
   // Filter players based on search and filters
-  const filteredPlayers = allPlayers.filter(player => {
-    const matchesSearch = player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         player.country.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredPlayers = allPlayers.filter((player) => {
+    const matchesSearch =
+      player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      player.country.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSport = filterSport === "all" || player.sport === filterSport;
-    const matchesPosition = filterPosition === "all" || player.position === filterPosition;
-    
+    const matchesPosition =
+      filterPosition === "all" || player.position === filterPosition;
+
     return matchesSearch && matchesSport && matchesPosition;
   });
 
@@ -291,8 +362,12 @@ const ManagePlayers = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Manage Players</h1>
-              <p className="text-gray-600 mt-1">Total Players: {allPlayers.length}</p>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Manage Players
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Total Players: {allPlayers.length}
+              </p>
             </div>
             <button
               onClick={() => setShowAddPlayerModal(true)}
@@ -311,7 +386,10 @@ const ManagePlayers = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
               <input
                 type="text"
                 placeholder="Search players..."
@@ -366,8 +444,12 @@ const ManagePlayers = () => {
             <div className="text-gray-400 mb-4">
               <Search size={48} className="mx-auto" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No players found</h3>
-            <p className="text-gray-600">Try adjusting your search or filters</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No players found
+            </h3>
+            <p className="text-gray-600">
+              Try adjusting your search or filters
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -377,22 +459,26 @@ const ManagePlayers = () => {
                 className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200"
               >
                 <div className="relative">
-                  <img
-                    src={player.image}
-                    alt={player.name}
-                    className="w-full h-48 object-cover rounded-t-lg"
-                    onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/300x200?text=No+Image";
-                    }}
-                  />
-                  <div className="absolute top-3 right-3 flex gap-2">
-                    <button 
+                  {/* Updated player image size to 80x80 with proper styling */}
+                  <div className="flex justify-center items-center h-24 bg-gray-50 rounded-t-lg">
+                    <img
+                      src={`${BACKEND_URL}${player.image}`}
+                      alt={player.name}
+                      className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                      style={{
+                        imageRendering: 'crisp-edges',
+                        imageRendering: '-webkit-optimize-contrast',
+                      }}
+                    />
+                  </div>
+                  <div className="absolute top-2 right-2 flex gap-2">
+                    <button
                       onClick={() => openEditModal(player)}
                       className="bg-white bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition"
                     >
                       <Edit3 size={16} className="text-gray-600" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDeletePlayer(player._id)}
                       className="bg-white bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition"
                     >
@@ -400,19 +486,44 @@ const ManagePlayers = () => {
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="p-4">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{player.name}</h3>
-                  
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    {player.name}
+                  </h3>
+
                   <div className="space-y-1 text-sm text-gray-600">
-                    <p><span className="font-medium text-gray-800">ID:</span> {player._id}</p>
-                    <p><span className="font-medium text-gray-800">Position:</span> {player.position}</p>
-                    <p><span className="font-medium text-gray-800">Country:</span> {player.country}</p>
+                    <p>
+                      <span className="font-medium text-gray-800">ID:</span>{" "}
+                      {player._id}
+                    </p>
+                    <p>
+                      <span className="font-medium text-gray-800">
+                        Position:
+                      </span>{" "}
+                      {player.position}
+                    </p>
+                    <p>
+                      <span className="font-medium text-gray-800">
+                        Country:
+                      </span>{" "}
+                      {player.country}
+                    </p>
                     {player.battingStyle && (
-                      <p><span className="font-medium text-gray-800">Batting:</span> {player.battingStyle}</p>
+                      <p>
+                        <span className="font-medium text-gray-800">
+                          Batting:
+                        </span>{" "}
+                        {player.battingStyle}
+                      </p>
                     )}
                     {player.bowlingStyle && player.bowlingStyle !== "none" && (
-                      <p><span className="font-medium text-gray-800">Bowling:</span> {player.bowlingStyle}</p>
+                      <p>
+                        <span className="font-medium text-gray-800">
+                          Bowling:
+                        </span>{" "}
+                        {player.bowlingStyle}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -430,6 +541,7 @@ const ManagePlayers = () => {
         setFormData={setFormData}
         onSubmit={handleAddPlayer}
         mode="add"
+        backendUrl={BACKEND_URL}
       />
 
       {/* Edit Player Modal */}
@@ -440,6 +552,8 @@ const ManagePlayers = () => {
         setFormData={setFormData}
         onSubmit={handleEditPlayer}
         mode="edit"
+        existingImageUrl={editingPlayer?.image || ""}
+        backendUrl={BACKEND_URL}
       />
     </div>
   );
