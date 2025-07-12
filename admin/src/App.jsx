@@ -14,7 +14,7 @@ const App = () => {
       <ToastContainer/>
 
       <div className='flex'>
-        <Sidebar/>
+        {/* <Sidebar/> */}
         <Routes>
           <Route path='/' element = {<ManagePlayers/>} />
           <Route path='/demo' element = {<Demo/>} />

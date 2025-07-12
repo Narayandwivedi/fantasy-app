@@ -250,6 +250,8 @@ const ManagePlayers = () => {
       toast.error("Please fill in all required fields");
       return;
     }
+    return console.log(formData);
+    
 
     try {
       let imageUrl = formData.imgLink; // Keep existing image URL by default
