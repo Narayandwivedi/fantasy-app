@@ -27,11 +27,10 @@ async function handlePlayerImgUpload(req, res) {
       })
       .png({
         progressive: false,         // Disable progressive for smaller files
-        compressionLevel: 8,        // Maximum PNG compression
-        palette: true,              // Force palette-based PNG
-        colors: 200,                // Limit to 200 colors max
-        quality: 50,                // Reduce quality significantly
-        effort: 10,                 // Maximum compression effort
+        compressionLevel: 2,        // Maximum PNG compression
+        // palette: true,              // Force palette-based PNG
+        // colors: 200,                // Limit to 200 colors max
+        quality: 70,                // Reduce quality significantly
         dither: 1.0,               // Add dithering to improve quality with fewer colors
       })
       .toFile(compressedPath);
