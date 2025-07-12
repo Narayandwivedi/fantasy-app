@@ -396,7 +396,7 @@ const ManageTeams = () => {
   // Fetch all teams
   const fetchAllTeams = async () => {
     try {
-      const { data } = await axios.get(`${BACKEND_URL}/api/admin/teams`);
+      const { data } = await axios.get(`${BACKEND_URL}/api/teams`);
       if (data.success) {
         setAllTeams(data.allTeams);
       }

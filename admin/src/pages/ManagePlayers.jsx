@@ -348,7 +348,7 @@ const ManagePlayers = () => {
   // Filter players based on search and filters
   const filteredPlayers = allPlayers.filter((player) => {
     const matchesSearch =
-      player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      player.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       player.country.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSport = filterSport === "all" || player.sport === filterSport;
     const matchesPosition =
@@ -372,7 +372,7 @@ const ManagePlayers = () => {
               </p>
             </div>
 
-            <Link to={"/demo"}><button className="bg-red-500 mr-2 p-2 rounded-md text-white">demo</button></Link>
+            {/* <Link to={"/demo"}><button className="bg-red-500 mr-2 p-2 rounded-md text-white">demo</button></Link> */}
 
             <button
               onClick={() => setShowAddPlayerModal(true)}
@@ -467,8 +467,8 @@ const ManagePlayers = () => {
                   {/* Updated player image size to 80x80 with proper styling */}
                   <div className="flex justify-center items-center h-24 bg-gray-50 rounded-t-lg">
                     <img
-                      src={`${BACKEND_URL}${player.image}`}
-                      alt={player.name}
+                      src={`${BACKEND_URL}${player.imgLink}`}
+                      alt={player.firstName}
                       className="w-20 h-20 object-cover rounded-lg border border-gray-200"
                       style={{
                         imageRendering: 'crisp-edges',
@@ -494,7 +494,7 @@ const ManagePlayers = () => {
 
                 <div className="p-4">
                   <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    {player.name}
+                    <span>{player.firstName}</span> <span>{player.lastName}</span>
                   </h3>
 
                   <div className="space-y-1 text-sm text-gray-600">

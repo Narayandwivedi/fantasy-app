@@ -2,28 +2,37 @@
 
   const playerSchema = new mongoose.Schema(
     {
-      name: {
+      firstName: {
         type: String,
         required: true,
       },
-      image: {
+      lastName: {
+        type: String,
+        required: true,
+      },
+
+      imgLink: {
         type: String,
       },
+
       sport: {
         type: String,
         required: true,
         enum: ["cricket", "football", "basketball", "kabaddi"],
       },
+
       position: {
         type: String,
         required: true,
         // For cricket: 'batsman', 'bowler', 'all-rounder', 'wicket-keeper'
         // For football: 'goalkeeper', 'defender', 'midfielder', 'forward'
       },
+
       country: {
         type: String,
         required: true,
       },
+      
       battingStyle: {
         type: String,
         enum: ["right-handed", "left-handed"],

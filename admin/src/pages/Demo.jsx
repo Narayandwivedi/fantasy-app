@@ -51,17 +51,21 @@ const Demo = () => {
       {/* Player cards */}
       <div className='relative z-10 flex justify-between gap-3 mt-5 items-center px-4'>
         <div className='transform hover:scale-105 transition-transform duration-200'>
-          <img src={`${BACKEND_URL}/images/players/player_1752302027568_compressed.png`} alt="" className='shadow-lg rounded-lg' />
+          <img src={`${BACKEND_URL}/images/players/player_1752311279580_compressed.png`} alt="" className='shadow-lg h-[80px] w-[80px] rounded-lg' />
           <p className='text-xs bg-white font-medium text-center rounded-b-lg px-2 py-1 shadow-md'>V. Kohli</p>
         </div>
+
+        {/* ms dhoni */}
         
         <div className='transform hover:scale-105 transition-transform duration-200'>
-          <img src={`${BACKEND_URL}/images/players/player_1752302095165_compressed.png`} alt="" className='shadow-lg rounded-lg' />
-          <p className='text-xs bg-white font-medium text-center rounded-b-lg px-2 py-1 shadow-md'>M. Dhoni</p>
+          <img src={`${BACKEND_URL}/images/players/player_1752312322969_compressed.png`} alt="" className='shadow-lg h-[80px] w-[80px] rounded-lg' />
+          <p className='text-xs bg-white font-medium text-center rounded-b-lg px-2 py-1 shadow-md'>MS. Dhoni</p>
         </div>
         
+        {/* ishant sharma */}
+
         <div className='transform hover:scale-105 transition-transform duration-200'>
-          <img src={`${BACKEND_URL}/images/players/player_1752253118712_compressed.png`} alt="" className='shadow-lg rounded-lg' />
+          <img src={`${BACKEND_URL}/images/players/player_1752312599324_compressed.png`} alt="" className='shadow-lg  h-[80px] w-[80px]rounded-lg' />
           <p className='text-xs bg-white font-medium text-center rounded-b-lg px-2 py-1 shadow-md'>I. Sharma</p>
         </div>
       </div>

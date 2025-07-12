@@ -21,17 +21,14 @@ async function handlePlayerImgUpload(req, res) {
 
     // Aggressive compression with fixed 80x80 size and reduced color palette
     await sharp(originalPath)
-      .resize(80, 80, {
+      .resize(152, 152, {
         fit: "cover",
         position: "center",
       })
       .png({
-        progressive: false,         // Disable progressive for smaller files
+        progressive: true,         // Disable progressive for smaller files
         compressionLevel: 2,        // Maximum PNG compression
-        // palette: true,              // Force palette-based PNG
-        // colors: 200,                // Limit to 200 colors max
-        quality: 70,                // Reduce quality significantly
-        dither: 1.0,               // Add dithering to improve quality with fewer colors
+        quality: 70,                
       })
       .toFile(compressedPath);
 

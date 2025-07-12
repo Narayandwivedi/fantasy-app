@@ -54,9 +54,11 @@ async function createMatch(req, res) {
 
 async function getAllMatch(req, res) {
   try {
-    const allMatches = await Match.find();
+    const allMatches = await Match.find().populate('team1 team2');
     return res.json({ success: true, allMatches });
   } catch (err) {
+    console.log(err.message);
+    
     return res.status(500).json({ success: false, message: "server error" });
   }
 }
