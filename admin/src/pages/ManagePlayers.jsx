@@ -4,6 +4,7 @@ import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import { Plus, Search, Edit3, Trash2, Filter } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // Updated PlayerModal to handle both Add and Edit modes
 const PlayerModal = ({
@@ -250,7 +251,6 @@ const ManagePlayers = () => {
       toast.error("Please fill in all required fields");
       return;
     }
-    return console.log(formData);
     
 
     try {
@@ -371,6 +371,9 @@ const ManagePlayers = () => {
                 Total Players: {allPlayers.length}
               </p>
             </div>
+
+            <Link to={"/demo"}><button className="bg-red-500 mr-2 p-2 rounded-md text-white">demo</button></Link>
+
             <button
               onClick={() => setShowAddPlayerModal(true)}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2 font-medium"
