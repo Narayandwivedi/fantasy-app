@@ -6,10 +6,11 @@ const Player = require("../models/Player");
 async function createPlayer(req, res) {
   try {
     // 1) validate req body
-
+    
     const {
-      name,
-      image,
+     firstName,
+     lastName,
+      imgLink,
       sport,
       position,
       country,
@@ -17,7 +18,9 @@ async function createPlayer(req, res) {
       bowlingStyle,
     } = req.body;
 
-    if ((!name || !image, !sport, !position)) {
+    console.log(firstName , lastName , imgLink , sport , position , country , battingStyle , bowlingStyle);
+
+    if ((!firstName || !lastName || !imgLink, !sport, !position)) {
       return res
         .status(400)
         .json({ success: false, message: "missing fields" });
@@ -25,7 +28,16 @@ async function createPlayer(req, res) {
 
     // validate name
 
-    if (typeof name !== "string" && name.trim().length === 0) {
+    
+    
+
+    if (typeof firstName !== "string" || firstName.trim().length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "please provide valid name" });
+    }
+
+    if (typeof lastName !== "string" || lastName.trim().length === 0) {
       return res
         .status(400)
         .json({ success: false, message: "please provide valid name" });
@@ -94,8 +106,9 @@ async function createPlayer(req, res) {
     }
 
     await Player.create({
-      name,
-      image,
+      firstName,
+      lastName,
+      imgLink,
       sport,
       position,
       country,

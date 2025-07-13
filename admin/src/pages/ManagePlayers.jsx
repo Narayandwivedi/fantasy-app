@@ -1,48 +1,120 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import upload_area from "../assets/upload_area.svg";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import { Plus, Search, Edit3, Trash2, Filter } from "lucide-react";
-import { Link } from "react-router-dom";
 
-// Updated PlayerModal to handle both Add and Edit modes
+// Constants
+const PLAYER_POSITIONS = [
+  { value: "batsman", label: "Batsman" },
+  { value: "bowler", label: "Bowler" },
+  { value: "all-rounder", label: "All-rounder" },
+  { value: "wicket-keeper", label: "Wicket-keeper" },
+];
+
+const BATTING_STYLES = [
+  { value: "right-handed", label: "Right-handed" },
+  { value: "left-handed", label: "Left-handed" },
+];
+
+const BOWLING_STYLES = [
+  { value: "right-arm-fast", label: "Right-arm-Fast" },
+  { value: "right-arm-medium", label: "Right-arm-medium" },
+  { value: "right-arm-medium-fast", label: "Right-arm-Medium-Fast" },
+  { value: "left-arm-fast", label: "Left-arm-Fast" },
+  { value: "left-arm-medium", label: "Left-arm-medium" },
+  { value: "left-arm-medium-fast", label: "Left-arm-Medium-Fast" },
+  { value: "right-arm-spin", label: "Right-arm-Spin" },
+  { value: "left-arm-spin", label: "Left-arm-Spin" },
+  { value: "none", label: "None" },
+];
+
+const INITIAL_FORM_DATA = {
+  firstName: "",
+  lastName: "",
+  position: "",
+  sport: "cricket",
+  battingStyle: "",
+  bowlingStyle: "",
+  country: "",
+  imgLink: "",
+  image: null,
+};
+
+// Improved PlayerModal Component
 const PlayerModal = ({
   showModal,
   onClose,
   formData,
   setFormData,
   onSubmit,
-  mode = "add", // "add" or "edit"
-  existingImageUrl = "", // Add this prop for existing image
-  backendUrl = "", // Add this prop for backend URL
+  mode = "add",
+  existingImageUrl = "",
+  backendUrl = "",
+  isSubmitting = false,
 }) => {
-  if (!showModal) return null;
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
-  const handleInputChange = (field, value) => {
+  // Reset image state when modal closes
+  useEffect(() => {
+    if (!showModal) {
+      setImage(null);
+      setImagePreview(null);
+    }
+  }, [showModal]);
+
+  const handleInputChange = useCallback((field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-  };
+  }, [setFormData]);
 
-  const [image, setImage] = useState(null);
+  const imageHandler = useCallback((e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select a valid image file');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
 
-  const imageHandler = (e) => {
-    setImage(e.target.files[0]);
-    setFormData((prev) => ({ ...prev, image: e.target.files[0] }));
-  };
-
-  // Function to get the image source for display
-  const getImageSource = () => {
-    if (image) {
-      return URL.createObjectURL(image);
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+      setFormData((prev) => ({ ...prev, image: file }));
     }
+  }, [setFormData]);
+
+  const getImageSource = () => {
+    if (imagePreview) return imagePreview;
     if (mode === "edit" && existingImageUrl) {
       return `${backendUrl}${existingImageUrl}`;
     }
     return upload_area;
   };
+
+  const isFormValid = () => {
+    return  formData.firstName.trim()  && formData.lastName.trim() && formData.position && formData.country.trim();
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!isFormValid()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    onSubmit();
+  };
+
+  if (!showModal) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -53,58 +125,74 @@ const PlayerModal = ({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 p-1"
+            disabled={isSubmitting}
           >
             ✕
           </button>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
-            value={formData.name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
+            value={formData.firstName}
+            onChange={(e) => handleInputChange("firstName", e.target.value)}
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Player name *"
+            placeholder="Player first name *"
             type="text"
+            required
+            disabled={isSubmitting}
+          />
+          <input
+            value={formData.lastName}
+            onChange={(e) => handleInputChange("lastName", e.target.value)}
+            className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Player last name *"
+            type="text"
+            required
+            disabled={isSubmitting}
           />
 
           <select
             value={formData.position}
             onChange={(e) => handleInputChange("position", e.target.value)}
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+            disabled={isSubmitting}
           >
             <option value="">Select player role *</option>
-            <option value="batsman">Batsman</option>
-            <option value="bowler">Bowler</option>
-            <option value="all-rounder">All-rounder</option>
-            <option value="wicket-keeper">Wicket-keeper</option>
+            {PLAYER_POSITIONS.map((position) => (
+              <option key={position.value} value={position.value}>
+                {position.label}
+              </option>
+            ))}
           </select>
 
           <select
             value={formData.battingStyle}
             onChange={(e) => handleInputChange("battingStyle", e.target.value)}
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSubmitting}
           >
             <option value="">Select batting style</option>
-            <option value="right-handed">Right-handed</option>
-            <option value="left-handed">Left-handed</option>
+            {BATTING_STYLES.map((style) => (
+              <option key={style.value} value={style.value}>
+                {style.label}
+              </option>
+            ))}
           </select>
 
           <select
             value={formData.bowlingStyle}
             onChange={(e) => handleInputChange("bowlingStyle", e.target.value)}
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSubmitting}
           >
             <option value="">Select bowling style</option>
-            <option value="right-arm-fast">Right-arm-Fast</option>
-            <option value="right-arm-medium">Right-arm-medium</option>
-            <option value="right-arm-medium-fast">Right-arm-Medium-Fast</option>
-            <option value="left-arm-fast">Left-arm-Fast</option>
-            <option value="left-arm-medium">Left-arm-medium</option>
-            <option value="left-arm-medium-fast">Left-arm-Medium-Fast</option>
-            <option value="right-arm-spin">Right-arm-Spin</option>
-            <option value="left-arm-spin">Left-arm-Spin</option>
-            <option value="none">None</option>
+            {BOWLING_STYLES.map((style) => (
+              <option key={style.value} value={style.value}>
+                {style.label}
+              </option>
+            ))}
           </select>
 
           <input
@@ -113,21 +201,23 @@ const PlayerModal = ({
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Player country *"
             type="text"
+            required
+            disabled={isSubmitting}
           />
 
-          {/* Image upload section - Updated size to 80x80 */}
+          {/* Image upload section */}
           <div className="w-full text-[#7b7b7b]">
             <p className="mb-2 text-sm font-medium">
               {mode === "edit" ? "Current Image / Upload New Image" : "Upload Player Image"}
             </p>
             <label className="cursor-pointer block" htmlFor="file-input">
               <img
-                className="h-[80px] w-[80px] object-cover rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors"
+                className="h-[80px] w-[80px] object-cover rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors mx-auto"
                 src={getImageSource()}
                 alt="Player preview"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                {mode === "edit" && existingImageUrl && !image
+              <p className="text-xs text-gray-500 mt-1 text-center">
+                {mode === "edit" && existingImageUrl && !imagePreview
                   ? "Click to change image"
                   : "Click to upload image"}
               </p>
@@ -139,33 +229,43 @@ const PlayerModal = ({
               name="image"
               id="file-input"
               accept="image/*"
+              disabled={isSubmitting}
             />
           </div>
 
           <div className="flex gap-3 mt-4">
             <button
+              type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition"
+              className="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"
+              disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
-              onClick={onSubmit}
-              className={`flex-1 text-white py-3 rounded-lg transition ${
+              type="submit"
+              className={`flex-1 text-white py-3 rounded-lg transition disabled:opacity-50 ${
                 mode === "add"
                   ? "bg-blue-600 hover:bg-blue-700"
                   : "bg-green-600 hover:bg-green-700"
               }`}
+              disabled={isSubmitting || !isFormValid()}
             >
-              {mode === "add" ? "Add Player" : "Update Player"}
+              {isSubmitting 
+                ? "Processing..." 
+                : mode === "add" 
+                  ? "Add Player" 
+                  : "Update Player"
+              }
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
 };
 
+// Main ManagePlayers Component
 const ManagePlayers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterSport, setFilterSport] = useState("all");
@@ -173,47 +273,44 @@ const ManagePlayers = () => {
   const [showAddPlayerModal, setShowAddPlayerModal] = useState(false);
   const [showEditPlayerModal, setShowEditPlayerModal] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+
   const { BACKEND_URL, allPlayers, setAllPlayers } = useContext(AppContext);
 
-  // Combine all form data into one object
-  const [formData, setFormData] = useState({
-    name: "",
-    position: "",
-    sport: "cricket",
-    battingStyle: "",
-    bowlingStyle: "",
-    country: "",
-    imgLink: "",
-    image: null, // Add image field
-  });
-
   // Reset form data
-  const resetFormData = () => {
-    setFormData({
-      name: "",
-      position: "",
-      sport: "cricket",
-      battingStyle: "",
-      bowlingStyle: "",
-      country: "",
-      imgLink: "",
-      image: null,
-    });
-  };
+  const resetFormData = useCallback(() => {
+    setFormData(INITIAL_FORM_DATA);
+  }, []);
+
+  // Fetch players function
+  const fetchPlayers = useCallback(async () => {
+    try {
+      const { data } = await axios.get(`${BACKEND_URL}/api/players`);
+      if (data.success) {
+        setAllPlayers(data.players);
+      }
+    } catch (err) {
+      console.error('Error fetching players:', err);
+      toast.error('Failed to fetch players');
+    }
+  }, [BACKEND_URL, setAllPlayers]);
 
   // Handle Add Player
   const handleAddPlayer = async () => {
-    if (!formData.name || !formData.position || !formData.country) {
+    if (!formData.firstName.trim() || !formData.position || !formData.country.trim()) {
       toast.error("Please fill in all required fields");
       return;
     }
 
+    setIsSubmitting(true);
     try {
       let imageUrl = "";
       
+      
       // Upload image if provided
       if (formData.image) {
-        let form = new FormData();
+        const form = new FormData();
         form.append("player", formData.image);
         const res = await axios.post(`${BACKEND_URL}/upload/player`, form, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -222,43 +319,45 @@ const ManagePlayers = () => {
       }
 
       const { data } = await axios.post(`${BACKEND_URL}/api/players`, {
-        name: formData.name,
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
         sport: formData.sport,
         position: formData.position,
         battingStyle: formData.battingStyle,
         bowlingStyle: formData.bowlingStyle,
-        country: formData.country,
-        image: imageUrl,
+        country: formData.country.trim(),
+        imgLink: imageUrl,
       });
 
       if (data.success) {
         toast.success("Player added successfully");
         resetFormData();
         setShowAddPlayerModal(false);
-        // Refresh the players list if needed
-        // You might want to fetch updated players here
+        // Add new player to the list instead of refetching
+        setAllPlayers(prev => [...prev, data.player]);
       }
     } catch (err) {
-      console.log(err);
-      console.log(err.message);
-      toast.error("Failed to add player");
+      console.error('Error adding player:', err);
+      toast.error(err.response?.data?.message || "Failed to add player");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // Handle Edit Player
   const handleEditPlayer = async () => {
-    if (!formData.name || !formData.position || !formData.country) {
+    if (!formData.name.trim() || !formData.position || !formData.country.trim()) {
       toast.error("Please fill in all required fields");
       return;
     }
-    
 
+    setIsSubmitting(true);
     try {
       let imageUrl = formData.imgLink; // Keep existing image URL by default
       
       // Upload new image if provided
       if (formData.image) {
-        let form = new FormData();
+        const form = new FormData();
         form.append("player", formData.image);
         const res = await axios.post(`${BACKEND_URL}/upload/player`, form, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -269,26 +368,33 @@ const ManagePlayers = () => {
       const { data } = await axios.put(
         `${BACKEND_URL}/api/players/${editingPlayer._id}`,
         {
-          name: formData.name,
+          name: formData.name.trim(),
           sport: formData.sport,
           position: formData.position,
           battingStyle: formData.battingStyle,
           bowlingStyle: formData.bowlingStyle,
-          country: formData.country,
+          country: formData.country.trim(),
           image: imageUrl,
         }
       );
 
       if (data.success) {
         toast.success("Player updated successfully");
-
         resetFormData();
         setShowEditPlayerModal(false);
         setEditingPlayer(null);
+        // Update the player in the list
+        setAllPlayers(prev => 
+          prev.map(player => 
+            player._id === editingPlayer._id ? data.player : player
+          )
+        );
       }
     } catch (err) {
-      console.log(err);
-      toast.error("Failed to update player");
+      console.error('Error updating player:', err);
+      toast.error(err.response?.data?.message || "Failed to update player");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -305,50 +411,49 @@ const ManagePlayers = () => {
 
       if (data.success) {
         toast.success("Player deleted successfully");
-
-        // Remove the player from allPlayers state
         setAllPlayers((prev) =>
           prev.filter((player) => player._id !== playerId)
         );
       }
     } catch (err) {
-      console.log(err);
-      toast.error("Failed to delete player");
+      console.error('Error deleting player:', err);
+      toast.error(err.response?.data?.message || "Failed to delete player");
     }
   };
 
   // Open Edit Modal
-  const openEditModal = (player) => {
+  const openEditModal = useCallback((player) => {
     setEditingPlayer(player);
     setFormData({
-      name: player.name,
+      name: player.name || `${player.firstName} ${player.lastName}`,
       position: player.position,
       sport: player.sport || "cricket",
       battingStyle: player.battingStyle || "",
       bowlingStyle: player.bowlingStyle || "",
       country: player.country,
       imgLink: player.image || "",
-      image: null, // Reset image field for new uploads
+      image: null,
     });
     setShowEditPlayerModal(true);
-  };
+  }, []);
 
   // Handle Close Modals
-  const handleCloseAddModal = () => {
+  const handleCloseAddModal = useCallback(() => {
     setShowAddPlayerModal(false);
     resetFormData();
-  };
+  }, [resetFormData]);
 
-  const handleCloseEditModal = () => {
+  const handleCloseEditModal = useCallback(() => {
     setShowEditPlayerModal(false);
     setEditingPlayer(null);
     resetFormData();
-  };
+  }, [resetFormData]);
 
-  // Filter players based on search and filters
+  // Filter players with improved search
   const filteredPlayers = allPlayers.filter((player) => {
+    const playerName = player.name || `${player.firstName} ${player.lastName}`;
     const matchesSearch =
-      player.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      playerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       player.country.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSport = filterSport === "all" || player.sport === filterSport;
     const matchesPosition =
@@ -371,8 +476,6 @@ const ManagePlayers = () => {
                 Total Players: {allPlayers.length}
               </p>
             </div>
-
-            {/* <Link to={"/demo"}><button className="bg-red-500 mr-2 p-2 rounded-md text-white">demo</button></Link> */}
 
             <button
               onClick={() => setShowAddPlayerModal(true)}
@@ -422,10 +525,11 @@ const ManagePlayers = () => {
               className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Positions</option>
-              <option value="batsman">Batsman</option>
-              <option value="bowler">Bowler</option>
-              <option value="all-rounder">All-rounder</option>
-              <option value="wicket-keeper">Wicket-keeper</option>
+              {PLAYER_POSITIONS.map((position) => (
+                <option key={position.value} value={position.value}>
+                  {position.label}
+                </option>
+              ))}
             </select>
 
             {/* Clear Filters */}
@@ -464,15 +568,13 @@ const ManagePlayers = () => {
                 className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200"
               >
                 <div className="relative">
-                  {/* Updated player image size to 80x80 with proper styling */}
                   <div className="flex justify-center items-center h-24 bg-gray-50 rounded-t-lg">
                     <img
-                      src={`${BACKEND_URL}${player.imgLink}`}
-                      alt={player.firstName}
+                      src={player.imgLink ? `${BACKEND_URL}${player.imgLink}` : upload_area}
+                      alt={player.name || player.firstName}
                       className="w-20 h-20 object-cover rounded-lg border border-gray-200"
-                      style={{
-                        imageRendering: 'crisp-edges',
-                        imageRendering: '-webkit-optimize-contrast',
+                      onError={(e) => {
+                        e.target.src = upload_area;
                       }}
                     />
                   </div>
@@ -494,40 +596,32 @@ const ManagePlayers = () => {
 
                 <div className="p-4">
                   <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    <span>{player.firstName}</span> <span>{player.lastName}</span>
+                    {player.name || (
+                      <>
+                        <span>{player.firstName}</span> <span>{player.lastName}</span>
+                      </>
+                    )}
                   </h3>
 
                   <div className="space-y-1 text-sm text-gray-600">
                     <p>
-                      <span className="font-medium text-gray-800">ID:</span>{" "}
-                      {player._id}
+                      <span className="font-medium text-gray-800">Position:</span>{" "}
+                      {PLAYER_POSITIONS.find(p => p.value === player.position)?.label || player.position}
                     </p>
                     <p>
-                      <span className="font-medium text-gray-800">
-                        Position:
-                      </span>{" "}
-                      {player.position}
-                    </p>
-                    <p>
-                      <span className="font-medium text-gray-800">
-                        Country:
-                      </span>{" "}
+                      <span className="font-medium text-gray-800">Country:</span>{" "}
                       {player.country}
                     </p>
                     {player.battingStyle && (
                       <p>
-                        <span className="font-medium text-gray-800">
-                          Batting:
-                        </span>{" "}
-                        {player.battingStyle}
+                        <span className="font-medium text-gray-800">Batting:</span>{" "}
+                        {BATTING_STYLES.find(s => s.value === player.battingStyle)?.label || player.battingStyle}
                       </p>
                     )}
                     {player.bowlingStyle && player.bowlingStyle !== "none" && (
                       <p>
-                        <span className="font-medium text-gray-800">
-                          Bowling:
-                        </span>{" "}
-                        {player.bowlingStyle}
+                        <span className="font-medium text-gray-800">Bowling:</span>{" "}
+                        {BOWLING_STYLES.find(s => s.value === player.bowlingStyle)?.label || player.bowlingStyle}
                       </p>
                     )}
                   </div>
@@ -547,6 +641,7 @@ const ManagePlayers = () => {
         onSubmit={handleAddPlayer}
         mode="add"
         backendUrl={BACKEND_URL}
+        isSubmitting={isSubmitting}
       />
 
       {/* Edit Player Modal */}
@@ -559,6 +654,7 @@ const ManagePlayers = () => {
         mode="edit"
         existingImageUrl={editingPlayer?.image || ""}
         backendUrl={BACKEND_URL}
+        isSubmitting={isSubmitting}
       />
     </div>
   );
