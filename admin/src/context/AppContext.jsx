@@ -21,7 +21,6 @@ export const AppContextProvider = (props) => {
       });
       if (data.success) {
         setAllPlayers(data.allPlayers);
-        console.log(data);
       }
     } catch (err) {
       console.log(err.message);

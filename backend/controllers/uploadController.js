@@ -71,7 +71,7 @@ async function handleTeamImgUpload(req, res) {
     const baseFilename = path.basename(filename, fileExtension);
 
     // Create compressed filename and path
-    const compressedFilename = `${baseFilename}_compressed.jpg`;
+    const compressedFilename = `${baseFilename}_compressed.png`;
     const compressedPath = path.join("upload/images/teams", compressedFilename);
 
     // Compress and resize image
@@ -81,9 +81,10 @@ async function handleTeamImgUpload(req, res) {
         fit: "cover",
         position: "center",
       })
-      .jpeg({
-        quality: 85, // Slightly higher quality for team logos
-        progressive: true,
+      .png({
+        progressive: true,         
+        compressionLevel: 2,       
+        quality: 70,                
       })
       .toFile(compressedPath);
 
@@ -105,24 +106,5 @@ async function handleTeamImgUpload(req, res) {
   }
 }
 
-// Alternative function with configurable options
-async function processImage(inputPath, outputPath, options = {}) {
-  const { width = 150, height = 150, quality = 80, format = "jpeg" } = options;
 
-  let sharpInstance = sharp(inputPath).resize(width, height, {
-    fit: "cover",
-    position: "center",
-  });
-
-  if (format === "jpeg") {
-    sharpInstance = sharpInstance.jpeg({ quality, progressive: true });
-  } else if (format === "png") {
-    sharpInstance = sharpInstance.png({ compressionLevel: 8 });
-  } else if (format === "webp") {
-    sharpInstance = sharpInstance.webp({ quality });
-  }
-
-  await sharpInstance.toFile(outputPath);
-}
-
-module.exports = { handlePlayerImgUpload, handleTeamImgUpload, processImage };
+module.exports = { handlePlayerImgUpload, handleTeamImgUpload};

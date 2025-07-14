@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 
 // Search Player Modal Component
 const SearchPlayerModal = ({ 
+  BACKEND_URL,
   showModal, 
   onClose, 
   allPlayers,
@@ -25,7 +26,8 @@ const SearchPlayerModal = ({
 
   // Filter players based on search and filters
   const filteredPlayers = availablePlayers.filter(player => {
-    const matchesSearch = player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = player.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         player.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          player.country.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPosition = filterPosition === "all" || player.position === filterPosition;
     
@@ -110,16 +112,13 @@ const SearchPlayerModal = ({
                 >
                   <div className="flex items-center space-x-4">
                     <img
-                      src={player.image}
-                      alt={player.name}
+                      src={`${BACKEND_URL}${player.imgLink}`}
+                      alt={`${player.firstName} ${player.lastName}`}
                       className="w-12 h-12 rounded-full object-cover"
-                      onError={(e) => {
-                        e.target.src = "https://via.placeholder.com/100x100?text=No+Image";
-                      }}
                     />
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-900 truncate">
-                        {player.name}
+                        {player.firstName} {player.lastName}
                       </h4>
                       <p className="text-xs text-gray-600 capitalize">
                         {player.position}
@@ -171,7 +170,7 @@ const TeamDetails = () => {
   async function fetchTeamDetails() {
     try {
       setLoading(true);
-      const { data } = await axios.get(`${BACKEND_URL}/api/admin/teams/${id}`);
+      const { data } = await axios.get(`${BACKEND_URL}/api/teams/${id}`);
       if (data.success) {
         setTeamDetails(data.getTeam);
       } else {
@@ -187,17 +186,13 @@ const TeamDetails = () => {
 
   // Function to add player to team squad
   const handleAddPlayerToSquad = async (player) => {
-    
     try {
-      
-      const { data } = await axios.post(`${BACKEND_URL}/api/admin/teams/${id}/add-player`, {
+      const { data } = await axios.post(`${BACKEND_URL}/api/teams/${id}/add-player`, {
         playerId: player._id
       });
       
       if (data.success) {
-        toast.success(`${player.name} added to squad successfully`);
-        // Refresh team details to show updated squad
-        fetchTeamDetails();
+        toast.success(`${player.firstName} ${player.lastName} added to squad successfully`);
       } else {
         toast.error(data.message || "Failed to add player to squad");
       }
@@ -208,17 +203,14 @@ const TeamDetails = () => {
   };
 
   // Function to remove player from squad
-  const handleRemovePlayerFromSquad = async (playerId, playerName) => {
-    if (window.confirm(`Are you sure you want to remove ${playerName} from the squad?`)) {
+  const handleRemovePlayerFromSquad = async (playerId, playerFirstName, playerLastName) => {
+    const fullName = `${playerFirstName} ${playerLastName}`;
+    if (window.confirm(`Are you sure you want to remove ${fullName} from the squad?`)) {
       try {
-        console.log(playerId);
-        
-        const { data } = await axios.delete(`${BACKEND_URL}/api/admin/teams/${id}/remove-player/${playerId}`);
-        console.log(data);
-        
+        const { data } = await axios.delete(`${BACKEND_URL}/api/teams/${id}/remove-player/${playerId}`);
         
         if (data.success) {
-          toast.success(`${playerName} removed from squad successfully`);
+          toast.success(`${fullName} removed from squad successfully`);
           // Refresh team details to show updated squad
           fetchTeamDetails();
         } else {
@@ -305,8 +297,8 @@ const TeamDetails = () => {
             <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
               <div className="flex items-center space-x-4">
                 <img
-                  src={teamDetails.captain.image}
-                  alt={teamDetails.captain.name}
+                  src={`${BACKEND_URL}${teamDetails.captain.imgLink}`}
+                  alt={`${teamDetails.captain.firstName} ${teamDetails.captain.lastName}`}
                   className="w-16 h-16 rounded-full object-cover"
                 />
                 <div>
@@ -315,8 +307,8 @@ const TeamDetails = () => {
                       Captain
                     </span>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 capitalize">
-                    {teamDetails.captain.name}
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {teamDetails.captain.firstName} {teamDetails.captain.lastName}
                   </h3>
                   <p className="text-sm text-gray-600 capitalize">
                     {teamDetails.captain.position} • {teamDetails.captain.battingStyle}
@@ -331,8 +323,8 @@ const TeamDetails = () => {
             <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
               <div className="flex items-center space-x-4">
                 <img
-                  src={teamDetails.viceCaptain.image}
-                  alt={teamDetails.viceCaptain.name}
+                  src={`${BACKEND_URL}${teamDetails.viceCaptain.imgLink}`}
+                  alt={`${teamDetails.viceCaptain.firstName} ${teamDetails.viceCaptain.lastName}`}
                   className="w-16 h-16 rounded-full object-cover"
                 />
                 <div>
@@ -341,8 +333,8 @@ const TeamDetails = () => {
                       Vice Captain
                     </span>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 capitalize">
-                    {teamDetails.viceCaptain.name}
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {teamDetails.viceCaptain.firstName} {teamDetails.viceCaptain.lastName}
                   </h3>
                   <p className="text-sm text-gray-600 capitalize">
                     {teamDetails.viceCaptain.position} • {teamDetails.viceCaptain.battingStyle}
@@ -377,14 +369,14 @@ const TeamDetails = () => {
                 >
                   <div className="aspect-w-4 aspect-h-3">
                     <img
-                      src={player.image}
-                      alt={player.name}
+                      src={`${BACKEND_URL}${player.imgLink}`}
+                      alt={`${player.firstName} ${player.lastName}`}
                       className="w-full h-48 object-cover"
                     />
                   </div>
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 capitalize mb-2">
-                      {player.name}
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {player.firstName} {player.lastName}
                     </h3>
                     <div className="space-y-1 mb-4">
                       <p className="text-sm text-gray-600">
@@ -411,7 +403,7 @@ const TeamDetails = () => {
                           Edit
                         </button>
                         <button 
-                          onClick={() => handleRemovePlayerFromSquad(player._id, player.name)}
+                          onClick={() => handleRemovePlayerFromSquad(player._id, player.firstName, player.lastName)}
                           className="px-3 py-1 bg-red-500 text-white text-xs rounded-md hover:bg-red-600 transition-colors"
                         >
                           Remove
@@ -439,6 +431,7 @@ const TeamDetails = () => {
 
       {/* Search Player Modal */}
       <SearchPlayerModal
+        BACKEND_URL={BACKEND_URL}
         showModal={showSearchModal}
         onClose={() => setShowSearchModal(false)}
         allPlayers={allPlayers || []}

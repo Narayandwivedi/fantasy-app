@@ -116,6 +116,10 @@ const PlayerModal = ({
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+
+          {/* player first name */}
+
           <input
             value={formData.firstName}
             onChange={(e) => handleInputChange("firstName", e.target.value)}
@@ -125,6 +129,9 @@ const PlayerModal = ({
             required
             disabled={isSubmitting}
           />
+
+          {/* player lastname */}
+
           <input
             value={formData.lastName}
             onChange={(e) => handleInputChange("lastName", e.target.value)}
@@ -134,6 +141,9 @@ const PlayerModal = ({
             required
             disabled={isSubmitting}
           />
+
+
+          {/* player position */}
 
           <select
             value={formData.position}
@@ -150,6 +160,10 @@ const PlayerModal = ({
             ))}
           </select>
 
+
+
+          {/* player batting style */}
+
           <select
             value={formData.battingStyle}
             onChange={(e) => handleInputChange("battingStyle", e.target.value)}
@@ -163,6 +177,8 @@ const PlayerModal = ({
               </option>
             ))}
           </select>
+          
+          {/* player bowling style */}
 
           <select
             value={formData.bowlingStyle}
@@ -178,6 +194,9 @@ const PlayerModal = ({
             ))}
           </select>
 
+
+          {/* player country */}
+
           <input
             value={formData.country}
             onChange={(e) => handleInputChange("country", e.target.value)}
@@ -187,6 +206,8 @@ const PlayerModal = ({
             required
             disabled={isSubmitting}
           />
+
+          {/*  file upload */}
 
           <div className="w-full text-[#7b7b7b]">
             <p className="mb-2 text-sm font-medium">
@@ -272,6 +293,7 @@ const ManagePlayers = () => {
   }, []);
 
   const handleAddPlayer = async () => {
+    
     if (!formData.firstName.trim() || !formData.position || !formData.country.trim()) {
       toast.error("Please fill in all required fields");
       return;

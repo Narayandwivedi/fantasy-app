@@ -39,6 +39,7 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
+app.use("/images", express.static("upload/images"));
 
 
 
@@ -48,10 +49,6 @@ app.get("/", (req, res) => {
 });
 
 
-
-// upload images
-
-app.use("/images", express.static("upload/images"));
 
 // player image upload
 
