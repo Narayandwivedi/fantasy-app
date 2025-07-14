@@ -98,7 +98,7 @@ async function handleTeamImgUpload(req, res) {
 
     res.json({
       success: true,
-      image_url: `http://localhost:${process.env.PORT}/images/teams/${compressedFilename}`,
+      image_url: `/images/teams/${compressedFilename}`,
     });
   } catch (err) {
     console.error("Error processing team image:", err);

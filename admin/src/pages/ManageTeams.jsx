@@ -802,7 +802,7 @@ const ManageTeams = () => {
               >
                 <div className="relative">
                   <img
-                    src={team.logo || "/api/placeholder/400/200"}
+                    src={team.logo}
                     alt={team.name}
                     className="w-full h-48 object-cover rounded-t-lg"
                     onError={(e) => {
