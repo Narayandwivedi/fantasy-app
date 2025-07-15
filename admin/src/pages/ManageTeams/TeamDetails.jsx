@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../../context/AppContext";
 import { useParams } from "react-router-dom";
 import { Plus, Search, X, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";

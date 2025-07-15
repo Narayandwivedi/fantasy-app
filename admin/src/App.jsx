@@ -1,11 +1,12 @@
 import React from 'react'
   import { ToastContainer} from 'react-toastify';
-import ManagePlayers from './pages/ManagePlayers'
 import Sidebar from './components/Sidebar';
 import { Route, Routes } from 'react-router-dom';
-import ManageTeams from './pages/ManageTeams';
-import ManageMatch from './pages/ManageMatch';
-import TeamDetails from './pages/TeamDetails';
+
+import ManagePlayers from './pages/ManagePlayers/ManagePlayers'
+import ManageTeams from './pages/ManageTeams/ManageTeams';
+import ManageMatch from './pages/ManageMatch/ManageMatch';
+import TeamDetails from './pages/ManageTeams/TeamDetails';
 import Demo from './pages/Demo';
 
 const App = () => {

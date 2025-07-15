@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useContext } from "react";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../../context/AppContext";
 import { useEffect } from "react";
 
 const ManageMatch = () => {

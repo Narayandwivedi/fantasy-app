@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../../context/AppContext";
 import { toast } from "react-toastify";
-import upload_area from "../assets/upload_area.svg";
+import upload_area from "../../assets/upload_area.svg";
 import {
   Plus,
   Search,
