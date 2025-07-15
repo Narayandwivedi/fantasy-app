@@ -205,7 +205,9 @@ const TeamDetails = () => {
   // Function to remove player from squad
   const handleRemovePlayerFromSquad = async (playerId, playerFirstName, playerLastName) => {
     const fullName = `${playerFirstName} ${playerLastName}`;
-    if (window.confirm(`Are you sure you want to remove ${fullName} from the squad?`)) {
+    if (window.confirm(`Are you sure you want to remove ${fullName} from the squad?`))
+       
+      {
       try {
         const { data } = await axios.delete(`${BACKEND_URL}/api/teams/${id}/remove-player/${playerId}`);
         

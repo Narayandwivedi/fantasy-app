@@ -63,8 +63,36 @@ async function getAllMatch(req, res) {
   }
 }
 
+
+async function getMatchByStatus(req,res) {
+  
+  const status = req.params.status
+
+  // check req params 
+  
+  if(!status){
+    return res.status(400).json({success:false , message:"status not found"})
+  }
+
+  if(typeof(status)!=='string'  || status.trim().length===0){
+    return res.status(400).json({success:false , message:"invalid status"})
+  }
+
+  const validStatus = ['live' , 'completed' , 'upcoming']
+
+  if(!validStatus.includes(status)){
+    return res.status(400).json({success:false , message:"status must be live' , 'completed' or 'upcoming"})
+  }
+
+  return res.json({success:true , message:"ok"})
+
+}
+
+
+
 module.exports = {
   
   createMatch,
   getAllMatch,
+  getMatchByStatus
 };

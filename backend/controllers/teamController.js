@@ -2,8 +2,6 @@ const Team = require("../models/Team");
 const mongoose = require("mongoose");
 const Player = require("../models/Player");
 
-
-
 async function createTeam(req, res) {
   try {
     const { name, shortName, logo, sport, captain, viceCaptain, squad } =
@@ -229,7 +227,9 @@ async function getAllTeam(req, res) {
     const allTeams = await Team.find();
     return res.json({ success: true, allTeams });
   } catch (err) {
-    return res.status(500).json({ success: false, message: ` server error ${err.message}` });
+    return res
+      .status(500)
+      .json({ success: false, message: ` server error ${err.message}` });
   }
 }
 
@@ -331,7 +331,7 @@ async function removePlayerFromTeam(req, res) {
 
     const getPlayer = await Player.findById(playerIdToRemove);
     if (!getPlayer) {
-      return res.status.json({ success: false, message: "invalid playerid" });
+      return res.status(400).json({ success: false, message: "invalid playerid" });
     }
 
     // check team exist or not
@@ -347,18 +347,35 @@ async function removePlayerFromTeam(req, res) {
       return playerId.toString() !== playerIdToRemove;
     });
 
-    if (getTeam.captain.toString() === playerIdToRemove) {
-      getTeam.captain = null;
+    if (getTeam.captain) {
+      if (getTeam.captain.toString() === playerIdToRemove) {
+        getTeam.captain = null;
+      }
     }
-    if (getTeam.viceCaptain.toString() === playerIdToRemove) {
-      getTeam.viceCaptain = null;
+
+    if (getTeam.viceCaptain) {
+      if (getTeam.viceCaptain.toString() === playerIdToRemove) {
+        getTeam.viceCaptain = null;
+      }
     }
 
     await getTeam.save();
 
     return res.json({ success: true, message: "player removed successfully" });
-  } catch (err) {}
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 }
 
+async function removeCaptainFromTeam(req, res) {
+  const teamId = req.params.id;
+  const playerId = req.params.playerId;
+}
 
-module.exports = {createTeam , getAllTeam , getTeamById , addNewPlayerToTeam , removePlayerFromTeam}
+module.exports = {
+  createTeam,
+  getAllTeam,
+  getTeamById,
+  addNewPlayerToTeam,
+  removePlayerFromTeam,
+};
