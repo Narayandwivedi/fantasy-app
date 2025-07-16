@@ -90,7 +90,7 @@ const ManageTeams = () => {
       if (formData.logo) {
         const form = new FormData();
         form.append("team", formData.logo);
-        const res = await axios.post(`${BACKEND_URL}/upload/team`, form, {
+        const res = await axios.post(`${BACKEND_URL}/api/upload/team`, form, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         imageUrl = res.data.image_url;

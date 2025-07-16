@@ -6,19 +6,18 @@ const cors = require("cors");
 const app = express();
 
 const { connectToDb } = require("./config/mongodb");
-const upload = require("./config/multer")
 
 
 
 // import routes
+const uploadRoute = require("./routes/uploadRoute")
+const searchRoute = require("./routes/searchRoute")
 const playerRoute = require("./routes/playerRoute")
 const matchRoute = require("./routes/matchRoute")
 const teamRoute = require("./routes/teamRoute")
 const userRoute = require("./routes/userRoute")
 
-// imports
 
-const {handlePlayerImgUpload , handleTeamImgUpload} = require("./controllers/uploadController")
 
 // CORS configuration 
 const corsOptions = {
@@ -50,22 +49,19 @@ app.get("/", (req, res) => {
 
 
 
-// player image upload
-
-app.post("/upload/player",upload.single("player"),handlePlayerImgUpload)
-
-// team image upload
-
-app.post("/upload/team", upload.single("team"), handleTeamImgUpload)
-
-
-
 
 // use all routes
 
+app.use("/api/upload",uploadRoute)
+
+app.use("/api/search",searchRoute)
+
 app.use("/api/players",playerRoute)
+
 app.use("/api/teams",teamRoute)
+
 app.use("/api/matches",matchRoute)
+
 app.use("/api/users",userRoute)
 
 

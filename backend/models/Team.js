@@ -36,9 +36,6 @@
         type: mongoose.Schema.Types.ObjectId,
         ref: "Player",
       }],
-      coach: {
-        type: String,
-      },
     },
     {
       timestamps: true,

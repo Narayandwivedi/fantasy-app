@@ -38,7 +38,7 @@ const AddPlayerModal = ({ showModal, onClose, onPlayerAdded }) => {
       if (formData.image) {
         const form = new FormData();
         form.append("player", formData.image);
-        const res = await axios.post(`${BACKEND_URL}/upload/player`, form, {
+        const res = await axios.post(`${BACKEND_URL}/api/upload/player`, form, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         imageUrl = res.data.image_url;

@@ -16,7 +16,7 @@ router.get("/completed-match", getCompletedMatch);
 
 router.post("/", createMatch);
 
-router.put("/change-status")
+// router.put("/change-status")
 
 
 module.exports = router;
