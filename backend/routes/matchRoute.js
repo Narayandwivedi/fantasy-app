@@ -1,16 +1,20 @@
+const express = require("express");
+const router = express.Router();
 
-const express = require("express")
-const router = express.Router()
-
-
-const {getAllMatch , createMatch , getMatchByStatus} = require("../controllers/matchController")
-
+const {
+  getAllMatch,
+  createMatch,
+  getLiveMatch,
+  getUpcomingMatch,
+  getCompletedMatch,
+} = require("../controllers/matchController");
 
 router.get("/", getAllMatch);
 
-router.get("/:status", getMatchByStatus);
+router.get("/live-match", getLiveMatch);
+router.get("/upcoming-match", getUpcomingMatch);
+router.get("/completed-match", getCompletedMatch);
 
 router.post("/", createMatch);
 
-
-module.exports = router
+module.exports = router;

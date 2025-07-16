@@ -1,4 +1,3 @@
-
 const Match = require("../models/Match");
 const mongoose = require("mongoose");
 
@@ -21,15 +20,19 @@ async function createMatch(req, res) {
         .json({ success: false, message: "missing details" });
     }
 
-    const sportsType = ['cricket' , 'football' , 'kabbadi']
-    if(!sportsType.includes(sport)){
-      return res.status(400).json({success:false , message:"invalid sports"})
+    const sportsType = ["cricket", "football", "kabbadi"];
+    if (!sportsType.includes(sport)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid sports" });
     }
 
     // verify team1 and team2 object id
 
-    if(!mongoose.isValidObjectId(team1)||!mongoose.isValidObjectId(team2)){
-      return res.status(400).json({success:false , message:"invalid team id"})
+    if (!mongoose.isValidObjectId(team1) || !mongoose.isValidObjectId(team2)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid team id" });
     }
 
     await Match.create({
@@ -43,8 +46,7 @@ async function createMatch(req, res) {
       endTime,
     });
 
-    return res.json({success:true , message:"match created successfully"})
-
+    return res.json({ success: true, message: "match created successfully" });
   } catch (err) {
     return res
       .status(500)
@@ -54,45 +56,56 @@ async function createMatch(req, res) {
 
 async function getAllMatch(req, res) {
   try {
-    const allMatches = await Match.find().populate('team1 team2');
+    const allMatches = await Match.find().populate("team1 team2");
     return res.json({ success: true, allMatches });
   } catch (err) {
     console.log(err.message);
-    
+
     return res.status(500).json({ success: false, message: "server error" });
   }
 }
 
 
-async function getMatchByStatus(req,res) {
-  
-  const status = req.params.status
+//live matches
 
-  // check req params 
-  
-  if(!status){
-    return res.status(400).json({success:false , message:"status not found"})
+async function getLiveMatch(req, res) {
+  try {
+    const liveMatches = await Match.find({ status: "live" });
+    return res.json({ success: true, liveMatches });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ success: false, message: "server error" });
   }
+}
 
-  if(typeof(status)!=='string'  || status.trim().length===0){
-    return res.status(400).json({success:false , message:"invalid status"})
+// upcoming matches
+async function getUpcomingMatch(req, res) {
+  try {
+    const upcomingMatches = await Match.find({ status: "upcoming" });
+    return res.json({ success: true, upcomingMatches });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ success: false, message: "server error" });
   }
-
-  const validStatus = ['live' , 'completed' , 'upcoming']
-
-  if(!validStatus.includes(status)){
-    return res.status(400).json({success:false , message:"status must be live' , 'completed' or 'upcoming"})
-  }
-
-  return res.json({success:true , message:"ok"})
-
 }
 
 
+//completed matches
+
+async function getCompletedMatch(req, res) {
+  try {
+    const completedMatches = await Match.find({ status: "completed" });
+    return res.json({ success: true,  completedMatches});
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ success: false, message: "server error" });
+  }
+}
 
 module.exports = {
-  
   createMatch,
   getAllMatch,
-  getMatchByStatus
+  getLiveMatch,
+  getUpcomingMatch,
+  getCompletedMatch
 };
