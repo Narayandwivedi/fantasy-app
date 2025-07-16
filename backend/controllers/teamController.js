@@ -367,6 +367,11 @@ async function removePlayerFromTeam(req, res) {
   }
 }
 
+
+async function deleteTeam(req,res) {
+  
+}
+
 async function removeCaptainFromTeam(req, res) {
   const teamId = req.params.id;
   const playerId = req.params.playerId;
@@ -378,4 +383,5 @@ module.exports = {
   getTeamById,
   addNewPlayerToTeam,
   removePlayerFromTeam,
+  deleteTeam
 };

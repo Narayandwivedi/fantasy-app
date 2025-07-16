@@ -65,7 +65,6 @@ async function getAllMatch(req, res) {
   }
 }
 
-
 //live matches
 
 async function getLiveMatch(req, res) {
@@ -89,23 +88,26 @@ async function getUpcomingMatch(req, res) {
   }
 }
 
-
 //completed matches
 
 async function getCompletedMatch(req, res) {
   try {
     const completedMatches = await Match.find({ status: "completed" });
-    return res.json({ success: true,  completedMatches});
+    return res.json({ success: true, completedMatches });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ success: false, message: "server error" });
   }
 }
 
+async function changeMatchStatus(req, res) {}
+
+async function updateMatchScore(req, res) {}
+
 module.exports = {
   createMatch,
   getAllMatch,
   getLiveMatch,
   getUpcomingMatch,
-  getCompletedMatch
+  getCompletedMatch,
 };

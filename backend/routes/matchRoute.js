@@ -10,11 +10,13 @@ const {
 } = require("../controllers/matchController");
 
 router.get("/", getAllMatch);
-
 router.get("/live-match", getLiveMatch);
 router.get("/upcoming-match", getUpcomingMatch);
 router.get("/completed-match", getCompletedMatch);
 
 router.post("/", createMatch);
+
+router.put("/change-status")
+
 
 module.exports = router;
