@@ -57,7 +57,7 @@ async function createMatch(req, res) {
 async function getAllMatch(req, res) {
   try {
     const allMatches = await Match.find().populate("team1 team2");
-    return res.json({ success: true, allMatches });
+    return res.json({ success: true, data: allMatches });
   } catch (err) {
     console.log(err.message);
 
@@ -84,7 +84,7 @@ async function getUpcomingMatch(req, res) {
       .populate("team1", "name , logo , shortName")
       .populate("team2", "name , logo , shortName")
       .select('-team1PlayingSquad -team2PlayingSquad -createdAt -updatedAt');
-    return res.json({ success: true, upcomingMatches });
+    return res.json({ success: true, data:upcomingMatches });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ success: false, message: "server error" });

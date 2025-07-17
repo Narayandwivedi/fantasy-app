@@ -42,11 +42,12 @@ const ManagePlayers = () => {
 
   const { BACKEND_URL, allPlayers, setAllPlayers } = useContext(AppContext);
 
-  // Search players from API when search term changes
+
+ 
   useEffect(() => {
     const searchPlayers = async () => {
       if (searchTerm.trim() === "") {
-        setFilteredPlayers(allPlayers);
+        setFilteredPlayers(allPlayers || []);
         return;
       }
 
@@ -57,13 +58,15 @@ const ManagePlayers = () => {
         );
         
         if (data.success) {
-          setFilteredPlayers(data.data);
-
+          setFilteredPlayers(data.data || []);
+        } else {
+          console.error('Search failed:', data.message);
+          setFilteredPlayers(allPlayers || []);
         }
       } catch (err) {
         console.error("Error searching players:", err);
         toast.error("Failed to search players");
-        setFilteredPlayers(allPlayers);
+        setFilteredPlayers(allPlayers || []);
       } finally {
         setSearchLoading(false);
       }
@@ -74,12 +77,12 @@ const ManagePlayers = () => {
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchTerm]);
+  }, [searchTerm, allPlayers, BACKEND_URL]);
 
   // Update filtered players when allPlayers changes
   useEffect(() => {
     if (searchTerm === "") {
-      setFilteredPlayers(allPlayers);
+      setFilteredPlayers(allPlayers || []);
     }
   }, [allPlayers, searchTerm]);
 
@@ -111,12 +114,12 @@ const ManagePlayers = () => {
   }, []);
 
   const handlePlayerAdded = (newPlayer) => {
-    setAllPlayers(prev => [...prev, newPlayer]);
+    setAllPlayers(prev => [...(prev || []), newPlayer]);
   };
 
   const handlePlayerUpdated = (updatedPlayer) => {
     setAllPlayers(prev => 
-      prev.map(player => 
+      (prev || []).map(player => 
         player._id === updatedPlayer._id ? updatedPlayer : player
       )
     );
@@ -127,6 +130,7 @@ const ManagePlayers = () => {
     setEditingPlayer(null);
   };
 
+  
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Header */}
@@ -138,7 +142,7 @@ const ManagePlayers = () => {
                 Manage Players
               </h1>
               <p className="text-gray-600 mt-1">
-                Total Players: {allPlayers.length}
+                Total Players: {(allPlayers || []).length}
               </p>
             </div>
 
@@ -171,14 +175,31 @@ const ManagePlayers = () => {
       </div>
 
       {/* Players Grid */}
+      
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {filteredPlayers.length === 0 ? (
+        {!allPlayers || allPlayers.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {searchTerm ? "No players found matching your search" : "No players found"}
+              No players found
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Start by adding your first player
+            </p>
+            <button
+              onClick={() => setShowAddPlayerModal(true)}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2 font-medium mx-auto"
+            >
+              <Plus size={20} />
+              Add First Player
+            </button>
+          </div>
+        ) : filteredPlayers.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No players found matching your search
             </h3>
             <p className="text-gray-600">
-              {searchTerm ? "Try adjusting your search terms" : "Start by adding your first player"}
+              Try adjusting your search terms
             </p>
           </div>
         ) : (

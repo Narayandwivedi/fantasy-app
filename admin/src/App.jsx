@@ -11,13 +11,14 @@ import Demo from "./pages/Demo";
 import UpcomingMath from "./pages/ManageMatch/UpcomingMath";
 import LiveMatch from "./pages/ManageMatch/LiveMatch";
 import CompletedMatch from "./pages/ManageMatch/CompletedMatch";
+import MatchCard from "./components/MatchCard";
 
 const App = () => {
   return (
     <div>
       <ToastContainer />
 
-      <div className="flex">
+      <div className="flex gap-4 lg:flex-row flex-col">
         <Sidebar />
         <Routes>
           <Route path="/" element={<ManagePlayers />} />
@@ -31,6 +32,7 @@ const App = () => {
           <Route path="/matches/upcoming" element={<UpcomingMath />} />
           <Route path="/matches/live" element={<LiveMatch />} />
           <Route path="/matches/completed" element={<CompletedMatch />} />
+          <Route path="/test" element={<MatchCard />} />
         </Routes>
       </div>
     </div>
