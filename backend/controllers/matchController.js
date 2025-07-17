@@ -80,7 +80,7 @@ async function getLiveMatch(req, res) {
 // upcoming matches
 async function getUpcomingMatch(req, res) {
   try {
-    const upcomingMatches = await Match.find({ status: "upcoming" });
+    const upcomingMatches = await Match.find({ status: "upcoming" }).populate('team1 team2');
     return res.json({ success: true, upcomingMatches });
   } catch (err) {
     console.log(err);
