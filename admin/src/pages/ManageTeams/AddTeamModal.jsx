@@ -22,9 +22,7 @@ const AddTeamModal = ({
 
   // Vice Captain search states
   const [viceCaptainSearchTerm, setViceCaptainSearchTerm] = useState("");
-  const [filteredViceCaptainPlayers, setFilteredViceCaptainPlayers] = useState(
-    []
-  );
+  const [filteredViceCaptainPlayers, setFilteredViceCaptainPlayers] = useState( []);
   const [showViceCaptainList, setShowViceCaptainList] = useState(false);
 
   // Reset search terms when modal closes

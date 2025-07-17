@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback, useEffect } from "react";
 import upload_area from "../../assets/upload_area.svg";
 import axios from "axios";
 import { AppContext } from "../../context/AppContext";
@@ -37,17 +37,51 @@ const ManagePlayers = () => {
   const [showEditPlayerModal, setShowEditPlayerModal] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filteredPlayers, setFilteredPlayers] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const { BACKEND_URL, allPlayers, setAllPlayers } = useContext(AppContext);
 
-  // Filter players based on search term
-  const filteredPlayers = allPlayers.filter(player => {
-    const fullName = `${player.firstName} ${player.lastName}`.toLowerCase();
-    const search = searchTerm.toLowerCase();
-    return fullName.includes(search) || 
-           player.country.toLowerCase().includes(search) ||
-           player.position.toLowerCase().includes(search);
-  });
+  // Search players from API when search term changes
+  useEffect(() => {
+    const searchPlayers = async () => {
+      if (searchTerm.trim() === "") {
+        setFilteredPlayers(allPlayers);
+        return;
+      }
+
+      try {
+        setSearchLoading(true);
+        const { data } = await axios.get(
+          `${BACKEND_URL}/api/search/players/${encodeURIComponent(searchTerm)}`
+        );
+        
+        if (data.success) {
+          setFilteredPlayers(data.data);
+
+        }
+      } catch (err) {
+        console.error("Error searching players:", err);
+        toast.error("Failed to search players");
+        setFilteredPlayers(allPlayers);
+      } finally {
+        setSearchLoading(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      searchPlayers();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm]);
+
+  // Update filtered players when allPlayers changes
+  useEffect(() => {
+    if (searchTerm === "") {
+      setFilteredPlayers(allPlayers);
+    }
+  }, [allPlayers, searchTerm]);
 
   const handleDeletePlayer = async (playerId) => {
     if (!window.confirm("Are you sure you want to delete this player?")) {
@@ -127,6 +161,11 @@ const ManagePlayers = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {searchLoading && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+              </div>
+            )}
           </div>
         </div>
       </div>
