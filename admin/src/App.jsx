@@ -5,7 +5,6 @@ import { Route, Routes } from "react-router-dom";
 
 import ManagePlayers from "./pages/ManagePlayers/ManagePlayers";
 import ManageTeams from "./pages/ManageTeams/ManageTeams";
-import ManageMatch from "./pages/ManageMatch/ManageMatch";
 import TeamDetails from "./pages/ManageTeams/TeamDetails";
 import Demo from "./pages/Demo";
 import UpcomingMath from "./pages/ManageMatch/UpcomingMath";
@@ -28,7 +27,7 @@ const App = () => {
           <Route path="/team-detail/:id" element={<TeamDetails />} />
 
           {/* for matches */}
-          <Route path="/matches" element={<ManageMatch />} />
+
           <Route path="/matches/upcoming" element={<UpcomingMath />} />
           <Route path="/matches/live" element={<LiveMatch />} />
           <Route path="/matches/completed" element={<CompletedMatch />} />

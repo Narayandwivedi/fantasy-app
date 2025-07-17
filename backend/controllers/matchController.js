@@ -69,8 +69,11 @@ async function getAllMatch(req, res) {
 
 async function getLiveMatch(req, res) {
   try {
-    const liveMatches = await Match.find({ status: "live" });
-    return res.json({ success: true, liveMatches });
+    const liveMatches = await Match.find({ status: "live" })
+      .populate("team1", "name , logo , shortName")
+      .populate("team2", "name , logo , shortName")
+      .select("-team1PlayingSquad -team2PlayingSquad -createdAt -updatedAt");
+    return res.json({ success: true, data: liveMatches });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ success: false, message: "server error" });
@@ -83,8 +86,8 @@ async function getUpcomingMatch(req, res) {
     const upcomingMatches = await Match.find({ status: "upcoming" })
       .populate("team1", "name , logo , shortName")
       .populate("team2", "name , logo , shortName")
-      .select('-team1PlayingSquad -team2PlayingSquad -createdAt -updatedAt');
-    return res.json({ success: true, data:upcomingMatches });
+      .select("-team1PlayingSquad -team2PlayingSquad -createdAt -updatedAt");
+    return res.json({ success: true, data: upcomingMatches });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ success: false, message: "server error" });
@@ -94,9 +97,12 @@ async function getUpcomingMatch(req, res) {
 //completed matches
 
 async function getCompletedMatch(req, res) {
-  try {
-    const completedMatches = await Match.find({ status: "completed" });
-    return res.json({ success: true, completedMatches });
+ try {
+    const CompletedMatch = await Match.find({ status: "completed" })
+      .populate("team1", "name , logo , shortName")
+      .populate("team2", "name , logo , shortName")
+      .select('-team1PlayingSquad -team2PlayingSquad -createdAt -updatedAt');
+    return res.json({ success: true, data:CompletedMatch });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ success: false, message: "server error" });

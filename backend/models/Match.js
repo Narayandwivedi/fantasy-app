@@ -27,9 +27,6 @@ const MatchSchema = new mongoose.Schema({
     ref: 'Team',
     required: true
   },
-   venue: {
-    type: String,
-  },
 
    tossWinner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -45,9 +42,7 @@ const MatchSchema = new mongoose.Schema({
     type: Date,
     // required: true,
   },
-  endTime: {
-    type: Date,
-  },
+
   status: {
     type: String,
     enum: ["upcoming", "live", "completed", "cancelled"],
