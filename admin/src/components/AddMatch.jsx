@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useContext } from "react";
-import { AppContext } from "../../context/AppContext";
+import { AppContext } from "../context/AppContext";
 
 const AddMatch = ({ onClose }) => {
   const [formData, setFormData] = useState({

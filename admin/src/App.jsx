@@ -28,9 +28,9 @@ const App = () => {
 
           {/* for matches */}
 
-          <Route path="/matches/upcoming" element={<UpcomingMath />} />
-          <Route path="/matches/live" element={<LiveMatch />} />
-          <Route path="/matches/completed" element={<CompletedMatch />} />
+          <Route path="/upcoming-matches" element={<UpcomingMath />} />
+          <Route path="/live-matches" element={<LiveMatch />} />
+          <Route path="/completed-matches" element={<CompletedMatch />} />
           <Route path="/test" element={<MatchCard />} />
         </Routes>
       </div>

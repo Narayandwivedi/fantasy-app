@@ -17,6 +17,12 @@ const Sidebar = () => {
       <nav className='p-4'>
         <div className='grid grid-cols-2 gap-3 lg:flex lg:flex-col lg:space-y-3'>
           
+          <Link to="/manage-user">
+            <button className='group flex flex-col lg:flex-row items-center justify-center lg:justify-start w-full bg-white/10 hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 text-white hover:text-white px-4 py-3 rounded-lg transition-all duration-300 border border-white/20 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/25'>
+              <Users className='w-5 h-5 mb-1 lg:mb-0 lg:mr-3' />
+              <span className='text-xs lg:text-sm font-medium'>Manage users</span>
+            </button>
+          </Link>
           <Link to="/">
             <button className='group flex flex-col lg:flex-row items-center justify-center lg:justify-start w-full bg-white/10 hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 text-white hover:text-white px-4 py-3 rounded-lg transition-all duration-300 border border-white/20 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/25'>
               <Users className='w-5 h-5 mb-1 lg:mb-0 lg:mr-3' />
@@ -31,10 +37,23 @@ const Sidebar = () => {
             </button>
           </Link>
 
-          <Link to="/matches">
+          <Link to="/upcoming-matches ">
             <button className='group flex flex-col lg:flex-row items-center justify-center lg:justify-start w-full bg-white/10 hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 text-white hover:text-white px-4 py-3 rounded-lg transition-all duration-300 border border-white/20 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/25'>
               <Trophy className='w-5 h-5 mb-1 lg:mb-0 lg:mr-3' />
-              <span className='text-xs lg:text-sm font-medium'>Matches</span>
+              <span className='text-xs lg:text-sm font-medium'>upcoming Matches</span>
+            </button>
+          </Link>
+          <Link to="/live-matches ">
+            <button className='group flex flex-col lg:flex-row items-center justify-center lg:justify-start w-full bg-white/10 hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 text-white hover:text-white px-4 py-3 rounded-lg transition-all duration-300 border border-white/20 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/25'>
+              <Trophy className='w-5 h-5 mb-1 lg:mb-0 lg:mr-3' />
+              <span className='text-xs lg:text-sm font-medium'>live Matches</span>
+            </button>
+          </Link>
+
+          <Link to="/completed-matches ">
+            <button className='group flex flex-col lg:flex-row items-center justify-center lg:justify-start w-full bg-white/10 hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 text-white hover:text-white px-4 py-3 rounded-lg transition-all duration-300 border border-white/20 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/25'>
+              <Trophy className='w-5 h-5 mb-1 lg:mb-0 lg:mr-3' />
+              <span className='text-xs lg:text-sm font-medium'>completed Matches</span>
             </button>
           </Link>
         </div>

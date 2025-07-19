@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from 'axios';
 
-const MatchCard = ({ match, BACKEND_URL }) => {
+const MatchCard = ({ match, BACKEND_URL, onStatusChange }) => {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
+
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'live':
@@ -9,6 +13,8 @@ const MatchCard = ({ match, BACKEND_URL }) => {
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'completed':
         return 'bg-green-100 text-green-800 border-green-200';
+      case 'cancelled':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -25,6 +31,33 @@ const MatchCard = ({ match, BACKEND_URL }) => {
     });
   };
 
+  const handleStatusChange = async (newStatus) => {
+    try {
+      setIsUpdating(true);
+      setShowStatusMenu(false);
+      
+      const response = await axios.put(`${BACKEND_URL}/api/matches/${match._id}/status`, {
+        status: newStatus
+      });
+      
+      
+
+      // Call parent callback to refresh data
+      if (onStatusChange) {
+        onStatusChange(match._id, newStatus);
+      }
+      
+      console.log('Status updated successfully:', response.data);
+    } catch (error) {
+      console.error('Error updating match status:', error);
+      alert('Failed to update match status. Please try again.');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const canChangeStatus = match.status?.toLowerCase() === 'upcoming';
+
   return (
     <div className="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
       {/* Header with Status */}
@@ -32,8 +65,52 @@ const MatchCard = ({ match, BACKEND_URL }) => {
         <div className="text-white text-sm font-medium">
           {match.series || 'Tournament'}
         </div>
-        <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(match.status)}`}>
-          {match.status?.toUpperCase() || 'SCHEDULED'}
+        <div className="flex items-center space-x-2">
+          <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(match.status)}`}>
+            {match.status?.toUpperCase() || 'SCHEDULED'}
+          </div>
+          
+          {/* Status Change Button - Only show for upcoming matches */}
+          {canChangeStatus && (
+            <div className="relative">
+              <button
+                onClick={() => setShowStatusMenu(!showStatusMenu)}
+                disabled={isUpdating}
+                className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-1.5 rounded-full transition-all duration-200 disabled:opacity-50"
+                title="Change Status"
+              >
+                {isUpdating ? (
+                  <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                  </svg>
+                )}
+              </button>
+              
+              {/* Status Menu Dropdown */}
+              {showStatusMenu && (
+                <div className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-10 min-w-32">
+                  <button
+                    onClick={() => handleStatusChange('live')}
+                    className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 rounded-t-lg flex items-center space-x-2"
+                  >
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span>Make Live</span>
+                  </button>
+                  <button
+                    onClick={() => handleStatusChange('cancelled')}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg flex items-center space-x-2"
+                  >
+                    <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                    <span>Cancel</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -47,9 +124,6 @@ const MatchCard = ({ match, BACKEND_URL }) => {
                 src={`${BACKEND_URL}${match.team1?.logo}`}      
                 alt={match.team1?.name || 'Team 1'}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = '/api/placeholder/48/48';
-                }}
               />
             </div>
             <div className="min-w-0 flex-1">
@@ -78,9 +152,6 @@ const MatchCard = ({ match, BACKEND_URL }) => {
                 src={`${BACKEND_URL}${match.team2?.logo}`}
                 alt={match.team2?.name || 'Team 2'}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = '/api/placeholder/48/48';
-                }}
               />
             </div>
           </div>
@@ -97,7 +168,6 @@ const MatchCard = ({ match, BACKEND_URL }) => {
             <span className="text-gray-600">Type:</span>
             <span className="font-medium text-gray-900">{match.matchType || 'N/A'}</span>
           </div>
-          
         </div>
 
         {/* Time Information */}
