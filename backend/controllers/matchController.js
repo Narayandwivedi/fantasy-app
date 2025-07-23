@@ -54,7 +54,6 @@ async function createMatch(req, res) {
   }
 }
 
-
 async function getAllMatch(req, res) {
   try {
     const allMatches = await Match.find().populate("team1 team2");
@@ -62,6 +61,60 @@ async function getAllMatch(req, res) {
   } catch (err) {
     console.log(err.message);
 
+    return res.status(500).json({ success: false, message: "server error" });
+  }
+}
+
+// match detail by id
+
+async function matchDetailsByID(req, res) {
+  try {
+    const { matchId } = req.params;
+    if (!matchId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "id not provided" });
+    }
+
+    if (!mongoose.isValidObjectId(matchId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid match id" });
+    }
+
+    const getMatch = await Match.findById(matchId)
+      .populate("team1PlayingSquad team2PlayingSquad")
+      .populate({
+        path: "team1",
+        populate: {
+          path: "squad",
+          model: "Player",
+          select:
+            "firstName lastName position battingStyle bowlingStyle imgLink", // Select specific fields
+        },
+      })
+      .populate({
+        path: "team2",
+        populate: {
+          path: "squad",
+          model: "Player",
+          select:
+            "firstName lastName position battingStyle bowlingStyle imgLink", // Select specific fields
+        },
+      });
+
+    if (!getMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid match id" });
+    }
+
+    return res.json({
+      success: true,
+      data: getMatch,
+    });
+  } catch (err) {
+    console.error("Error in matchDetailsByID:", err);
     return res.status(500).json({ success: false, message: "server error" });
   }
 }
@@ -115,8 +168,8 @@ async function changeMatchStatus(req, res) {
     const { matchId } = req.params;
     const { status } = req.body;
 
-      // console.log(status , matchId);
-      
+    // console.log(status , matchId);
+
     //  check req body
 
     if (!matchId || !status) {
@@ -125,7 +178,7 @@ async function changeMatchStatus(req, res) {
 
     //  check status valid or not
 
-    const validStatus = ["upcoming", "live", "completed"];
+    const validStatus = ["upcoming", "live", "completed", "cancelled"];
     if (!validStatus.includes(status)) {
       return res.status(400).json({
         success: false,
@@ -150,6 +203,13 @@ async function changeMatchStatus(req, res) {
         .json({ success: false, message: "match not found with this id" });
     }
 
+    if (getMatch.status === status) {
+      return res.status(400).json({
+        success: false,
+        message: "invalid request changing same status not allowed",
+      });
+    }
+
     getMatch.status = status;
 
     await getMatch.save();
@@ -160,57 +220,103 @@ async function changeMatchStatus(req, res) {
   }
 }
 
+async function changeMatchPlaying11(req, res) {
+  try{
 
-async function changeMatchPlaying11(req,res) {
+    const { team1PlayingSquad, team2PlayingSquad } = req.body;
+  const { matchId } = req.params;
+
+
+  console.log(team1PlayingSquad , team2PlayingSquad);
   
 
-  const {team1Squad , team2Squad} = req.body
-  res.json({success:true , message})
+  //  check req body
 
-
-}
-
-
-async function createMatchScore(req,res) {
-  
-  const {matchId} = req.params
-
-  // check req body 
-
-  if(!matchId){
-    return res.status(400).json({success:false , message:"please provide valid matchid"})
-
-  // check is valid object id
-    if(!mongoose.isValidObjectId(matchId)){
-      return res.status(400).json({success:false , message:"invalid matchid"})
-    }
-
-    // check is match exist
-    const getMatch = await Match.findById(matchId)
-    if(!getMatch){
-      return res.status(400).json({success:false , message:"match not found"})
-    }
-
-    return res.json({success:true , message:"mtach score created successfully"})
-
+  if ((!team1PlayingSquad || !team2PlayingSquad || !matchId)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "please provide valid details" });
   }
 
 
+  //  check squad length
+
+  if (team1PlayingSquad.length !==11 || team2PlayingSquad.length !== 11) {
+    return res
+      .status(400)
+      .json({ success: false, message: "squad must have 11 players " });
+  }
+
+  //  check is valid object id
+
+  if (!mongoose.isValidObjectId(matchId)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "invalid match id type" });
+  }
+
+
+  const getMatch = await Match.findById(matchId)
+  if(!getMatch){
+    return res.status(400).json({success:false , message:"match not found"})
+  }
+
+  getMatch.team1PlayingSquad = team1PlayingSquad
+  getMatch.team2PlayingSquad = team2PlayingSquad
+
+  await getMatch.save()
+  res.json({ success: true, message: "team added successfull" });
+
+  }catch(err){
+
+    console.log(err.message);
+    return res.status(500).json({success:false , message:"server error"})
+    
+  }
+
+
+
+  
 }
 
-async function updateMatchScore(req, res) {
+async function createMatchScore(req, res) {
+  const { matchId } = req.params;
 
+  // check req body
+
+  if (!matchId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "please provide valid matchid" });
+  }
+  // check is valid object id
+  if (!mongoose.isValidObjectId(matchId)) {
+    return res.status(400).json({ success: false, message: "invalid matchid" });
+  }
+
+  // check is match exist
+  const getMatch = await Match.findById(matchId);
+  if (!getMatch) {
+    return res.status(400).json({ success: false, message: "match not found" });
+  }
+
+  return res.json({
+    success: true,
+    message: "mtach score created successfully",
+  });
 }
+
+async function updateMatchScore(req, res) {}
 
 module.exports = {
   createMatch,
   getAllMatch,
+  matchDetailsByID,
   getLiveMatch,
   getUpcomingMatch,
   getCompletedMatch,
   changeMatchStatus,
   changeMatchPlaying11,
   createMatchScore,
-  updateMatchScore
-  
+  updateMatchScore,
 };

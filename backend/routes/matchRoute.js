@@ -11,19 +11,27 @@ const {
   changeMatchPlaying11,
   createMatchScore,
   updateMatchScore,
+  matchDetailsByID
 } = require("../controllers/matchController");
 
+
+router.get("/status/live", getLiveMatch);
+router.get("/status/upcoming", getUpcomingMatch);
+router.get("/status/completed", getCompletedMatch);
+
 router.get("/", getAllMatch);
-router.get("/live", getLiveMatch);
-router.get("/upcoming", getUpcomingMatch);
-router.get("/completed", getCompletedMatch);
+router.get("/:matchId", matchDetailsByID);
 
 router.put("/:matchId/status", changeMatchStatus);
-router.put("/matchId/playing11", changeMatchPlaying11);
-router.put("/:matchId/update-score", updateMatchScore);
+
+router.put("/:matchId/playing11", changeMatchPlaying11);
+
+
+router.post("/:matchId/scores", createMatchScore);
+router.put("/:matchId/scores", updateMatchScore);
 
 router.post("/", createMatch);
-router.post("/:matchId/create-Score", createMatchScore);
+
 
 // router.put("/change-status")
 

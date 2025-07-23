@@ -377,11 +377,16 @@ async function removeCaptainFromTeam(req, res) {
   const playerId = req.params.playerId;
 }
 
+async function getTeamSquad(req,res) {
+  
+}
+
 module.exports = {
   createTeam,
   getAllTeam,
   getTeamById,
   addNewPlayerToTeam,
   removePlayerFromTeam,
-  deleteTeam
+  deleteTeam,
+  getTeamSquad
 };

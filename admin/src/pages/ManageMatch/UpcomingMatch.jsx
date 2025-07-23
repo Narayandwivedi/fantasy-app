@@ -15,7 +15,7 @@ const UpcomingMath = () => {
     try {
       setLoading(true); 
       setError(null);
-      const { data } = await axios.get(`${BACKEND_URL}/api/matches/upcoming`);
+      const { data } = await axios.get(`${BACKEND_URL}/api/matches/status/upcoming`);
       setUpcomingMatches(data.upcomingMatches || data.data || []);
       console.log(data);
     } catch (error) {
