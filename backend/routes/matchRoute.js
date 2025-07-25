@@ -4,13 +4,17 @@ const router = express.Router();
 const {
   getAllMatch,
   createMatch,
+
   getLiveMatch,
   getUpcomingMatch,
   getCompletedMatch,
+
   changeMatchStatus,
   changeMatchPlaying11,
+
   createMatchScore,
   updateMatchScore,
+  getMatchScore,
   matchDetailsByID
 } = require("../controllers/matchController");
 
@@ -27,8 +31,9 @@ router.put("/:matchId/status", changeMatchStatus);
 router.put("/:matchId/playing11", changeMatchPlaying11);
 
 
+router.get("/:matchId/scores",getMatchScore)
 router.post("/:matchId/scores", createMatchScore);
-router.put("/:matchId/scores", updateMatchScore);
+router.put("/:matchId/players/scores", updateMatchScore);
 
 router.post("/", createMatch);
 

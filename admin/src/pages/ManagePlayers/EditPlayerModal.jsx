@@ -4,7 +4,7 @@ import { AppContext } from "../../context/AppContext";
 import { toast } from "react-toastify";
 import PlayerForm from "./PlayerForm";
 
-const EditPlayerModal = ({ showModal, onClose, player, onPlayerUpdated }) => {
+const EditPlayerModal = ({ showModal, onClose, player}) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -69,7 +69,7 @@ const EditPlayerModal = ({ showModal, onClose, player, onPlayerUpdated }) => {
       if (formData.image) {
         const form = new FormData();
         form.append("player", formData.image);
-        const res = await axios.post(`${BACKEND_URL}/upload/player`, form, {
+        const res = await axios.post(`${BACKEND_URL}/api/upload/player`, form, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         imageUrl = res.data.image_url;
@@ -94,7 +94,6 @@ const EditPlayerModal = ({ showModal, onClose, player, onPlayerUpdated }) => {
         toast.success("Player updated successfully");
         resetForm();
         onClose();
-        onPlayerUpdated(data.player);
       }
     } catch (err) {
       console.error('Error updating player:', err);

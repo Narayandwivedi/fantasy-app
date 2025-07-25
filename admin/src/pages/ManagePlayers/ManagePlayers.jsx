@@ -113,18 +113,6 @@ const ManagePlayers = () => {
     setShowEditPlayerModal(true);
   }, []);
 
-  const handlePlayerAdded = (newPlayer) => {
-    setAllPlayers(prev => [...(prev || []), newPlayer]);
-  };
-
-  const handlePlayerUpdated = (updatedPlayer) => {
-    setAllPlayers(prev => 
-      (prev || []).map(player => 
-        player._id === updatedPlayer._id ? updatedPlayer : player
-      )
-    );
-  };
-
   const handleCloseEditModal = () => {
     setShowEditPlayerModal(false);
     setEditingPlayer(null);
@@ -274,7 +262,6 @@ const ManagePlayers = () => {
       <AddPlayerModal
         showModal={showAddPlayerModal}
         onClose={() => setShowAddPlayerModal(false)}
-        onPlayerAdded={handlePlayerAdded}
       />
 
       {/* Edit Player Modal */}
@@ -282,7 +269,6 @@ const ManagePlayers = () => {
         showModal={showEditPlayerModal}
         onClose={handleCloseEditModal}
         player={editingPlayer}
-        onPlayerUpdated={handlePlayerUpdated}
       />
     </div>
   );

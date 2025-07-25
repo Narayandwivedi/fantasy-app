@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { AppContext } from '../../context/AppContext'
 import { Edit3, Plus, X, Calendar, Clock, Trophy, Save, AlertCircle, Check, ArrowUp, ArrowDown, Hash } from 'lucide-react'
+import ScoreCard from '../../components/ScoreCard'
 
 const MatchDetail = () => {
     const { matchId } = useParams()
@@ -233,12 +234,12 @@ const MatchDetail = () => {
     }
 
     const PlayerCard = ({ player, isInPlaying11, battingOrder, onToggle, onMoveUp, onMoveDown, showActions = false, teamKey, canAdd = true, canMoveUp = false, canMoveDown = false }) => (
-        <div className={`bg-white rounded-lg shadow-sm border ${isInPlaying11 ? 'border-green-300 bg-green-50' : 'border-gray-200'} p-4 transition-all duration-200 hover:shadow-md`}>
+        <div className={`bg-white rounded-lg shadow-sm border ${isInPlaying11 ? 'border-green-300 bg-green-50' : 'border-gray-200'} p-3 transition-all duration-200 hover:shadow-md`}>
             <div className="flex items-center space-x-3">
                 {/* Batting order number */}
                 {isInPlaying11 && (
                     <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                        <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
                             {battingOrder}
                         </div>
                     </div>
@@ -248,15 +249,15 @@ const MatchDetail = () => {
                 <img 
                     src={"h"} 
                     alt={`${player.firstName} ${player.lastName}`}
-                    className="w-12 h-12 rounded-full object-cover bg-gray-200 flex-shrink-0"
+                    className="w-10 h-10 rounded-full object-cover bg-gray-200 flex-shrink-0"
                 />
 
                 {/* Player info */}
                 <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-800 truncate">
+                    <h4 className="font-semibold text-gray-800 truncate text-sm">
                         {player.firstName} {player.lastName}
                     </h4>
-                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getPositionColor(player.position)}`}>
+                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getPositionColor(player.position)}`}>
                         {player.position.replace('-', ' ').toUpperCase()}
                     </span>
                 </div>
@@ -277,7 +278,7 @@ const MatchDetail = () => {
                                     }`}
                                     title="Move up in batting order"
                                 >
-                                    <ArrowUp size={14} />
+                                    <ArrowUp size={12} />
                                 </button>
                                 <button
                                     onClick={() => onMoveDown(player._id, teamKey)}
@@ -289,7 +290,7 @@ const MatchDetail = () => {
                                     }`}
                                     title="Move down in batting order"
                                 >
-                                    <ArrowDown size={14} />
+                                    <ArrowDown size={12} />
                                 </button>
                             </>
                         )}
@@ -298,7 +299,7 @@ const MatchDetail = () => {
                         <button
                             onClick={() => onToggle(player._id, teamKey)}
                             disabled={!isInPlaying11 && !canAdd}
-                            className={`p-2 rounded-full transition-colors ${
+                            className={`p-1.5 rounded-full transition-colors ${
                                 isInPlaying11 
                                     ? 'bg-red-100 hover:bg-red-200 text-red-600' 
                                     : canAdd
@@ -307,7 +308,7 @@ const MatchDetail = () => {
                             }`}
                             title={!isInPlaying11 && !canAdd ? 'Playing 11 is full (11/11)' : ''}
                         >
-                            {isInPlaying11 ? <X size={16} /> : <Plus size={16} />}
+                            {isInPlaying11 ? <X size={12} /> : <Plus size={12} />}
                         </button>
                     </div>
                 )}
@@ -332,45 +333,45 @@ const MatchDetail = () => {
         return (
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 {/* Team Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-3">
                             <img 
                                 src={team.logo} 
                                 alt={team.name}
-                                className="w-16 h-16 rounded-full bg-white p-2"
+                                className="w-12 h-12 rounded-full bg-white p-1"
                             />
                             <div>
-                                <h2 className="text-2xl font-bold">{team.name}</h2>
-                                <p className="text-blue-100">({team.shortName})</p>
+                                <h2 className="text-xl font-bold">{team.name}</h2>
+                                <p className="text-blue-100 text-sm">({team.shortName})</p>
                             </div>
                         </div>
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2">
                             {currentPlaying11.length === 11 && (
-                                <div className="flex items-center space-x-1 bg-green-500/20 px-3 py-1 rounded-full">
-                                    <Check size={14} />
-                                    <span className="text-sm">Complete</span>
+                                <div className="flex items-center space-x-1 bg-green-500/20 px-2 py-1 rounded-full">
+                                    <Check size={12} />
+                                    <span className="text-xs">Complete</span>
                                 </div>
                             )}
                             <button
                                 onClick={toggleEditMode}
-                                className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors"
+                                className="flex items-center space-x-1 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-colors text-sm"
                             >
-                                <Edit3 size={16} />
-                                <span>{isEditing ? 'Done' : 'Edit Playing 11'}</span>
+                                <Edit3 size={14} />
+                                <span>{isEditing ? 'Done' : 'Edit'}</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="p-6">
+                <div className="p-4">
                     {/* Squad Section */}
-                    <div className="mb-8">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                            <Trophy className="mr-2 text-yellow-600" size={20} />
-                            Full Squad ({team.squad.length} players)
+                    <div className="mb-6">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                            <Trophy className="mr-2 text-yellow-600" size={18} />
+                            Full Squad ({team.squad.length})
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 gap-3">
                             {team.squad.map(player => {
                                 const playerInPlaying11 = currentPlaying11.find(p => p.playerId === player._id)
                                 const isInPlaying11 = !!playerInPlaying11
@@ -392,19 +393,19 @@ const MatchDetail = () => {
                     </div>
 
                     {/* Playing 11 Section */}
-                    <div className="border-t pt-8">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                                <div className={`w-5 h-5 rounded-full mr-2 ${
+                    <div className="border-t pt-6">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                                <div className={`w-4 h-4 rounded-full mr-2 ${
                                     currentPlaying11.length === 11 ? 'bg-green-600' : 'bg-yellow-500'
                                 }`}></div>
-                                Playing 11 - Batting Order ({currentPlaying11.length}/11)
+                                Playing 11 ({currentPlaying11.length}/11)
                             </h3>
                             
                             {currentPlaying11.length < 11 && isEditing && (
-                                <div className="flex items-center space-x-1 text-amber-600 text-sm">
-                                    <AlertCircle size={14} />
-                                    <span>Need {11 - currentPlaying11.length} more player(s)</span>
+                                <div className="flex items-center space-x-1 text-amber-600 text-xs">
+                                    <AlertCircle size={12} />
+                                    <span>Need {11 - currentPlaying11.length} more</span>
                                 </div>
                             )}
                         </div>
@@ -413,15 +414,15 @@ const MatchDetail = () => {
                             <div className="space-y-3">
                                 {/* Batting order hint */}
                                 {isEditing && (
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-                                        <div className="flex items-center space-x-2 text-blue-800 text-sm">
-                                            <Hash size={14} />
-                                            <span>Use ↑↓ buttons to adjust batting order. Players are arranged from 1st to 11th position.</span>
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-3">
+                                        <div className="flex items-center space-x-2 text-blue-800 text-xs">
+                                            <Hash size={12} />
+                                            <span>Use ↑↓ buttons to adjust batting order</span>
                                         </div>
                                     </div>
                                 )}
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-2 gap-3">
                                     {currentPlaying11
                                         .sort((a, b) => a.battingOrder - b.battingOrder)
                                         .map((playerData, index) => {
@@ -448,11 +449,11 @@ const MatchDetail = () => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="text-center py-8 bg-gray-50 rounded-lg">
-                                <p className="text-gray-500">No players selected for playing 11</p>
+                            <div className="text-center py-6 bg-gray-50 rounded-lg">
+                                <p className="text-gray-500 text-sm">No players selected</p>
                                 {isEditing && (
-                                    <p className="text-sm text-gray-400 mt-2">
-                                        Click the + button on squad players to add them
+                                    <p className="text-xs text-gray-400 mt-1">
+                                        Click + to add players
                                     </p>
                                 )}
                             </div>
@@ -490,7 +491,7 @@ const MatchDetail = () => {
         <div className="min-h-screen bg-gray-50">
             {/* Match Header */}
             <div className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 py-6">
+                <div className="max-w-7xl mx-auto px-4 py-4">
                     <div className="text-center">
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-600 mb-2">
                             <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
@@ -501,20 +502,20 @@ const MatchDetail = () => {
                             </span>
                         </div>
                         
-                        <h1 className="text-3xl font-bold text-gray-800 mb-4">
+                        <h1 className="text-2xl font-bold text-gray-800 mb-3">
                             {matchDetail.team1.name} vs {matchDetail.team2.name}
                         </h1>
                         
-                        <div className="flex items-center justify-center space-x-6 text-gray-600">
+                        <div className="flex items-center justify-center space-x-6 text-gray-600 text-sm">
                             <div className="flex items-center space-x-2">
-                                <Calendar size={16} />
+                                <Calendar size={14} />
                                 <span>{formatDate(matchDetail.startTime)}</span>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <Clock size={16} />
+                                <Clock size={14} />
                                 <span>{formatTime(matchDetail.startTime)}</span>
                             </div>
-                            <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
                                 matchDetail.status === 'upcoming' 
                                     ? 'bg-yellow-100 text-yellow-800' 
                                     : 'bg-green-100 text-green-800'
@@ -529,45 +530,45 @@ const MatchDetail = () => {
             {/* Save/Reset Actions Bar */}
             {hasUnsavedChanges && (
                 <div className="bg-yellow-50 border-b border-yellow-200">
-                    <div className="max-w-7xl mx-auto px-4 py-4">
+                    <div className="max-w-7xl mx-auto px-4 py-3">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2 text-yellow-800">
-                                <AlertCircle size={16} />
-                                <span className="text-sm font-medium">You have unsaved changes</span>
+                                <AlertCircle size={14} />
+                                <span className="text-sm font-medium">Unsaved changes</span>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <button
                                     onClick={resetChanges}
-                                    className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
                                 >
-                                    Reset Changes
+                                    Reset
                                 </button>
                                 <button
                                     onClick={savePlayingSquads}
                                     disabled={!bothTeamsComplete || saving}
-                                    className={`flex items-center space-x-2 px-6 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                    className={`flex items-center space-x-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                                         bothTeamsComplete && !saving
                                             ? 'bg-green-600 hover:bg-green-700 text-white'
                                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                                 >
-                                    <Save size={16} />
-                                    <span>{saving ? 'Saving...' : 'Save Playing 11 & Order'}</span>
+                                    <Save size={14} />
+                                    <span>{saving ? 'Saving...' : 'Save'}</span>
                                 </button>
                             </div>
                         </div>
                         {!bothTeamsComplete && (
-                            <p className="text-xs text-yellow-700 mt-2">
-                                Both teams must have exactly 11 players selected to save
+                            <p className="text-xs text-yellow-700 mt-1">
+                                Both teams need 11 players to save
                             </p>
                         )}
                     </div>
                 </div>
             )}
 
-            {/* Teams Section */}
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="space-y-8">
+            {/* Teams Section - Side by Side Layout */}
+            <div className="max-w-7xl mx-auto px-4 py-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <TeamSection 
                         team={matchDetail.team1} 
                         teamKey="team1"
@@ -576,6 +577,16 @@ const MatchDetail = () => {
                         team={matchDetail.team2} 
                         teamKey="team2"
                     />
+                </div>
+            </div>
+
+            {/* Scorecard Section Placeholder */}
+            <div className="max-w-7xl mx-auto px-4 pb-8">
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+                        Scorecard Section
+                    </h2>
+                    <ScoreCard matchId={matchId}/>
                 </div>
             </div>
         </div>
