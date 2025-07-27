@@ -587,6 +587,7 @@ const MatchDetail = () => {
                         Scorecard Section
                     </h2>
                     <ScoreCard matchId={matchId}/>
+                    
                 </div>
             </div>
         </div>

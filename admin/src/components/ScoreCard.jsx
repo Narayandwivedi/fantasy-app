@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Edit3, Save, X, Plus, Minus } from 'lucide-react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { Edit3, Save, X, Plus, Minus, ChevronUp, ChevronDown, Zap, Users, Activity } from 'lucide-react';
 import axios from 'axios';
 import { AppContext } from '../context/AppContext';
 
@@ -8,24 +8,43 @@ const ScoreCard = ({ matchId }) => {
   const [matchData, setMatchData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingPlayer, setEditingPlayer] = useState(null);
-  const [battingTeam, setBattingTeam] = useState(''); // Dynamic team name
+  const [battingTeam, setBattingTeam] = useState('');
   const [pendingUpdates, setPendingUpdates] = useState({});
   const [bulkEditMode, setBulkEditMode] = useState(false);
-  const [availableTeams, setAvailableTeams] = useState([]); // Store team names
+  const [availableTeams, setAvailableTeams] = useState([]);
+  const [quickEditMode, setQuickEditMode] = useState(false);
+  const [selectedPlayers, setSelectedPlayers] = useState(new Set());
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Quick action presets
+  const quickActions = {
+    batting: [
+      { label: 'Single', runs: 1, balls: 1 },
+      { label: 'Double', runs: 2, balls: 1 },
+      { label: 'Triple', runs: 3, balls: 1 },
+      { label: 'Four', runs: 4, balls: 1, fours: 1 },
+      { label: 'Six', runs: 6, balls: 1, sixes: 1 },
+      { label: 'Dot Ball', runs: 0, balls: 1 },
+    ],
+    bowling: [
+      { label: 'Dot Ball', runs: 0, balls: 1 },
+      { label: 'Single', runs: 1, balls: 1 },
+      { label: 'Wicket', runs: 0, balls: 1, wickets: 1 },
+      { label: 'Wide', runs: 1, balls: 0, wides: 1 },
+      { label: 'No Ball', runs: 1, balls: 0, noBalls: 1 },
+    ]
+  };
 
   const fetchScore = async () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`${BACKEND_URL}/api/matches/${matchId}/scores`);
-      console.log(data);
       setMatchData(data);
       
-      // Extract team names dynamically from API response
       if (data.matchScore && data.matchScore.length > 0) {
         const teamNames = data.matchScore.map(team => team.teamName);
         setAvailableTeams(teamNames);
         
-        // Set first team as default batting team if not already set
         if (!battingTeam && teamNames.length > 0) {
           setBattingTeam(teamNames[0]);
         }
@@ -39,13 +58,18 @@ const ScoreCard = ({ matchId }) => {
 
   const editMultipleScores = async (playersData) => {
     try {
+      setIsUpdating(true);
       const { data } = await axios.put(`${BACKEND_URL}/api/matches/${matchId}/players/scores`, {
         players: playersData
       });
       console.log('Multiple stats updated:', data);
-      fetchScore();
+      await fetchScore();
+      // Show success toast/notification here
     } catch (error) {
       console.error('Error updating multiple stats:', error);
+      // Show error toast/notification here
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -70,6 +94,7 @@ const ScoreCard = ({ matchId }) => {
       setPendingUpdates({});
       setBulkEditMode(false);
       setEditingPlayer(null);
+      setSelectedPlayers(new Set());
     }
   };
 
@@ -77,6 +102,7 @@ const ScoreCard = ({ matchId }) => {
     setPendingUpdates({});
     setBulkEditMode(false);
     setEditingPlayer(null);
+    setSelectedPlayers(new Set());
   };
 
   useEffect(() => {
@@ -112,74 +138,157 @@ const ScoreCard = ({ matchId }) => {
     }
   };
 
+  // Enhanced update function with validation
   const updateStat = (category, field, value) => {
     if (editingPlayer && pendingUpdates[editingPlayer]) {
+      // Validation to prevent negative values
+      const validatedValue = Math.max(0, value);
+      
       setPendingUpdates(prev => ({
         ...prev,
         [editingPlayer]: {
           ...prev[editingPlayer],
           [category]: {
             ...prev[editingPlayer][category],
-            [field]: value
+            [field]: validatedValue
           }
         }
       }));
     }
   };
 
-  const incrementStat = (category, field) => {
+  // Keyboard shortcuts for quick updates
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (!editingPlayer || !pendingUpdates[editingPlayer]) return;
+      
+      // Number keys 1-6 for quick runs update
+      if (e.key >= '1' && e.key <= '6' && !e.ctrlKey && !e.altKey) {
+        const runs = parseInt(e.key);
+        updateStat('batting', 'runs', pendingUpdates[editingPlayer].batting.runs + runs);
+        updateStat('batting', 'ballsFaced', pendingUpdates[editingPlayer].batting.ballsFaced + 1);
+        
+        if (runs === 4) {
+          updateStat('batting', 'fours', pendingUpdates[editingPlayer].batting.fours + 1);
+        } else if (runs === 6) {
+          updateStat('batting', 'sixes', pendingUpdates[editingPlayer].batting.sixes + 1);
+        }
+      }
+      
+      // 0 for dot ball
+      if (e.key === '0') {
+        updateStat('batting', 'ballsFaced', pendingUpdates[editingPlayer].batting.ballsFaced + 1);
+      }
+      
+      // W for wicket
+      if (e.key.toLowerCase() === 'w') {
+        updateStat('batting', 'isOut', true);
+      }
+    };
+    
+    window.addEventListener('keypress', handleKeyPress);
+    return () => window.removeEventListener('keypress', handleKeyPress);
+  }, [editingPlayer, pendingUpdates]);
+
+  const incrementStat = (category, field, increment = 1) => {
     if (editingPlayer && pendingUpdates[editingPlayer]) {
       const currentValue = pendingUpdates[editingPlayer][category][field] || 0;
-      updateStat(category, field, currentValue + 1);
+      updateStat(category, field, currentValue + increment);
     }
   };
 
-  const decrementStat = (category, field) => {
+  const decrementStat = (category, field, decrement = 1) => {
     if (editingPlayer && pendingUpdates[editingPlayer]) {
       const currentValue = pendingUpdates[editingPlayer][category][field] || 0;
-      updateStat(category, field, Math.max(currentValue - 1, 0));
+      updateStat(category, field, Math.max(currentValue - decrement, 0));
     }
   };
 
-  // Dynamic function to get bowling team players
+  // Quick action handler
+  const applyQuickAction = (playerId, action, category) => {
+    if (!pendingUpdates[playerId]) {
+      const player = getBattingTeamPlayers().find(p => p._id === playerId) || 
+                     getBowlingTeamPlayers().find(p => p._id === playerId);
+      if (player) {
+        addToPendingUpdates(playerId, {
+          batting: { ...player.batting },
+          bowling: { ...player.bowling },
+          fielding: { ...player.fielding }
+        });
+      }
+    }
+    
+    setEditingPlayer(playerId);
+    
+    if (category === 'batting') {
+      if (action.runs !== undefined) {
+        incrementStat('batting', 'runs', action.runs);
+      }
+      if (action.balls !== undefined) {
+        incrementStat('batting', 'ballsFaced', action.balls);
+      }
+      if (action.fours !== undefined) {
+        incrementStat('batting', 'fours', action.fours);
+      }
+      if (action.sixes !== undefined) {
+        incrementStat('batting', 'sixes', action.sixes);
+      }
+    } else if (category === 'bowling') {
+      if (action.runs !== undefined) {
+        incrementStat('bowling', 'runsGiven', action.runs);
+      }
+      if (action.balls !== undefined) {
+        incrementStat('bowling', 'oversBowled', action.balls / 6);
+      }
+      if (action.wickets !== undefined) {
+        incrementStat('bowling', 'wicketsTaken', action.wickets);
+      }
+    }
+    
+    if (!bulkEditMode) {
+      setBulkEditMode(true);
+    }
+  };
+
+  // Batch player selection
+  const togglePlayerSelection = (playerId) => {
+    const newSelection = new Set(selectedPlayers);
+    if (newSelection.has(playerId)) {
+      newSelection.delete(playerId);
+    } else {
+      newSelection.add(playerId);
+    }
+    setSelectedPlayers(newSelection);
+  };
+
   const getBowlingTeamPlayers = () => {
     if (!matchData || !matchData.matchScore || !battingTeam) return [];
-    
-    // Find the team that is NOT batting (bowling team)
     const bowlingTeam = matchData.matchScore.find(team => team.teamName !== battingTeam);
     return bowlingTeam ? bowlingTeam.players : [];
   };
 
-  // Dynamic function to get batting team players
   const getBattingTeamPlayers = () => {
     if (!matchData || !matchData.matchScore || !battingTeam) return [];
-    
     const battingTeamData = matchData.matchScore.find(team => team.teamName === battingTeam);
     return battingTeamData ? battingTeamData.players : [];
   };
 
-  // Dynamic function to get fielding team players (opposite of batting team)
   const getFieldingTeamPlayers = () => {
     if (!matchData || !matchData.matchScore || !battingTeam) return [];
-    
-    // Fielding team is the team that is NOT batting
     const fieldingTeam = matchData.matchScore.find(team => team.teamName !== battingTeam);
     return fieldingTeam ? fieldingTeam.players : [];
   };
 
-  // Get the bowling team name dynamically
   const getBowlingTeamName = () => {
     if (!availableTeams.length || !battingTeam) return '';
     return availableTeams.find(team => team !== battingTeam) || '';
   };
 
-  // Get the fielding team name dynamically (same as bowling team)
   const getFieldingTeamName = () => {
     if (!availableTeams.length || !battingTeam) return '';
     return availableTeams.find(team => team !== battingTeam) || '';
   };
 
-  // Get match title dynamically
   const getMatchTitle = () => {
     if (!matchData || !matchData.matchScore || matchData.matchScore.length < 2) {
       return 'Match Scorecard';
@@ -199,6 +308,18 @@ const ScoreCard = ({ matchId }) => {
     return player[category];
   };
 
+  // Calculate team totals
+  const getTeamTotals = (teamPlayers) => {
+    return teamPlayers.reduce((totals, player) => {
+      const battingStats = getCurrentStats(player, 'batting');
+      return {
+        runs: totals.runs + (battingStats.runs || 0),
+        wickets: totals.wickets + (battingStats.isOut ? 1 : 0),
+        overs: totals.overs + (getCurrentStats(player, 'bowling').oversBowled || 0)
+      };
+    }, { runs: 0, wickets: 0, overs: 0 });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -211,13 +332,25 @@ const ScoreCard = ({ matchId }) => {
     return <div className="text-center p-8">No match data available</div>;
   }
 
+  const battingTeamTotals = getTeamTotals(getBattingTeamPlayers());
+
   return (
     <div className="max-w-full mx-auto p-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold text-gray-800">{getMatchTitle()}</h1>
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center">
+            <button
+              onClick={() => setQuickEditMode(!quickEditMode)}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+                quickEditMode ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              <Zap size={16} />
+              Quick Edit
+            </button>
+            
             <select 
               value={battingTeam} 
               onChange={(e) => setBattingTeam(e.target.value)}
@@ -234,13 +367,16 @@ const ScoreCard = ({ matchId }) => {
               <div className="flex gap-2">
                 <button
                   onClick={saveAllPendingUpdates}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  disabled={isUpdating}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
                 >
+                  <Save size={16} />
                   Save All ({Object.keys(pendingUpdates).length})
                 </button>
                 <button
                   onClick={cancelAllUpdates}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  disabled={isUpdating}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
                 >
                   Cancel All
                 </button>
@@ -248,11 +384,41 @@ const ScoreCard = ({ matchId }) => {
             )}
           </div>
         </div>
-        <div className="text-lg text-gray-600">
-          Total Players: {matchData.totalPlayers}
+        
+        {/* Live Score Display */}
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-xl font-semibold">{battingTeam}</h3>
+              <p className="text-3xl font-bold">
+                {battingTeamTotals.runs}/{battingTeamTotals.wickets}
+              </p>
+              <p className="text-sm opacity-90">Overs: {battingTeamTotals.overs.toFixed(1)}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm opacity-90">Run Rate</p>
+              <p className="text-2xl font-bold">
+                {battingTeamTotals.overs > 0 
+                  ? (battingTeamTotals.runs / battingTeamTotals.overs).toFixed(2) 
+                  : '0.00'}
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex gap-4 mt-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Activity size={16} />
+            Total Players: {matchData.totalPlayers}
+          </div>
           {bulkEditMode && (
-            <span className="ml-4 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
               Bulk Edit Mode Active
+            </span>
+          )}
+          {editingPlayer && (
+            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+              Press 1-6 for runs, 0 for dot, W for wicket
             </span>
           )}
         </div>
@@ -262,8 +428,11 @@ const ScoreCard = ({ matchId }) => {
         {/* Batting Team Scorecard */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md">
-            <div className="bg-blue-600 text-white p-4 rounded-t-lg">
-              <h2 className="text-xl font-bold">{battingTeam} Batting</h2>
+            <div className="bg-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Users size={20} />
+                {battingTeam} Batting
+              </h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -287,18 +456,34 @@ const ScoreCard = ({ matchId }) => {
                     const hasPendingChanges = pendingUpdates[player._id];
                     
                     return (
-                      <tr key={player._id} className="border-b hover:bg-gray-50">
+                      <tr key={player._id} className={`border-b hover:bg-gray-50 ${isEditing ? 'bg-blue-50' : ''}`}>
                         <td className="p-3">
-                          <div className="font-semibold">
-                            {player.player.firstName} {player.player.lastName}
-                            {hasPendingChanges && <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Modified</span>}
+                          <div className="flex items-center gap-2">
+                            {quickEditMode && (
+                              <input
+                                type="checkbox"
+                                checked={selectedPlayers.has(player._id)}
+                                onChange={() => togglePlayerSelection(player._id)}
+                                className="rounded"
+                              />
+                            )}
+                            <div>
+                              <div className="font-semibold">
+                                {player.player.firstName} {player.player.lastName}
+                                {hasPendingChanges && <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Modified</span>}
+                              </div>
+                              <div className="text-sm text-gray-500">#{player.batting.battingOrder}</div>
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-500">#{player.batting.battingOrder}</div>
                         </td>
                         <td className="p-3 text-center font-bold text-blue-600">
                           {isEditing ? (
                             <div className="flex items-center justify-center gap-1">
-                              <button onClick={() => decrementStat('batting', 'runs')} className="text-red-500 hover:bg-red-100 rounded p-1">
+                              <button 
+                                onClick={() => decrementStat('batting', 'runs')} 
+                                className="text-red-500 hover:bg-red-100 rounded p-1"
+                                title="Decrease runs"
+                              >
                                 <Minus size={12} />
                               </button>
                               <input
@@ -306,8 +491,13 @@ const ScoreCard = ({ matchId }) => {
                                 value={battingStats.runs || 0}
                                 onChange={(e) => updateStat('batting', 'runs', parseInt(e.target.value) || 0)}
                                 className="w-16 p-1 border rounded text-center"
+                                min="0"
                               />
-                              <button onClick={() => incrementStat('batting', 'runs')} className="text-green-500 hover:bg-green-100 rounded p-1">
+                              <button 
+                                onClick={() => incrementStat('batting', 'runs')} 
+                                className="text-green-500 hover:bg-green-100 rounded p-1"
+                                title="Increase runs"
+                              >
                                 <Plus size={12} />
                               </button>
                             </div>
@@ -319,12 +509,27 @@ const ScoreCard = ({ matchId }) => {
                         </td>
                         <td className="p-3 text-center">
                           {isEditing ? (
-                            <input
-                              type="number"
-                              value={battingStats.ballsFaced || 0}
-                              onChange={(e) => updateStat('batting', 'ballsFaced', parseInt(e.target.value) || 0)}
-                              className="w-16 p-1 border rounded text-center"
-                            />
+                            <div className="flex items-center justify-center gap-1">
+                              <button 
+                                onClick={() => decrementStat('batting', 'ballsFaced')} 
+                                className="text-red-500 hover:bg-red-100 rounded p-1"
+                              >
+                                <Minus size={12} />
+                              </button>
+                              <input
+                                type="number"
+                                value={battingStats.ballsFaced || 0}
+                                onChange={(e) => updateStat('batting', 'ballsFaced', parseInt(e.target.value) || 0)}
+                                className="w-16 p-1 border rounded text-center"
+                                min="0"
+                              />
+                              <button 
+                                onClick={() => incrementStat('batting', 'ballsFaced')} 
+                                className="text-green-500 hover:bg-green-100 rounded p-1"
+                              >
+                                <Plus size={12} />
+                              </button>
+                            </div>
                           ) : (
                             <span className={hasPendingChanges ? 'bg-yellow-100 px-2 py-1 rounded' : ''}>
                               {battingStats.ballsFaced}
@@ -388,25 +593,45 @@ const ScoreCard = ({ matchId }) => {
                           {player.fantasyPoints.totalPoints}
                         </td>
                         <td className="p-3 text-center">
-                          {isEditing ? (
-                            <button onClick={handleCancelEdit} className="text-red-600 hover:bg-red-100 p-1 rounded">
-                              <X size={16} />
-                            </button>
-                          ) : (
-                            <button onClick={() => handleEditClick(player)} className="text-blue-600 hover:bg-blue-100 p-1 rounded">
-                              <Edit3 size={16} />
-                            </button>
-                          )}
+                          <div className="flex items-center justify-center gap-1">
+                            {isEditing ? (
+                              <button onClick={handleCancelEdit} className="text-red-600 hover:bg-red-100 p-1 rounded">
+                                <X size={16} />
+                              </button>
+                            ) : (
+                              <button onClick={() => handleEditClick(player)} className="text-blue-600 hover:bg-blue-100 p-1 rounded">
+                                <Edit3 size={16} />
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
+              
+              {/* Quick Actions for Batting */}
+              {quickEditMode && editingPlayer && (
+                <div className="p-4 bg-gray-50 border-t">
+                  <p className="text-sm font-semibold mb-2">Quick Actions:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {quickActions.batting.map((action, index) => (
+                      <button
+                        key={index}
+                        onClick={() => applyQuickAction(editingPlayer, action, 'batting')}
+                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                      >
+                        {action.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Fielding Stats - Now shows the fielding team (opposite of batting team) */}
+          {/* Fielding Stats */}
           <div className="bg-white rounded-lg shadow-md mt-6">
             <div className="bg-green-600 text-white p-4 rounded-t-lg">
               <h2 className="text-xl font-bold">{getFieldingTeamName()} Fielding</h2>
@@ -430,7 +655,7 @@ const ScoreCard = ({ matchId }) => {
                     const hasPendingChanges = pendingUpdates[player._id];
                     
                     return (
-                      <tr key={player._id} className="border-b hover:bg-gray-50">
+                      <tr key={player._id} className={`border-b hover:bg-gray-50 ${isEditing ? 'bg-green-50' : ''}`}>
                         <td className="p-3 font-semibold">
                           {player.player.firstName} {player.player.lastName}
                           {hasPendingChanges && <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Modified</span>}

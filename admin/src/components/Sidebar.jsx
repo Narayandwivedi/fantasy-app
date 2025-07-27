@@ -1,21 +1,38 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Users, Shield, Trophy } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Users, Shield, Trophy, Calendar, Play, CheckCircle, UserCheck} from 'lucide-react';
 
 const Sidebar = () => {
+  const location = useLocation();
+
+  const isActive = (path) => location.pathname === path;
+
+  const navItems = [
+    { path: '/manage-user', label: 'Manage Users', icon: UserCheck },
+    { path: '/', label: 'Players', icon: Users },
+    { path: '/teams', label: 'Teams', icon: Shield },
+    { path: '/upcoming-matches', label: 'Upcoming Matches', icon: Calendar },
+    { path: '/live-matches', label: 'Live Matches', icon: Play },
+    { path: '/completed-matches', label: 'Completed Matches', icon: CheckCircle }
+  ];
 
   return (
-    <div className='lg:h-screen lg:max-w-[280px] bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 shadow-lg'>
+    <div className='lg:h-screen lg:max-w-[300px] bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 shadow-2xl border-r border-purple-500/20'>
       {/* Header */}
-      <div className='p-4 border-b border-purple-400/30'>
-        <h2 className='text-white text-xl font-bold text-center lg:text-left'>
-          Sports Manager
-        </h2>
+      <div className='p-6 border-b border-purple-400/30'>
+        <div className='flex items-center justify-center lg:justify-start space-x-3'>
+          <div className='bg-gradient-to-r from-purple-500 to-blue-500 p-2 rounded-lg'>
+            <Trophy className='w-6 h-6 text-white' />
+          </div>
+          <h2 className='text-white text-xl font-bold hidden lg:block'>
+            Sports Manager
+          </h2>
+        </div>
       </div>
 
       {/* Navigation */}
-      <nav className='p-4'>
-        <div className='grid grid-cols-2 gap-3 lg:flex lg:flex-col lg:space-y-3'>
+      <nav className='p-6'>
+        <div className='grid grid-cols-2 gap-4 lg:flex lg:flex-col lg:space-y-4'>
           
           <Link to="/manage-user">
             <button className='group flex flex-col lg:flex-row items-center justify-center lg:justify-start w-full bg-white/10 hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 text-white hover:text-white px-4 py-3 rounded-lg transition-all duration-300 border border-white/20 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/25'>
