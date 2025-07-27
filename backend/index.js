@@ -26,7 +26,8 @@ const corsOptions = {
     "http://localhost:5174", 
     "https://fantasy-app-73q4.vercel.app",
     "https://fantasy-backend-three.vercel.app",
-    "https://fantasybackend.winnersclubs.fun"
+    "https://fantasybackend.winnersclubs.fun",
+    "https://winners11-8j4kup615-narayan-dwivedis-projects.vercel.app"
   ],
   credentials: true
 };
