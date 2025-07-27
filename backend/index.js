@@ -27,7 +27,7 @@ const corsOptions = {
     "https://fantasy-app-73q4.vercel.app",
     "https://fantasy-backend-three.vercel.app",
     "https://fantasybackend.winnersclubs.fun",
-    "https://winners11-8j4kup615-narayan-dwivedis-projects.vercel.app"
+    "https://winners11.vercel.app"
   ],
   credentials: true
 };
