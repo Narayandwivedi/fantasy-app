@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import upload_area from "../../assets/upload_area.svg";
-import { Crown } from "lucide-react";
+import { Crown, Upload, X, User, Users, Star } from "lucide-react";
 
 const AddTeamModal = ({
   showModal,
@@ -14,6 +14,7 @@ const AddTeamModal = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredPlayers, setFilteredPlayers] = useState([]);
   const [showPlayerList, setShowPlayerList] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   // Captain search states
   const [captainSearchTerm, setCaptainSearchTerm] = useState("");
@@ -34,6 +35,7 @@ const AddTeamModal = ({
       setShowPlayerList(false);
       setShowCaptainList(false);
       setShowViceCaptainList(false);
+      setImagePreview(null);
     }
   }, [showModal]);
 
@@ -207,97 +209,176 @@ const AddTeamModal = ({
 
   const imageHandler = (e) => {
     const file = e.target.files[0];
-    setFormData((prev) => ({ ...prev, logo: file }));
+    if (file) {
+      setFormData((prev) => ({ ...prev, logo: file }));
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData((prev) => ({ ...prev, logo: null }));
+    setImagePreview(null);
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Add New Team</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-7xl max-h-[95vh] overflow-y-auto border border-gray-100">
+        <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-800">Add New Team</h2>
+          </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
+            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
           >
-            ✕
+            <X className="w-5 h-5 text-gray-600" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Team Details Form */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Team Details</h3>
-            <div className="flex flex-col gap-4">
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <User className="w-4 h-4 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800">Team Details</h3>
+            </div>
+            <div className="space-y-6">
               {/* team name */}
-              <input
-                value={formData.teamName}
-                onChange={(e) => handleInputChange("teamName", e.target.value)}
-                className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Team name *"
-                type="text"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Team Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={formData.teamName}
+                  onChange={(e) => handleInputChange("teamName", e.target.value)}
+                  className="w-full border border-gray-300 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                  placeholder="Enter team name"
+                  type="text"
+                />
+              </div>
 
               {/* team shortname */}
-              <input
-                value={formData.shortName}
-                onChange={(e) => handleInputChange("shortName", e.target.value)}
-                className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Team short name *"
-                type="text"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Short Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={formData.shortName}
+                  onChange={(e) => handleInputChange("shortName", e.target.value)}
+                  className="w-full border border-gray-300 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                  placeholder="Enter short name (e.g., MI, CSK)"
+                  type="text"
+                />
+              </div>
 
               {/* upload team logo */}
-              <label htmlFor="file-inp">
-                <img src={upload_area} alt="" />
-              </label>
-              <input
-                onChange={imageHandler}
-                hidden
-                id="file-inp"
-                className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                type="file"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Team Logo
+                </label>
+                <div className="relative">
+                  {imagePreview ? (
+                    <div className="relative w-32 h-32 mx-auto">
+                      <img
+                        src={imagePreview}
+                        alt="Team logo preview"
+                        className="w-full h-full object-cover rounded-xl border-2 border-gray-200 shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label
+                      htmlFor="file-inp"
+                      className="cursor-pointer block w-full p-8 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 text-center"
+                    >
+                      <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-600">Click to upload team logo</p>
+                      <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
+                    </label>
+                  )}
+                  <input
+                    onChange={imageHandler}
+                    hidden
+                    id="file-inp"
+                    accept="image/*"
+                    type="file"
+                  />
+                </div>
+              </div>
 
               {/* select team sport */}
-              <select
-                value={formData.sport}
-                onChange={(e) => handleInputChange("sport", e.target.value)}
-                className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="cricket">Cricket</option>
-                <option value="football">Football</option>
-              </select>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sport
+                </label>
+                <select
+                  value={formData.sport}
+                  onChange={(e) => handleInputChange("sport", e.target.value)}
+                  className="w-full border border-gray-300 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white appearance-none cursor-pointer"
+                >
+                  <option value="cricket">🏏 Cricket</option>
+                  <option value="football">⚽ Football</option>
+                </select>
+              </div>
 
               {/* Captain Search */}
               <div className="relative">
-                <input
-                  value={captainSearchTerm}
-                  onChange={handleCaptainInputChange}
-                  className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Search and select team captain..."
-                  type="text"
-                  disabled={formData.teamSquad.length === 0}
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Team Captain
+                </label>
+                <div className="relative">
+                  <Crown className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-yellow-500" />
+                  <input
+                    value={captainSearchTerm}
+                    onChange={handleCaptainInputChange}
+                    className="w-full border border-gray-300 pl-12 pr-4 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    placeholder="Search and select team captain..."
+                    type="text"
+                    disabled={formData.teamSquad.length === 0}
+                  />
+                </div>
 
                 {showCaptainList && formData.teamSquad.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 bg-white border border-t-0 rounded-b-lg max-h-32 overflow-y-auto z-20 shadow-lg">
+                  <div className="absolute top-full left-0 right-0 bg-white border rounded-b-xl max-h-40 overflow-y-auto z-20 shadow-lg mt-1">
                     {filteredCaptainPlayers.length > 0 ? (
                       filteredCaptainPlayers.map((player) => (
                         <div
                           key={player._id || player.id}
-                          className="p-2 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                          className="p-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0 transition-colors"
                           onClick={() => selectCaptain(player)}
                         >
-                          <div className="font-medium">
-                            {player.firstName} {player.lastName}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {player.position || player.role}
+                          <div className="flex items-center gap-2">
+                            <Crown className="w-4 h-4 text-yellow-500" />
+                            <div>
+                              <div className="font-medium text-gray-800">
+                                {player.firstName} {player.lastName}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {player.position || player.role}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <div className="p-2 text-center text-gray-500">
+                      <div className="p-3 text-center text-gray-500">
                         No matching players in squad
                       </div>
                     )}
@@ -305,7 +386,8 @@ const AddTeamModal = ({
                 )}
 
                 {formData.teamSquad.length === 0 && (
-                  <div className="text-sm text-gray-500 mt-1">
+                  <div className="text-sm text-gray-500 mt-2 flex items-center gap-1">
+                    <Users className="w-4 h-4" />
                     Add players to squad first
                   </div>
                 )}
@@ -313,34 +395,45 @@ const AddTeamModal = ({
 
               {/* Vice Captain Search */}
               <div className="relative">
-                <input
-                  value={viceCaptainSearchTerm}
-                  onChange={handleViceCaptainInputChange}
-                  className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Search and select team vice captain..."
-                  type="text"
-                  disabled={formData.teamSquad.length === 0}
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Vice Captain
+                </label>
+                <div className="relative">
+                  <Star className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-500" />
+                  <input
+                    value={viceCaptainSearchTerm}
+                    onChange={handleViceCaptainInputChange}
+                    className="w-full border border-gray-300 pl-12 pr-4 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    placeholder="Search and select vice captain..."
+                    type="text"
+                    disabled={formData.teamSquad.length === 0}
+                  />
+                </div>
 
                 {showViceCaptainList && formData.teamSquad.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 bg-white border border-t-0 rounded-b-lg max-h-32 overflow-y-auto z-20 shadow-lg">
+                  <div className="absolute top-full left-0 right-0 bg-white border rounded-b-xl max-h-40 overflow-y-auto z-20 shadow-lg mt-1">
                     {filteredViceCaptainPlayers.length > 0 ? (
                       filteredViceCaptainPlayers.map((player) => (
                         <div
                           key={player._id || player.id}
-                          className="p-2 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                          className="p-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0 transition-colors"
                           onClick={() => selectViceCaptain(player)}
                         >
-                          <div className="font-medium">
-                            {player.firstName} {player.lastName}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {player.position || player.role}
+                          <div className="flex items-center gap-2">
+                            <Star className="w-4 h-4 text-blue-500" />
+                            <div>
+                              <div className="font-medium text-gray-800">
+                                {player.firstName} {player.lastName}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {player.position || player.role}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <div className="p-2 text-center text-gray-500">
+                      <div className="p-3 text-center text-gray-500">
                         No matching players available
                       </div>
                     )}
@@ -348,7 +441,8 @@ const AddTeamModal = ({
                 )}
 
                 {formData.teamSquad.length === 0 && (
-                  <div className="text-sm text-gray-500 mt-1">
+                  <div className="text-sm text-gray-500 mt-2 flex items-center gap-1">
+                    <Users className="w-4 h-4" />
                     Add players to squad first
                   </div>
                 )}
@@ -357,51 +451,67 @@ const AddTeamModal = ({
           </div>
 
           {/* Player Search and Squad Management */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Build Squad</h3>
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <Users className="w-4 h-4 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800">Build Squad</h3>
+            </div>
 
             {/* Player Search */}
-            <div className="relative mb-4">
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Search players by name..."
-                type="text"
-              />
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Search Players
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full border border-gray-300 pl-12 pr-4 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                  placeholder="Search players by name..."
+                  type="text"
+                />
+              </div>
 
               {/* Search Results Dropdown */}
               {showPlayerList && (
-                <div className="absolute top-full left-0 right-0 bg-white border border-t-0 rounded-b-lg max-h-48 overflow-y-auto z-10 shadow-lg">
+                <div className="absolute top-full left-0 right-0 bg-white border rounded-b-xl max-h-56 overflow-y-auto z-10 shadow-lg mt-1">
                   {loading ? (
-                    <div className="p-3 text-center text-gray-500">
+                    <div className="p-4 text-center text-gray-500">
+                      <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
                       Loading players...
                     </div>
                   ) : filteredPlayers.length > 0 ? (
                     filteredPlayers.map((player) => (
                       <div
                         key={player._id || player.id}
-                        className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                        className="p-4 hover:bg-green-50 cursor-pointer border-b last:border-b-0 transition-colors"
                         onClick={() => addPlayerToSquad(player)}
                       >
                         <div className="flex justify-between items-center">
-                          <div>
-                            <div className="font-medium">
-                              {player.firstName} {player.lastName}
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                              <User className="w-5 h-5 text-gray-600" />
                             </div>
-                            <div className="text-sm text-gray-600">
-                              {player.position || player.role} •{" "}
-                              {player.team || player.currentTeam}
+                            <div>
+                              <div className="font-medium text-gray-800">
+                                {player.firstName} {player.lastName}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {player.position || player.role} • {player.team || player.currentTeam}
+                              </div>
                             </div>
                           </div>
-                          <button className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
+                          <button className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition-colors font-medium">
                             Add
                           </button>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="p-3 text-center text-gray-500">
+                    <div className="p-4 text-center text-gray-500">
                       No players found
                     </div>
                   )}
@@ -411,85 +521,119 @@ const AddTeamModal = ({
 
             {/* Current Squad */}
             <div>
-              <h4 className="text-md font-medium mb-3">
-                Current Squad ({formData.teamSquad.length})
-              </h4>
-
-              {formData.captain && (
-                <div className="mb-2 p-2 bg-yellow-100 rounded-md border-l-4 border-yellow-500">
-                  <span className="text-sm font-medium text-yellow-800">
-                    Captain: {formData.captain}
-                  </span>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-semibold text-gray-800">
+                  Current Squad
+                </h4>
+                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                  {formData.teamSquad.length} players
                 </div>
-              )}
+              </div>
 
-              {formData.viceCaptain && (
-                <div className="mb-3 p-2 bg-blue-100 rounded-md border-l-4 border-blue-500">
-                  <span className="text-sm font-medium text-blue-800">
-                    Vice Captain: {formData.viceCaptain}
-                  </span>
+              {/* Leadership Cards */}
+              {(formData.captain || formData.viceCaptain) && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                  {formData.captain && (
+                    <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 p-3 rounded-xl border border-yellow-200">
+                      <div className="flex items-center gap-2">
+                        <Crown className="w-5 h-5 text-yellow-600" />
+                        <div>
+                          <div className="text-xs font-medium text-yellow-600 uppercase tracking-wide">Captain</div>
+                          <div className="text-sm font-semibold text-yellow-800">{formData.captain}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {formData.viceCaptain && (
+                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-3 rounded-xl border border-blue-200">
+                      <div className="flex items-center gap-2">
+                        <Star className="w-5 h-5 text-blue-600" />
+                        <div>
+                          <div className="text-xs font-medium text-blue-600 uppercase tracking-wide">Vice Captain</div>
+                          <div className="text-sm font-semibold text-blue-800">{formData.viceCaptain}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
               {formData.teamSquad.length === 0 ? (
-                <div className="text-gray-500 text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-                  No players added yet
+                <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-500 font-medium">No players added yet</p>
+                  <p className="text-sm text-gray-400 mt-1">Search and add players to build your squad</p>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {formData.teamSquad.map((player) => (
-                    <div
-                      key={player._id || player.id}
-                      className={`flex justify-between items-center p-3 rounded-lg ${
-                        `${player.firstName} ${player.lastName}` ===
-                        formData.captain
-                          ? "bg-yellow-50 border border-yellow-300"
-                          : `${player.firstName} ${player.lastName}` ===
-                            formData.viceCaptain
-                          ? "bg-blue-50 border border-blue-300"
-                          : "bg-gray-50"
-                      }`}
-                    >
-                      <div>
-                        <div className="font-medium">
-                          {player.firstName} {player.lastName}
-                          {`${player.firstName} ${player.lastName}` ===
-                            formData.captain && (
-                            <span className="ml-2 text-xs bg-yellow-500 text-white px-2 py-1 rounded">
-                              C
-                            </span>
-                          )}
-                          {`${player.firstName} ${player.lastName}` ===
-                            formData.viceCaptain && (
-                            <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-1 rounded">
-                              VC
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {player.position || player.role}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() =>
-                          removePlayerFromSquad(player._id || player.id)
-                        }
-                        className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                <div className="space-y-3 max-h-72 overflow-y-auto bg-gray-50 rounded-xl p-3">
+                  {formData.teamSquad.map((player) => {
+                    const playerName = `${player.firstName} ${player.lastName}`;
+                    const isCaptain = playerName === formData.captain;
+                    const isViceCaptain = playerName === formData.viceCaptain;
+                    
+                    return (
+                      <div
+                        key={player._id || player.id}
+                        className={`flex justify-between items-center p-4 rounded-xl border transition-all ${
+                          isCaptain
+                            ? "bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 shadow-sm"
+                            : isViceCaptain
+                            ? "bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 shadow-sm"
+                            : "bg-white border-gray-200 hover:shadow-sm"
+                        }`}
                       >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            isCaptain ? "bg-yellow-200" : isViceCaptain ? "bg-blue-200" : "bg-gray-200"
+                          }`}>
+                            {isCaptain ? (
+                              <Crown className="w-5 h-5 text-yellow-600" />
+                            ) : isViceCaptain ? (
+                              <Star className="w-5 h-5 text-blue-600" />
+                            ) : (
+                              <User className="w-5 h-5 text-gray-600" />
+                            )}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-800">{playerName}</span>
+                              {isCaptain && (
+                                <span className="text-xs bg-yellow-500 text-white px-2 py-1 rounded-full font-medium">
+                                  C
+                                </span>
+                              )}
+                              {isViceCaptain && (
+                                <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full font-medium">
+                                  VC
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {player.position || player.role}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => removePlayerFromSquad(player._id || player.id)}
+                          className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors"
+                          title="Remove player"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="flex gap-3 mt-6">
+        <div className="flex gap-4 mt-8 pt-6 border-t border-gray-200">
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition"
+            className="flex-1 bg-gray-100 text-gray-700 py-4 rounded-xl hover:bg-gray-200 transition-colors font-medium"
           >
             Cancel
           </button>
@@ -500,9 +644,16 @@ const AddTeamModal = ({
               !formData.shortName ||
               formData.teamSquad.length === 0
             }
-            className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed font-medium shadow-lg disabled:shadow-none"
           >
-            Add Team
+            {loading ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                Creating Team...
+              </div>
+            ) : (
+              "Add Team"
+            )}
           </button>
         </div>
       </div>

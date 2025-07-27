@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { AppContext } from '../../context/AppContext'
 import { Edit3, Plus, X, Calendar, Clock, Trophy, Save, AlertCircle, Check, ArrowUp, ArrowDown, Hash } from 'lucide-react'
 import ScoreCard from '../../components/ScoreCard'
+import ImprovedScoreCard from '../../components/ImprovedScoreCard'
 
 const MatchDetail = () => {
     const { matchId } = useParams()
@@ -586,7 +587,8 @@ const MatchDetail = () => {
                     <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
                         Scorecard Section
                     </h2>
-                    <ScoreCard matchId={matchId}/>
+                    {/* <ScoreCard matchId={matchId}/> */}
+                    <ImprovedScoreCard matchId={matchId}/>
                     
                 </div>
             </div>
