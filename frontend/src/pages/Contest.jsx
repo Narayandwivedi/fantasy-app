@@ -3,7 +3,7 @@ import ContestCard from '../components/ContestCard'
 
 
 const headToHead = [
-    {entryFee:15 , price : 28 , maxTeamPerContest:1 , maxParticipants},
+    {entryFee:15 , price : 28 , maxTeamPerContest:1},
     {entryFee:55 , price:100 , maxTeamPerContest:1},
     {entryFee:85 , price:150 , maxTeamPerContest:1}
 ]
