@@ -25,7 +25,7 @@ const MenuSidebar = ({ isOpen, onClose }) => {
               </div>
               <div>
                 <h2 className="text-lg font-bold">John Doe</h2>
-                <p className="text-sm text-gray-300">Premium Member</p>
+                <p className="text-xs text-gray-400">Member</p>
               </div>
             </div>
             <button 
@@ -117,8 +117,8 @@ const MenuItem = ({ icon, title, subtitle, onClick, className = "" }) => {
         {icon}
       </div>
       <div className="flex-1">
-        <p className="font-medium text-gray-900">{title}</p>
-        <p className="text-sm text-gray-500">{subtitle}</p>
+        <p className="text-sm font-medium text-gray-900">{title}</p>
+        <p className="text-xs text-gray-500">{subtitle}</p>
       </div>
     </button>
   )

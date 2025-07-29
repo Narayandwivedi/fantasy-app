@@ -16,6 +16,7 @@ const playerRoute = require("./routes/playerRoute")
 const matchRoute = require("./routes/matchRoute")
 const teamRoute = require("./routes/teamRoute")
 const userRoute = require("./routes/userRoute")
+const contestRoute = require("./routes/contestRoute")
 
 
 
@@ -64,6 +65,8 @@ app.use("/api/teams",teamRoute)
 app.use("/api/matches",matchRoute)
 
 app.use("/api/users",userRoute)
+
+app.use("/api/contest",contestRoute)
 
 
 

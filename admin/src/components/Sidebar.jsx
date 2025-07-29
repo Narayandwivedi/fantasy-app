@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Users, Shield, Trophy, Calendar, Play, CheckCircle, UserCheck} from 'lucide-react';
+import { Users, Shield, Trophy, Calendar, Play, CheckCircle, UserCheck, Target, Settings} from 'lucide-react';
 
 const Sidebar = () => {
   const location = useLocation();

@@ -11,7 +11,7 @@ const ContestSchema = new mongoose.Schema(
 
     contestFormat: {
       type: String,
-      enum: ["h2h", "league", "mega-contest", "practice"],
+      enum: ["h2h", "league","winners-takes-all", "mega-contest", "practice"],
       required: true,
     },
 
@@ -59,7 +59,7 @@ const ContestSchema = new mongoose.Schema(
     isCancelled: {
       type: Boolean,
       default: false,
-    },
+    }
   },
   { timestamps: true }
 );

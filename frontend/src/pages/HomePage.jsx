@@ -49,6 +49,7 @@ const HomePage = () => {
                 team2Img={item.team2.logo}
                 series = {item.series}
                 startTime = {item.startTime}
+                matchId={item._id}
               />
             );
           })}

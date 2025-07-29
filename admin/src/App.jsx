@@ -37,6 +37,7 @@ const App = () => {
           <Route path="/completed-matches" element={<CompletedMatch />} />
           <Route path="/matches/:matchId" element={<MatchDetail />} />
           <Route path="/test" element={<MatchCard />} />
+
         </Routes>
       </div>
     </div>
