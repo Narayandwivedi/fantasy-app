@@ -15,6 +15,12 @@ const ContestSchema = new mongoose.Schema(
       required: true,
     },
 
+    status :{
+      type:String,
+      enum :["open","closed","completed"],
+      default:"open"
+    },
+
     entryFee: {
       type: Number,
       required: true,
@@ -28,6 +34,7 @@ const ContestSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
     totalSpots: {
       type: Number,
       required: true,
@@ -38,6 +45,7 @@ const ContestSchema = new mongoose.Schema(
       enum: ["public", "private"],
       default: "public",
     },
+    
     prizeDistribution: [
       {
         rank: { type: Number, required: true },
@@ -47,7 +55,7 @@ const ContestSchema = new mongoose.Schema(
     joinedUsers: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        teams: [{ type: mongoose.Schema.Types.ObjectId, ref: "UserTeam" }],
+        team: { type: mongoose.Schema.Types.ObjectId, ref: "UserTeam" },
         joinedAt: { type: Date, default: Date.now },
       },
     ],
