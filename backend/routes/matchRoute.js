@@ -9,6 +9,8 @@ const {
   getUpcomingMatch,
   getCompletedMatch,
 
+  getAllPlayerOfAMatch,
+
   changeMatchStatus,
   changeMatchPlaying11,
 
@@ -19,12 +21,15 @@ const {
 } = require("../controllers/matchController");
 
 
+//  match by status
 router.get("/status/live", getLiveMatch);
 router.get("/status/upcoming", getUpcomingMatch);
 router.get("/status/completed", getCompletedMatch);
 
+// get match by id 
 router.get("/", getAllMatch);
 router.get("/:matchId", matchDetailsByID);
+router.get("/:matchId/players",getAllPlayerOfAMatch)
 
 router.put("/:matchId/status", changeMatchStatus);
 

@@ -15,6 +15,7 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
     country: "",
     image: null,
     imgLink: "",
+    fantasyPrice: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { BACKEND_URL } = useContext(AppContext);
@@ -32,6 +33,7 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
         country: player.country || "",
         image: null,
         imgLink: player.imgLink || "",
+        fantasyPrice: player.fantasyPrice ? player.fantasyPrice.toString() : "",
       });
     }
   }, [player]);
@@ -47,6 +49,7 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
       country: "",
       image: null,
       imgLink: "",
+      fantasyPrice: "",
     });
   };
 
@@ -87,6 +90,7 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
           bowlingStyle: formData.bowlingStyle,
           country: formData.country.trim(),
           imgLink: imageUrl,
+          fantasyPrice: formData.fantasyPrice ? parseFloat(formData.fantasyPrice) : undefined,
         }
       );
 

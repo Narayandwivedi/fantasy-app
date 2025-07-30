@@ -131,6 +131,9 @@ async function updatePlayer(req, res) {
         .json({ success: false, message: "invalid player id" });
     }
 
+    console.log(req.body);
+    
+
     const updatedPlayer = await Player.findByIdAndUpdate(playerId, req.body);
     if (!updatePlayer) {
       return res

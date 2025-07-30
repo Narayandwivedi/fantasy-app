@@ -165,6 +165,63 @@ async function getCompletedMatch(req, res) {
   }
 }
 
+async function getAllPlayerOfAMatch(req, res) {
+  try {
+    const { matchId } = req.params;
+
+    if (!matchId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "please provide matchid" });
+    }
+
+    if (!mongoose.isValidObjectId(matchId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "please provide valid matchid" });
+    }
+
+    const match = await Match.findById(matchId)
+      .populate({
+        path: 'team1',
+        select: 'name shortName logo squad',
+        populate: {
+          path: 'squad',
+          // Add select fields for squad/players if needed
+          // select: 'name role battingStyle bowlingStyle'
+        }
+      })
+      .populate({
+        path: 'team2', 
+        select: 'name shortName logo squad',
+        populate: {
+          path: 'squad',
+          // Add select fields for squad/players if needed
+          // select: 'name role battingStyle bowlingStyle'
+        }
+      });
+
+    if (!match) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Match not found" });
+    }
+
+    return res.json({ 
+      success: true, 
+      message: "Match players retrieved successfully",
+      data: {
+        matchId: match._id,
+        team1: match.team1,
+        team2: match.team2
+      }
+    });
+
+  } catch (err) {
+    console.error('Error fetching match players:', err);
+    return res.status(500).json({ success: false, message: "server error" });
+  }
+}
 // change match status
 
 async function changeMatchStatus(req, res) {
@@ -766,6 +823,7 @@ module.exports = {
   createMatch,
   getAllMatch,
   matchDetailsByID,
+  getAllPlayerOfAMatch,
   getLiveMatch,
   getUpcomingMatch,
   getCompletedMatch,

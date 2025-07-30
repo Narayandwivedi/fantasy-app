@@ -64,7 +64,6 @@
         min: 7.0,
         max: 12.0,
       },
-      fantasyPoints: { type: Number, default: 0 },
 
       fullName: {
         type: String,

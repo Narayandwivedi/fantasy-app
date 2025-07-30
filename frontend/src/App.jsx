@@ -2,18 +2,23 @@ import React from 'react'
 import MatchCard from './components/MatchCard'
 import HomePage from './pages/HomePage'
 import BottomNav from './components/BottomNav'
-import { Routes , Route } from 'react-router-dom'
+import { Routes , Route, useLocation } from 'react-router-dom'
 import Contest from './pages/Contest'
+import CreateTeam from './pages/CreateTeam'
 
 const App = () => {
+  const location = useLocation()
+  const hideBottomNav = location.pathname.includes('/create-team')
+
   return (
     <div className='max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden'>
       <div>
         <Routes>
           <Route path='/' element = {<HomePage/>} />
           <Route path='/:matchId/contest' element = {<Contest/>} />
+          <Route path='/:matchId/create-team' element = {<CreateTeam/>} />
         </Routes>
-        <BottomNav/>
+        {!hideBottomNav && <BottomNav/>}
       </div>
     </div>
   )

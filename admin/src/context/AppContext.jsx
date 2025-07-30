@@ -20,6 +20,7 @@ export const AppContextProvider = (props) => {
         withCredentials: true,
       });
       if (data.success) {
+        
         setAllPlayers(data.allPlayers);
       }
     } catch (err) {

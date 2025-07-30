@@ -77,4 +77,11 @@ async function getContest(req, res) {
   }
 }
 
+
+async function joinContest(req,res) {
+  
+  const {userId , teamId} = req.body
+
+}
+
 module.exports = { createContest, getContest };

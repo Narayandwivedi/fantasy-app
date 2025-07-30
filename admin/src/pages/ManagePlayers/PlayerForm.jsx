@@ -162,6 +162,24 @@ const PlayerForm = ({
         disabled={isSubmitting}
       />
 
+      {/* Fantasy Price */}
+      <div className="relative">
+        <input
+          value={formData.fantasyPrice}
+          onChange={(e) => handleInputChange("fantasyPrice", e.target.value)}
+          className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+          placeholder="Fantasy Price (7.0 - 12.0)"
+          type="number"
+          min="7.0"
+          max="12.0"
+          step="0.5"
+          disabled={isSubmitting}
+        />
+        <div className="text-xs text-gray-500 mt-1">
+          Current: {formData.fantasyPrice || 'Not set'} | Range: 7.0 - 12.0
+        </div>
+      </div>
+
       {/* File upload */}
       <div className="w-full text-[#7b7b7b]">
         <p className="mb-2 text-sm font-medium">
