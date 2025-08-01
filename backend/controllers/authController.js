@@ -103,7 +103,7 @@ const handelUserSignup = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "user created successfully",
-      userId: userObj,
+      userData: userObj,
     });
   } catch (err) {
     console.log(err.message);
@@ -376,8 +376,7 @@ const isloggedin = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await userModel
       .findById(decoded.userId)
-      .select("-password")
-      .lean();
+      .select("-password");
 
     if (user.isBankAdded) {
       user.accountNumber = maskString(user.bankAccount.accountNumber, 4);
@@ -389,10 +388,23 @@ const isloggedin = async (req, res) => {
       delete user.upiId;
     }
 
-    sendLoginAlert(user.fullName).catch((err) =>
-      console.error("Telegram Error:", err.message)
-    );
-    return res.status(200).json({ isLoggedIn: true, user });
+    // Check if user is returning after being away (more than 1 hour)
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    
+    if (!user.lastActive || user.lastActive < oneHourAgo) {
+      // User is returning after being away
+      sendReturnAlert(user.fullName).catch((err) =>
+        console.error("Telegram Error:", err.message)
+      );
+    }
+
+    // Update last active time
+    user.lastActive = now;
+    await user.save();
+
+    const userObj = user.toObject();
+    return res.status(200).json({ isLoggedIn: true, user: userObj });
   } catch (err) {
     return res
       .status(401)
@@ -411,12 +423,30 @@ function generateReferralCode() {
   return code;
 }
 
-// Send alert function
+// Send login alert function
 const sendLoginAlert = async (userName) => {
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const CHAT_ID = process.env.TELEGRAM_GROUP_ID;
 
-  const message = `🔐User ${userName} just logged in!`;
+  const message = `🔐 NEW LOGIN: ${userName} just logged in!`;
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+  try {
+    await axios.post(url, {
+      chat_id: CHAT_ID,
+      text: message,
+    });
+  } catch (err) {
+    console.error("Telegram error:", err.message);
+  }
+};
+
+// Send return alert function
+const sendReturnAlert = async (userName) => {
+  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+  const CHAT_ID = process.env.TELEGRAM_GROUP_ID;
+
+  const message = `👋 RETURN VISIT: ${userName} is back on the app!`;
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
   try {

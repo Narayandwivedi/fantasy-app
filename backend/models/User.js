@@ -117,6 +117,10 @@ const userSchema = new mongoose.Schema({
 
   resetOtp: String,
   otpExpiresAt: Date,
+  lastActive: {
+    type: Date,
+    default: Date.now,
+  },
 },{timestamps:true});
 
 const User = mongoose.model("User", userSchema);

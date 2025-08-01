@@ -16,7 +16,7 @@ const scrollbarHideStyle = `
 
 const CreateTeam = () => {
   const { matchId } = useParams()
-  const { BACKEND_URL } = useContext(AppContext)
+  const { BACKEND_URL, user } = useContext(AppContext)
   
   const [matchData, setMatchData] = useState(null)
   const [selectedPlayers, setSelectedPlayers] = useState([])
@@ -187,7 +187,8 @@ const CreateTeam = () => {
     
     // Here you can implement the API call later
     const teamData = {
-      userId: 'your-user-id', // You'll need to get this from context or auth
+      userId: user?._id,
+      userName: user?.fullName,
       matchId: matchId,
       players: selectedPlayers,
       captain: captain,
@@ -195,6 +196,7 @@ const CreateTeam = () => {
     }
     
     console.log('Team data to save:', teamData)
+    console.log('Current user:', user)
     alert('Team saved successfully! (API implementation pending)')
     
     setSaving(false)

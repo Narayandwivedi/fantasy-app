@@ -1,6 +1,9 @@
 import { X, Wallet, HelpCircle, Headphones, FileText, Settings, LogOut, User } from 'lucide-react'
+import { useContext } from 'react'
+import { AppContext } from '../context/AppContext'
 
 const MenuSidebar = ({ isOpen, onClose }) => {
+  const { user, logout } = useContext(AppContext)
   return (
     <>
       {/* Backdrop */}
@@ -24,8 +27,8 @@ const MenuSidebar = ({ isOpen, onClose }) => {
                 <User size={24} className="text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-bold">John Doe</h2>
-                <p className="text-xs text-gray-400">Member</p>
+                <h2 className="text-lg font-bold">{user?.fullName || 'User'}</h2>
+                <p className="text-xs text-gray-400">{user?.role || 'user'}</p>
               </div>
             </div>
             <button 
@@ -45,7 +48,7 @@ const MenuSidebar = ({ isOpen, onClose }) => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Current Balance</p>
-              <p className="text-xl font-bold text-green-600">₹0</p>
+              <p className="text-xl font-bold text-green-600">₹{user?.balance || 0}</p>
             </div>
           </div>
         </div>
@@ -98,7 +101,10 @@ const MenuSidebar = ({ isOpen, onClose }) => {
             icon={<LogOut size={20} />}
             title="Logout"
             subtitle="Sign out of your account"
-            onClick={() => console.log('Logout clicked')}
+            onClick={() => {
+              logout()
+              onClose()
+            }}
             className="text-red-600 hover:bg-red-50"
           />
         </div>
