@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/User.js");
-const transporter = require("../config/nodemailer.js");
+const transporter = require("../config/Nodemailer.js");
 const axios = require("axios");
 
 const handelUserSignup = async (req, res) => {
