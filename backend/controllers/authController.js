@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const userModel = require("../models/user.js");
+const userModel = require("../models/User.js");
 const transporter = require("../config/nodemailer.js");
 const axios = require("axios");
 
