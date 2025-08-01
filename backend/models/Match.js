@@ -2,19 +2,6 @@
 const mongoose = require("mongoose");
 
 
-const PlayingSquadSchema = new mongoose.Schema({
-  playerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Player',
-    required: true
-  },
-  battingOrder: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 11
-  }
-}, { _id: false })
 
 const MatchSchema = new mongoose.Schema({
   sport: {
@@ -67,8 +54,6 @@ const MatchSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Team'
   },
-   team1PlayingSquad: [PlayingSquadSchema],
-  team2PlayingSquad: [PlayingSquadSchema],
 },{timestamps:true});
 
 

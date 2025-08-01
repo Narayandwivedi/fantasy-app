@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AppContext } from "../../context/AppContext";
 import { toast } from "react-toastify";
-import { Plus, Search, Edit3, Trash2, Filter, Users, Crown } from "lucide-react";
+import { Plus, Search, Edit3, Trash2, Filter, Users, Crown, Star, TrendingUp, Award, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AddTeamModal from "./AddTeamModal";
 
@@ -182,54 +182,74 @@ const ManageTeams = () => {
 
   if (loading && allTeams.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading teams...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto"></div>
+          <p className="mt-6 text-slate-600 font-medium">Loading teams...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="relative bg-white shadow-xl border-b border-slate-200/60 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
+        <div className="relative max-w-7xl mx-auto px-6 py-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Manage Teams</h1>
-              <p className="text-gray-600 mt-1">
-                Total Teams: {allTeams.length}
-              </p>
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Users size={24} className="text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold text-slate-800 tracking-tight">Team Management</h1>
+                  <p className="text-slate-600 font-medium mt-1">
+                    Manage your sports teams and squads
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-6 mt-4">
+                <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-200">
+                  <TrendingUp size={14} className="text-blue-600" />
+                  <span className="text-blue-700 text-sm font-semibold">{allTeams.length} Teams</span>
+                </div>
+                <div className="flex items-center space-x-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+                  <Award size={14} className="text-emerald-600" />
+                  <span className="text-emerald-700 text-sm font-semibold">
+                    {filteredTeams.length} Active
+                  </span>
+                </div>
+              </div>
             </div>
             <button
               onClick={() => setShowAddTeamModal(true)}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2 font-medium"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center gap-3 font-semibold shadow-xl hover:shadow-2xl hover:scale-105"
             >
               <Plus size={20} />
-              Add Team
+              Create New Team
             </button>
           </div>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             {/* Search */}
-            <div className="relative">
+            <div className="relative md:col-span-2">
               <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"
+                size={18}
               />
               <input
                 type="text"
                 placeholder="Search teams by name or short name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70 backdrop-blur-sm font-medium"
               />
             </div>
 
@@ -237,7 +257,7 @@ const ManageTeams = () => {
             <select
               value={filterSport}
               onChange={(e) => setFilterSport(e.target.value)}
-              className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-slate-200 px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70 backdrop-blur-sm font-medium"
             >
               <option value="all">All Sports</option>
               <option value="cricket">Cricket</option>
@@ -250,114 +270,154 @@ const ManageTeams = () => {
                 setSearchTerm("");
                 setFilterSport("all");
               }}
-              className="bg-gray-100 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-200 transition flex items-center justify-center gap-2"
+              className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-medium hover:scale-105"
             >
-              <Filter size={18} />
-              Clear Filters
+              <Filter size={16} />
+              Clear
             </button>
+
+            {/* Results count */}
+            <div className="flex items-center justify-center bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl px-4">
+              <span className="text-emerald-700 font-semibold text-sm">
+                {filteredTeams.length} Results
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Teams Grid */}
         {filteredTeams.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <div className="text-gray-400 mb-4">
-              <Users size={48} className="mx-auto" />
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-16 text-center border border-white/20">
+            <div className="w-20 h-20 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Users size={32} className="text-slate-500" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-2xl font-bold text-slate-800 mb-3">
               No teams found
             </h3>
-            <p className="text-gray-600">
-              Try adjusting your search or filters
+            <p className="text-slate-600 font-medium">
+              Try adjusting your search or filters, or create a new team
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredTeams.map((team) => (
               <div
                 key={team._id}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200"
+                className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:scale-105 overflow-hidden"
               >
-                <div className="relative">
-                  <img
-                    src={`${BACKEND_URL}${team.logo}`}
-                    alt={team.name}
-                    className="w-full h-48 object-cover rounded-t-lg"
-                  />
-
-                  {/* Edit and Delete buttons */}
-                  <div className="absolute top-3 right-3 flex gap-2">
+                {/* Team Header with Logo */}
+                <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 p-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
+                  
+                  {/* Action Buttons */}
+                  <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         // Handle edit functionality
                       }}
-                      className="bg-white bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition"
+                      className="bg-white/90 backdrop-blur-sm p-2 rounded-xl hover:bg-white transition-all duration-200 shadow-lg hover:scale-110"
                     >
-                      <Edit3 size={16} className="text-gray-600" />
+                      <Edit3 size={14} className="text-slate-600" />
                     </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteTeam(team._id);
                       }}
-                      className="bg-white bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition"
+                      className="bg-white/90 backdrop-blur-sm p-2 rounded-xl hover:bg-red-50 transition-all duration-200 shadow-lg hover:scale-110"
                     >
-                      <Trash2 size={16} className="text-red-600" />
+                      <Trash2 size={14} className="text-red-500" />
                     </button>
+                  </div>
+
+                  {/* Team Logo */}
+                  <div className="relative flex justify-center mb-4">
+                    <div className="w-20 h-20 bg-white rounded-2xl shadow-lg p-3 flex items-center justify-center">
+                      {team.logo ? (
+                        <img
+                          src={`${BACKEND_URL}${team.logo}`}
+                          alt={team.name}
+                          className="w-full h-full object-contain rounded-xl"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400 rounded-xl flex items-center justify-center text-slate-600 font-bold text-lg">
+                          {team.name[0]}
+                        </div>
+                      )}
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center">
+                      <Star size={12} className="text-white" />
+                    </div>
+                  </div>
+
+                  {/* Team Name and Short Name */}
+                  <div className="text-center relative z-10">
+                    <h3 className="text-xl font-bold text-slate-800 mb-1 group-hover:text-blue-600 transition-colors">
+                      {team.name}
+                    </h3>
+                    <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 text-xs font-bold px-3 py-1.5 rounded-full border border-blue-200">
+                      {team.shortName}
+                    </div>
                   </div>
                 </div>
 
-                {/* Team name and short name */}
+                {/* Team Details */}
                 <div
-                  className="p-4 cursor-pointer"
+                  className="p-6 cursor-pointer"
                   onClick={() => navigate(`/team-detail/${team._id}`)}
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-bold text-gray-900">
-                      {team.name}
-                    </h3>
-                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
-                      {team.shortName}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <p>
-                      <span className="font-medium text-gray-800">Sport:</span>{" "}
-                      {team.sport}
-                    </p>
-                    <p>
-                      <span className="font-medium text-gray-800">
-                        Squad Size:
-                      </span>{" "}
-                      {team.squad ? team.squad.length : 0} players
-                    </p>
-
-                    {team.captain && (
-                      <div className="flex items-center gap-1">
-                        <Crown size={14} className="text-yellow-500" />
-                        <span className="font-medium text-gray-800">
-                          Captain:
-                        </span>
-                        <span>
-                          {team.captain.firstName} {team.captain.lastName}
+                  <div className="space-y-4">
+                    {/* Sport and Squad Size */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                          team.sport === 'cricket' ? 'bg-green-100 text-green-600' :
+                          team.sport === 'football' ? 'bg-orange-100 text-orange-600' :
+                          'bg-blue-100 text-blue-600'
+                        }`}>
+                          {team.sport === 'cricket' ? <Shield size={14} /> : <Award size={14} />}
+                        </div>
+                        <span className="text-slate-700 font-semibold capitalize">{team.sport}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-lg">
+                        <Users size={12} className="text-slate-600" />
+                        <span className="text-slate-700 font-semibold text-sm">
+                          {team.squad ? team.squad.length : 0} players
                         </span>
                       </div>
-                    )}
+                    </div>
 
-                    {team.viceCaptain && (
-                      <div className="flex items-center gap-1">
-                        <Crown size={14} className="text-blue-500" />
-                        <span className="font-medium text-gray-800">
-                          Vice Captain:
-                        </span>
-                        <span>
-                          {team.viceCaptain.firstName}{" "}
-                          {team.viceCaptain.lastName}
-                        </span>
+                    {/* Captain and Vice Captain */}
+                    <div className="space-y-2">
+                      {team.captain && (
+                        <div className="flex items-center space-x-2 bg-gradient-to-r from-yellow-50 to-amber-50 px-3 py-2 rounded-lg border border-yellow-200">
+                          <Crown size={14} className="text-yellow-600" />
+                          <span className="text-yellow-800 font-medium text-sm">Captain:</span>
+                          <span className="text-yellow-900 font-semibold text-sm">
+                            {team.captain.firstName} {team.captain.lastName}
+                          </span>
+                        </div>
+                      )}
+
+                      {team.viceCaptain && (
+                        <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2 rounded-lg border border-blue-200">
+                          <Crown size={14} className="text-blue-600" />
+                          <span className="text-blue-800 font-medium text-sm">Vice Captain:</span>
+                          <span className="text-blue-900 font-semibold text-sm">
+                            {team.viceCaptain.firstName} {team.viceCaptain.lastName}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* View Details Button */}
+                    <div className="pt-2 border-t border-slate-200">
+                      <div className="flex items-center justify-center text-blue-600 font-medium text-sm group-hover:text-blue-700 transition-colors">
+                        <span>View Team Details</span>
+                        <TrendingUp size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               </div>

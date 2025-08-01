@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   },
   dateOfBirth: {
     type: Date,
-    required: true,
+    // required: true,
   },
   mobile: {
     type: Number,
@@ -31,12 +31,6 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 
-  // Role-based access control
-  role: {
-    type: String,
-    enum: ["user", "admin", "super_admin", "moderator"],
-    default: "user",
-  },
 
   balance: {
     type: Number,
@@ -123,7 +117,7 @@ const userSchema = new mongoose.Schema({
 
   resetOtp: String,
   otpExpiresAt: Date,
-});
+},{timestamps:true});
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

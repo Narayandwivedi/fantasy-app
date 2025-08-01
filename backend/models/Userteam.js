@@ -22,14 +22,6 @@ const userTeamSchema = new mongoose.Schema({
       ref: 'Player',
       required: true
     },
-    isCaptain: {
-      type: Boolean,
-      default: false
-    },
-    isViceCaptain: {
-      type: Boolean,
-      default: false
-    },
     fantasyPoints: {
       type: Number,
       default: 0
@@ -60,11 +52,11 @@ const userTeamSchema = new mongoose.Schema({
     allRounders: { type: Number, default: 0 },
     bowlers: { type: Number, default: 0 }
   },
-  contests: [{
-    contest: { type: mongoose.Schema.Types.ObjectId, ref: 'Contest' },
-    rank: { type: Number },
-    prize: { type: Number, default: 0 }
-  }]
+  // contests: [{
+  //   contest: { type: mongoose.Schema.Types.ObjectId, ref: 'Contest' },
+  //   rank: { type: Number },
+  //   prize: { type: Number, default: 0 }
+  // }]
 }, {
   timestamps: true
 });

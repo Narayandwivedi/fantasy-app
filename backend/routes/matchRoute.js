@@ -12,9 +12,9 @@ const {
   getAllPlayerOfAMatch,
 
   changeMatchStatus,
-  changeMatchPlaying11,
+  setMatchPlaying11AndCreateScores,
+  getMatchPlaying11,
 
-  createMatchScore,
   updateMatchScore,
   getMatchScore,
   matchDetailsByID
@@ -25,19 +25,19 @@ const {
 router.get("/status/live", getLiveMatch);
 router.get("/status/upcoming", getUpcomingMatch);
 router.get("/status/completed", getCompletedMatch);
+router.put("/:matchId/status", changeMatchStatus);
 
-// get match by id 
+// get match by id , get all player and get player list of a match
 router.get("/", getAllMatch);
 router.get("/:matchId", matchDetailsByID);
 router.get("/:matchId/players",getAllPlayerOfAMatch)
 
-router.put("/:matchId/status", changeMatchStatus);
-
-router.put("/:matchId/playing11", changeMatchPlaying11);
 
 
+// set and get playing 11 and score updates
+router.put("/:matchId/playing11", setMatchPlaying11AndCreateScores);
+router.get("/:matchId/playing11", getMatchPlaying11);
 router.get("/:matchId/scores",getMatchScore)
-router.post("/:matchId/scores", createMatchScore);
 router.put("/:matchId/players/scores", updateMatchScore);
 
 router.post("/", createMatch);

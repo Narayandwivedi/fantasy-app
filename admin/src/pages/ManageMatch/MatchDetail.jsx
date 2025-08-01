@@ -2,13 +2,15 @@ import axios from 'axios'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { AppContext } from '../../context/AppContext'
-import { Edit3, Plus, X, Calendar, Clock, Trophy, Save, AlertCircle, Check, ArrowUp, ArrowDown, Hash } from 'lucide-react'
+import { Edit3, Plus, X, Calendar, Clock, Trophy, Save, AlertCircle, Check, ArrowUp, ArrowDown, Hash, Users, Shield, Target, Zap, Award } from 'lucide-react'
 import ScoreCard from '../../components/ScoreCard'
 import ImprovedScoreCard from '../../components/ImprovedScoreCard'
+import { useNavigate } from 'react-router-dom'
 
 const MatchDetail = () => {
     const { matchId } = useParams()
     const { BACKEND_URL } = useContext(AppContext)
+    const navigate = useNavigate()
     const [matchDetail, setMatchDetail] = useState(null)
     const [loading, setLoading] = useState(true)
     const [editingTeam, setEditingTeam] = useState(null) // 'team1' or 'team2' or null
@@ -201,11 +203,15 @@ const MatchDetail = () => {
                 setEditingTeam(null)
                 
                 // Show success message (you can replace with toast notification)
-                alert('Playing 11 and batting order updated successfully!')
+                alert('Playing 11 set and player scores created successfully!')
             }
         } catch (error) {
             console.error('Error saving playing squads:', error)
-            alert('Error saving playing squads. Please try again.')
+            if (error.response?.data?.message) {
+                alert(`Error: ${error.response.data.message}`)
+            } else {
+                alert('Error saving playing squads. Please try again.')
+            }
         } finally {
             setSaving(false)
         }
@@ -235,84 +241,99 @@ const MatchDetail = () => {
     }
 
     const PlayerCard = ({ player, isInPlaying11, battingOrder, onToggle, onMoveUp, onMoveDown, showActions = false, teamKey, canAdd = true, canMoveUp = false, canMoveDown = false }) => (
-        <div className={`bg-white rounded-lg shadow-sm border ${isInPlaying11 ? 'border-green-300 bg-green-50' : 'border-gray-200'} p-3 transition-all duration-200 hover:shadow-md`}>
-            <div className="flex items-center space-x-3">
-                {/* Batting order number */}
-                {isInPlaying11 && (
-                    <div className="flex-shrink-0">
-                        <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                            {battingOrder}
+        <div className={`group relative bg-white rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
+            isInPlaying11 
+                ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 shadow-sm' 
+                : 'border-slate-200 hover:border-slate-300'
+        }`}>
+            {/* Batting order badge */}
+            {isInPlaying11 && (
+                <div className="absolute -top-2 -left-2 z-10">
+                    <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-lg">
+                        {battingOrder}
+                    </div>
+                </div>
+            )}
+
+            <div className="p-4">
+                <div className="flex items-center space-x-3">
+                    {/* Player avatar */}
+                    <div className="relative">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center text-slate-600 font-semibold text-sm shadow-sm">
+                            {player.firstName[0]}{player.lastName[0]}
+                        </div>
+                        {isInPlaying11 && (
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center">
+                                <Check size={8} className="text-white" />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Player info */}
+                    <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-slate-800 truncate">
+                            {player.firstName} {player.lastName}
+                        </h4>
+                        <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mt-1 ${getPositionColor(player.position)}`}>
+                            {player.position === 'wicket-keeper' && <Shield size={10} className="mr-1" />}
+                            {player.position === 'batsman' && <Target size={10} className="mr-1" />}
+                            {player.position === 'bowler' && <Zap size={10} className="mr-1" />}
+                            {player.position === 'all-rounder' && <Users size={10} className="mr-1" />}
+                            {player.position.replace('-', ' ').toUpperCase()}
                         </div>
                     </div>
-                )}
 
-                {/* Player image */}
-                <img 
-                    src={"h"} 
-                    alt={`${player.firstName} ${player.lastName}`}
-                    className="w-10 h-10 rounded-full object-cover bg-gray-200 flex-shrink-0"
-                />
-
-                {/* Player info */}
-                <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-800 truncate text-sm">
-                        {player.firstName} {player.lastName}
-                    </h4>
-                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getPositionColor(player.position)}`}>
-                        {player.position.replace('-', ' ').toUpperCase()}
-                    </span>
+                    {/* Action buttons */}
+                    {showActions && (
+                        <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            {/* Batting order controls */}
+                            {isInPlaying11 && (
+                                <>
+                                    <button
+                                        onClick={() => onMoveUp(player._id, teamKey)}
+                                        disabled={!canMoveUp}
+                                        className={`p-2 rounded-lg transition-all duration-200 ${
+                                            canMoveUp
+                                                ? 'hover:bg-indigo-100 text-indigo-600 hover:scale-105'
+                                                : 'text-slate-400 cursor-not-allowed'
+                                        }`}
+                                        title="Move up in batting order"
+                                    >
+                                        <ArrowUp size={14} />
+                                    </button>
+                                    <button
+                                        onClick={() => onMoveDown(player._id, teamKey)}
+                                        disabled={!canMoveDown}
+                                        className={`p-2 rounded-lg transition-all duration-200 ${
+                                            canMoveDown
+                                                ? 'hover:bg-indigo-100 text-indigo-600 hover:scale-105'
+                                                : 'text-slate-400 cursor-not-allowed'
+                                        }`}
+                                        title="Move down in batting order"
+                                    >
+                                        <ArrowDown size={14} />
+                                    </button>
+                                </>
+                            )}
+                            
+                            {/* Add/Remove button */}
+                            <button
+                                onClick={() => onToggle(player._id, teamKey)}
+                                disabled={!isInPlaying11 && !canAdd}
+                                className={`p-2 rounded-lg transition-all duration-200 ${
+                                    isInPlaying11 
+                                        ? 'bg-red-100 hover:bg-red-200 text-red-600 hover:scale-105' 
+                                        : canAdd
+                                            ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-600 hover:scale-105'
+                                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                }`}
+                                title={!isInPlaying11 && !canAdd ? 'Playing 11 is full (11/11)' : ''}
+                            >
+                                {isInPlaying11 ? <X size={14} /> : <Plus size={14} />}
+                            </button>
+                        </div>
+                    )}
                 </div>
-
-                {/* Action buttons */}
-                {showActions && (
-                    <div className="flex items-center space-x-1 flex-shrink-0">
-                        {/* Batting order controls */}
-                        {isInPlaying11 && (
-                            <>
-                                <button
-                                    onClick={() => onMoveUp(player._id, teamKey)}
-                                    disabled={!canMoveUp}
-                                    className={`p-1 rounded transition-colors ${
-                                        canMoveUp
-                                            ? 'hover:bg-blue-100 text-blue-600'
-                                            : 'text-gray-400 cursor-not-allowed'
-                                    }`}
-                                    title="Move up in batting order"
-                                >
-                                    <ArrowUp size={12} />
-                                </button>
-                                <button
-                                    onClick={() => onMoveDown(player._id, teamKey)}
-                                    disabled={!canMoveDown}
-                                    className={`p-1 rounded transition-colors ${
-                                        canMoveDown
-                                            ? 'hover:bg-blue-100 text-blue-600'
-                                            : 'text-gray-400 cursor-not-allowed'
-                                    }`}
-                                    title="Move down in batting order"
-                                >
-                                    <ArrowDown size={12} />
-                                </button>
-                            </>
-                        )}
-                        
-                        {/* Add/Remove button */}
-                        <button
-                            onClick={() => onToggle(player._id, teamKey)}
-                            disabled={!isInPlaying11 && !canAdd}
-                            className={`p-1.5 rounded-full transition-colors ${
-                                isInPlaying11 
-                                    ? 'bg-red-100 hover:bg-red-200 text-red-600' 
-                                    : canAdd
-                                        ? 'bg-green-100 hover:bg-green-200 text-green-600'
-                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            }`}
-                            title={!isInPlaying11 && !canAdd ? 'Playing 11 is full (11/11)' : ''}
-                        >
-                            {isInPlaying11 ? <X size={12} /> : <Plus size={12} />}
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     )
@@ -332,98 +353,108 @@ const MatchDetail = () => {
         }
 
         return (
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
                 {/* Team Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                            <img 
-                                src={team.logo} 
-                                alt={team.name}
-                                className="w-12 h-12 rounded-full bg-white p-1"
-                            />
+                <div className="relative bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 text-white p-6">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
+                    <div className="relative flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <div className="relative">
+                                <div className="w-16 h-16 rounded-2xl bg-white backdrop-blur-sm border border-white/20 p-2 flex items-center justify-center shadow-lg">
+                                    {team.logo ? (
+                                        <img 
+                                            src={team.logo} 
+                                            alt={team.name}
+                                            className="w-full h-full object-contain rounded-xl"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400 rounded-xl flex items-center justify-center text-slate-600 font-bold text-lg">
+                                            {team.name[0]}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-md">
+                                    <Trophy size={12} className="text-white" />
+                                </div>
+                            </div>
                             <div>
-                                <h2 className="text-xl font-bold">{team.name}</h2>
-                                <p className="text-blue-100 text-sm">({team.shortName})</p>
+                                <h2 className="text-2xl font-bold mb-1">{team.name}</h2>
+                                <div className="flex items-center space-x-3">
+                                    <span className="text-slate-300 text-sm">({team.shortName})</span>
+                                    <div className="flex items-center space-x-1 text-xs text-slate-300">
+                                        <Users size={12} />
+                                        <span>{team.squad.length} players</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3">
                             {currentPlaying11.length === 11 && (
-                                <div className="flex items-center space-x-1 bg-green-500/20 px-2 py-1 rounded-full">
-                                    <Check size={12} />
-                                    <span className="text-xs">Complete</span>
+                                <div className="flex items-center space-x-2 bg-emerald-500/20 backdrop-blur-sm px-3 py-2 rounded-full border border-emerald-400/30">
+                                    <Check size={14} className="text-emerald-300" />
+                                    <span className="text-emerald-200 text-sm font-medium">Complete</span>
                                 </div>
                             )}
                             <button
                                 onClick={toggleEditMode}
-                                className="flex items-center space-x-1 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-colors text-sm"
+                                className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 text-sm font-medium ${
+                                    isEditing 
+                                        ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/30' 
+                                        : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                                }`}
                             >
                                 <Edit3 size={14} />
-                                <span>{isEditing ? 'Done' : 'Edit'}</span>
+                                <span>{isEditing ? 'Done' : 'Edit Squad'}</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="p-4">
-                    {/* Squad Section */}
-                    <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                            <Trophy className="mr-2 text-yellow-600" size={18} />
-                            Full Squad ({team.squad.length})
-                        </h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            {team.squad.map(player => {
-                                const playerInPlaying11 = currentPlaying11.find(p => p.playerId === player._id)
-                                const isInPlaying11 = !!playerInPlaying11
-                                
-                                return (
-                                    <PlayerCard
-                                        key={player._id}
-                                        player={player}
-                                        isInPlaying11={isInPlaying11}
-                                        battingOrder={playerInPlaying11?.battingOrder}
-                                        onToggle={togglePlayer}
-                                        showActions={isEditing}
-                                        teamKey={teamKey}
-                                        canAdd={canAddMore || isInPlaying11}
-                                    />
-                                )
-                            })}
-                        </div>
-                    </div>
-
+                <div className="p-6 space-y-8">
                     {/* Playing 11 Section */}
-                    <div className="border-t pt-6">
-                        <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-                                <div className={`w-4 h-4 rounded-full mr-2 ${
-                                    currentPlaying11.length === 11 ? 'bg-green-600' : 'bg-yellow-500'
-                                }`}></div>
-                                Playing 11 ({currentPlaying11.length}/11)
-                            </h3>
+                    <div>
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center space-x-3">
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                                    currentPlaying11.length === 11 
+                                        ? 'bg-emerald-100 text-emerald-600' 
+                                        : 'bg-amber-100 text-amber-600'
+                                }`}>
+                                    {currentPlaying11.length === 11 ? <Check size={20} /> : <AlertCircle size={20} />}
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-800">Playing XI</h3>
+                                    <p className="text-slate-500 text-sm">
+                                        {currentPlaying11.length}/11 players selected
+                                    </p>
+                                </div>
+                            </div>
                             
                             {currentPlaying11.length < 11 && isEditing && (
-                                <div className="flex items-center space-x-1 text-amber-600 text-xs">
-                                    <AlertCircle size={12} />
-                                    <span>Need {11 - currentPlaying11.length} more</span>
+                                <div className="flex items-center space-x-2 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
+                                    <AlertCircle size={16} className="text-amber-600" />
+                                    <span className="text-amber-700 text-sm font-medium">
+                                        Need {11 - currentPlaying11.length} more
+                                    </span>
                                 </div>
                             )}
                         </div>
                         
                         {currentPlaying11.length > 0 ? (
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {/* Batting order hint */}
                                 {isEditing && (
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-3">
-                                        <div className="flex items-center space-x-2 text-blue-800 text-xs">
-                                            <Hash size={12} />
-                                            <span>Use ↑↓ buttons to adjust batting order</span>
+                                    <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+                                        <div className="flex items-center space-x-3 text-indigo-700">
+                                            <Hash size={16} />
+                                            <span className="text-sm font-medium">
+                                                Use ↑↓ buttons to adjust batting order
+                                            </span>
                                         </div>
                                     </div>
                                 )}
                                 
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     {currentPlaying11
                                         .sort((a, b) => a.battingOrder - b.battingOrder)
                                         .map((playerData, index) => {
@@ -450,16 +481,53 @@ const MatchDetail = () => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="text-center py-6 bg-gray-50 rounded-lg">
-                                <p className="text-gray-500 text-sm">No players selected</p>
+                            <div className="text-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                                <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Users size={24} className="text-slate-400" />
+                                </div>
+                                <p className="text-slate-500 font-medium">No players selected</p>
                                 {isEditing && (
-                                    <p className="text-xs text-gray-400 mt-1">
-                                        Click + to add players
+                                    <p className="text-slate-400 text-sm mt-2">
+                                        Choose players from the squad below
                                     </p>
                                 )}
                             </div>
                         )}
                     </div>
+
+                    {/* Squad Section */}
+                    {isEditing && (
+                        <div className="border-t border-slate-200 pt-8">
+                            <div className="flex items-center space-x-3 mb-6">
+                                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                                    <Trophy size={20} className="text-blue-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-800">Squad</h3>
+                                    <p className="text-slate-500 text-sm">{team.squad.length} players available</p>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                {team.squad.map(player => {
+                                    const playerInPlaying11 = currentPlaying11.find(p => p.playerId === player._id)
+                                    const isInPlaying11 = !!playerInPlaying11
+                                    
+                                    return (
+                                        <PlayerCard
+                                            key={player._id}
+                                            player={player}
+                                            isInPlaying11={isInPlaying11}
+                                            battingOrder={playerInPlaying11?.battingOrder}
+                                            onToggle={togglePlayer}
+                                            showActions={isEditing}
+                                            teamKey={teamKey}
+                                            canAdd={canAddMore || isInPlaying11}
+                                        />
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         )
@@ -489,37 +557,38 @@ const MatchDetail = () => {
     const bothTeamsComplete = localPlaying11.team1.length === 11 && localPlaying11.team2.length === 11
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
             {/* Match Header */}
-            <div className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="relative bg-white shadow-lg border-b border-slate-200/60 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
+                <div className="relative max-w-7xl mx-auto px-6 py-8">
                     <div className="text-center">
-                        <div className="flex items-center justify-center space-x-2 text-sm text-gray-600 mb-2">
-                            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
+                        <div className="flex items-center justify-center space-x-3 mb-4">
+                            <div className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-semibold text-sm shadow-lg">
                                 {matchDetail.matchType}
-                            </span>
-                            <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full">
+                            </div>
+                            <div className="px-4 py-2 bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 rounded-full font-medium text-sm">
                                 {matchDetail.series}
-                            </span>
+                            </div>
                         </div>
                         
-                        <h1 className="text-2xl font-bold text-gray-800 mb-3">
-                            {matchDetail.team1.name} vs {matchDetail.team2.name}
+                        <h1 className="text-4xl font-bold text-slate-800 mb-6 tracking-tight">
+                            {matchDetail.team1.name} <span className="text-slate-400 mx-4">vs</span> {matchDetail.team2.name}
                         </h1>
                         
-                        <div className="flex items-center justify-center space-x-6 text-gray-600 text-sm">
-                            <div className="flex items-center space-x-2">
-                                <Calendar size={14} />
-                                <span>{formatDate(matchDetail.startTime)}</span>
+                        <div className="flex items-center justify-center space-x-8 text-slate-600">
+                            <div className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-slate-200/60">
+                                <Calendar size={16} className="text-blue-500" />
+                                <span className="font-medium">{formatDate(matchDetail.startTime)}</span>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <Clock size={14} />
-                                <span>{formatTime(matchDetail.startTime)}</span>
+                            <div className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-slate-200/60">
+                                <Clock size={16} className="text-emerald-500" />
+                                <span className="font-medium">{formatTime(matchDetail.startTime)}</span>
                             </div>
-                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            <div className={`px-4 py-2 rounded-xl font-semibold text-sm border ${
                                 matchDetail.status === 'upcoming' 
-                                    ? 'bg-yellow-100 text-yellow-800' 
-                                    : 'bg-green-100 text-green-800'
+                                    ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border-amber-200' 
+                                    : 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-800 border-emerald-200'
                             }`}>
                                 {matchDetail.status.toUpperCase()}
                             </div>
@@ -528,48 +597,55 @@ const MatchDetail = () => {
                 </div>
             </div>
 
-            {/* Save/Reset Actions Bar */}
+            {/* Floating Save Actions */}
             {hasUnsavedChanges && (
-                <div className="bg-yellow-50 border-b border-yellow-200">
-                    <div className="max-w-7xl mx-auto px-4 py-3">
+                <div className="sticky top-0 z-50 bg-gradient-to-r from-amber-500 to-orange-500 shadow-xl border-b border-orange-200/50 backdrop-blur-sm">
+                    <div className="max-w-7xl mx-auto px-6 py-4">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2 text-yellow-800">
-                                <AlertCircle size={14} />
-                                <span className="text-sm font-medium">Unsaved changes</span>
+                            <div className="flex items-center space-x-3 text-white">
+                                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                    <AlertCircle size={20} />
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Unsaved Changes</p>
+                                    <p className="text-orange-100 text-sm">Your squad selections haven't been saved yet</p>
+                                </div>
                             </div>
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-4">
                                 <button
                                     onClick={resetChanges}
-                                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                                    className="px-6 py-2.5 text-white hover:bg-white/20 rounded-xl transition-all duration-200 font-medium border border-white/30 hover:border-white/50"
                                 >
-                                    Reset
+                                    Reset Changes
                                 </button>
                                 <button
                                     onClick={savePlayingSquads}
                                     disabled={!bothTeamsComplete || saving}
-                                    className={`flex items-center space-x-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                                    className={`flex items-center space-x-3 px-8 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg ${
                                         bothTeamsComplete && !saving
-                                            ? 'bg-green-600 hover:bg-green-700 text-white'
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                            ? 'bg-white text-orange-600 hover:bg-orange-50 hover:scale-105 shadow-white/25'
+                                            : 'bg-white/20 text-white/70 cursor-not-allowed'
                                     }`}
                                 >
-                                    <Save size={14} />
-                                    <span>{saving ? 'Saving...' : 'Save'}</span>
+                                    <Save size={18} />
+                                    <span>{saving ? 'Saving Squad...' : 'Save Playing XI'}</span>
                                 </button>
                             </div>
                         </div>
                         {!bothTeamsComplete && (
-                            <p className="text-xs text-yellow-700 mt-1">
-                                Both teams need 11 players to save
-                            </p>
+                            <div className="mt-3 bg-orange-600/20 backdrop-blur-sm px-4 py-2 rounded-lg border border-orange-400/30">
+                                <p className="text-orange-100 text-sm font-medium">
+                                    ⚠️ Both teams need exactly 11 players selected to save
+                                </p>
+                            </div>
                         )}
                     </div>
                 </div>
             )}
 
-            {/* Teams Section - Side by Side Layout */}
-            <div className="max-w-7xl mx-auto px-4 py-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Teams Section */}
+            <div className="max-w-7xl mx-auto px-6 py-8">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                     <TeamSection 
                         team={matchDetail.team1} 
                         teamKey="team1"
@@ -578,6 +654,30 @@ const MatchDetail = () => {
                         team={matchDetail.team2} 
                         teamKey="team2"
                     />
+                </div>
+            </div>
+
+            {/* Contest Management Button */}
+            <div className="max-w-7xl mx-auto px-6 pb-8">
+                <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                <Award size={24} className="text-white" />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold text-slate-800">Contest Management</h2>
+                                <p className="text-slate-600">Create and manage contests for this match</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => navigate(`/manage-contests?matchId=${matchId}`)}
+                            className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-3 shadow-lg hover:shadow-xl hover:scale-105"
+                        >
+                            <Award size={20} />
+                            <span>Manage Contests</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 

@@ -13,6 +13,7 @@ import CompletedMatch from "./pages/ManageMatch/CompletedMatch";
 import MatchCard from "./components/MatchCard";
 import MatchDetail from "./pages/ManageMatch/MatchDetail";
 import ManageUser from "./pages/ManageUser";
+import ManageContest from "./pages/ManageContest/ManageContest";
 
 const App = () => {
   return (
@@ -36,6 +37,7 @@ const App = () => {
           <Route path="/live-matches" element={<LiveMatch />} />
           <Route path="/completed-matches" element={<CompletedMatch />} />
           <Route path="/matches/:matchId" element={<MatchDetail />} />
+          <Route path="/manage-contests" element={<ManageContest />} />
           <Route path="/test" element={<MatchCard />} />
 
         </Routes>

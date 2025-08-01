@@ -14,7 +14,7 @@ const Contest = () => {
   const fetchContest = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`${BACKEND_URL}/api/contest/${matchId}`);
+      const { data } = await axios.get(`${BACKEND_URL}/api/contests/${matchId}`);
       console.log(data);
       if (data.success) {
         setContests(data.data);

@@ -84,7 +84,6 @@ async function matchDetailsByID(req, res) {
     }
 
     const getMatch = await Match.findById(matchId)
-      .populate("team1PlayingSquad team2PlayingSquad")
       .populate({
         path: "team1",
         populate: {
@@ -110,9 +109,38 @@ async function matchDetailsByID(req, res) {
         .json({ success: false, message: "invalid match id" });
     }
 
+    // Get playing 11 from player scores if they exist
+    const playerScores = await PlayerScore.find({ match: matchId })
+      .populate("player", "firstName lastName position battingStyle bowlingStyle imgLink")
+      .sort({ team: 1, "batting.battingOrder": 1 });
+
+    // Create playing squads from player scores
+    const team1PlayingSquad = [];
+    const team2PlayingSquad = [];
+
+    playerScores.forEach(score => {
+      const playerData = {
+        playerId: score.player._id,
+        battingOrder: score.batting.battingOrder
+      };
+
+      if (score.team.toString() === getMatch.team1._id.toString()) {
+        team1PlayingSquad.push(playerData);
+      } else if (score.team.toString() === getMatch.team2._id.toString()) {
+        team2PlayingSquad.push(playerData);
+      }
+    });
+
+    // Add playing squads to the response
+    const matchWithPlayingSquads = {
+      ...getMatch.toObject(),
+      team1PlayingSquad,
+      team2PlayingSquad
+    };
+
     return res.json({
       success: true,
-      data: getMatch,
+      data: matchWithPlayingSquads,
     });
   } catch (err) {
     console.error("Error in matchDetailsByID:", err);
@@ -281,9 +309,9 @@ async function changeMatchStatus(req, res) {
   }
 }
 
-// change playing 11
+// set playing 11 and create player scores
 
-async function changeMatchPlaying11(req, res) {
+async function setMatchPlaying11AndCreateScores(req, res) {
   try {
     const { team1PlayingSquad, team2PlayingSquad } = req.body;
     const { matchId } = req.params;
@@ -314,53 +342,14 @@ async function changeMatchPlaying11(req, res) {
         .json({ success: false, message: "invalid match id type" });
     }
 
-    const getMatch = await Match.findById(matchId);
+    const getMatch = await Match.findById(matchId)
+      .populate("team1", "name")
+      .populate("team2", "name");
+      
     if (!getMatch) {
       return res
         .status(400)
         .json({ success: false, message: "match not found" });
-    }
-
-    getMatch.team1PlayingSquad = team1PlayingSquad;
-    getMatch.team2PlayingSquad = team2PlayingSquad;
-
-    await getMatch.save();
-    res.json({ success: true, message: "team added successfull" });
-  } catch (err) {
-    console.log(err.message);
-    return res.status(500).json({ success: false, message: "server error" });
-  }
-}
-
-// match score
-
-async function createMatchScore(req, res) {
-  const { matchId } = req.params;
-
-  // Validate matchId
-  if (!matchId) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Please provide valid matchId" });
-  }
-
-  // Check if valid ObjectId
-  if (!mongoose.isValidObjectId(matchId)) {
-    return res.status(400).json({ success: false, message: "Invalid matchId" });
-  }
-
-  try {
-    // Check if match exists and populate team details
-    const getMatch = await Match.findById(matchId)
-      .populate("team1", "name")
-      .populate("team2", "name")
-      .populate("team1PlayingSquad.playerId", "name")
-      .populate("team2PlayingSquad.playerId", "name");
-
-    if (!getMatch) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Match not found" });
     }
 
     // Check if PlayerScores already exist for this match
@@ -368,21 +357,21 @@ async function createMatchScore(req, res) {
     if (existingScores.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Player scores already exist for this match",
+        message: "Player scores already exist for this match. Please delete existing scores first.",
       });
     }
 
     const playerScoresToCreate = [];
 
     // Create PlayerScore entries for Team 1 players
-    for (let i = 0; i < getMatch.team1PlayingSquad.length; i++) {
-      const player = getMatch.team1PlayingSquad[i];
+    for (let i = 0; i < team1PlayingSquad.length; i++) {
+      const player = team1PlayingSquad[i];
 
       const playerScoreData = {
         match: matchId,
-        team: getMatch.team1,
+        team: getMatch.team1._id,
         series: getMatch.series || "",
-        player: player.playerId._id,
+        player: player.playerId,
         sport: getMatch.sport,
         batting: {
           battingOrder: player.battingOrder,
@@ -394,7 +383,7 @@ async function createMatchScore(req, res) {
         playerScoreData.batting = {
           ...playerScoreData.batting,
           runs: 0,
-          ballsFaced: 0,
+          ballsFaced: 0,  
           fours: 0,
           sixes: 0,
           isOut: false,
@@ -441,14 +430,14 @@ async function createMatchScore(req, res) {
     }
 
     // Create PlayerScore entries for Team 2 players
-    for (let i = 0; i < getMatch.team2PlayingSquad.length; i++) {
-      const player = getMatch.team2PlayingSquad[i];
+    for (let i = 0; i < team2PlayingSquad.length; i++) {
+      const player = team2PlayingSquad[i];
 
       const playerScoreData = {
         match: matchId,
-        team: getMatch.team2,
+        team: getMatch.team2._id,
         series: getMatch.series || "",
-        player: player.playerId._id,
+        player: player.playerId,
         sport: getMatch.sport,
         batting: {
           battingOrder: player.battingOrder,
@@ -512,21 +501,101 @@ async function createMatchScore(req, res) {
 
     return res.status(201).json({
       success: true,
-      message: "Match player scores created successfully",
+      message: "Playing 11 set and player scores created successfully",
       data: {
         matchId: matchId,
         sport: getMatch.sport,
         totalPlayersCreated: createdPlayerScores.length,
-        team1Players: getMatch.team1PlayingSquad.length,
-        team2Players: getMatch.team2PlayingSquad.length,
+        team1Players: team1PlayingSquad.length,
+        team2Players: team2PlayingSquad.length,
         createdScores: createdPlayerScores,
       },
     });
+  } catch (err) {
+    console.error("Error setting playing 11 and creating scores:", err);
+    return res.status(500).json({ 
+      success: false, 
+      message: "server error",
+      error: err.message 
+    });
+  }
+}
+
+// get playing 11 from player scores
+async function getMatchPlaying11(req, res) {
+  const { matchId } = req.params;
+
+  if (!matchId) {
+    return res.status(400).json({
+      success: false,
+      message: "Match ID is required",
+    });
+  }
+
+  if (!mongoose.isValidObjectId(matchId)) {
+    return res.status(400).json({ success: false, message: "Invalid matchId" });
+  }
+
+  try {
+    // Get match details
+    const getMatch = await Match.findById(matchId)
+      .populate("team1", "name shortName logo")
+      .populate("team2", "name shortName logo");
+
+    if (!getMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Match not found",
+      });
+    }
+
+    // Get player scores (which contain playing 11 data)
+    const playerScores = await PlayerScore.find({ match: matchId })
+      .populate("player", "firstName lastName position battingStyle bowlingStyle imgLink")
+      .populate("team", "name shortName logo")
+      .sort({ team: 1, "batting.battingOrder": 1 });
+
+    // Group by teams and format playing 11
+    const team1Playing11 = [];
+    const team2Playing11 = [];
+
+    playerScores.forEach(score => {
+      const playerData = {
+        playerId: score.player._id,
+        battingOrder: score.batting.battingOrder,
+        player: score.player
+      };
+
+      if (score.team._id.toString() === getMatch.team1._id.toString()) {
+        team1Playing11.push(playerData);
+      } else {
+        team2Playing11.push(playerData);
+      }
+    });
+
+    const responseData = {
+      matchId: matchId,
+      team1: {
+        ...getMatch.team1.toObject(),
+        playingSquad: team1Playing11
+      },
+      team2: {
+        ...getMatch.team2.toObject(),
+        playingSquad: team2Playing11
+      }
+    };
+
+    return res.json({
+      success: true,
+      message: "Playing 11 retrieved successfully",
+      data: responseData,
+      totalPlayers: playerScores.length
+    });
   } catch (error) {
-    console.error("Error creating match scores:", error);
+    console.error("Error fetching playing 11:", error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error while creating player scores",
+      message: "Error fetching playing 11",
       error: error.message,
     });
   }
@@ -828,8 +897,8 @@ module.exports = {
   getUpcomingMatch,
   getCompletedMatch,
   changeMatchStatus,
-  changeMatchPlaying11,
-  createMatchScore,
+  setMatchPlaying11AndCreateScores,
+  getMatchPlaying11,
   updateMatchScore,
   getMatchScore,
 };

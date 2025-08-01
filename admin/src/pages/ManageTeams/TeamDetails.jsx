@@ -4,6 +4,7 @@ import { AppContext } from "../../context/AppContext";
 import { useParams } from "react-router-dom";
 import { Plus, Search, X, UserPlus, Crown, Shield, Star, Users, Trophy, Target } from "lucide-react";
 import { toast } from "react-toastify";
+import EditPlayerModal from "../ManagePlayers/EditPlayerModal";
 
 // Search Player Modal Component
 const SearchPlayerModal = ({ 
@@ -176,8 +177,10 @@ const TeamDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showEditPlayerModal, setShowEditPlayerModal] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState(null);
 
-  const { BACKEND_URL, allPlayers } = useContext(AppContext);
+  const { BACKEND_URL, allPlayers, setAllPlayers } = useContext(AppContext);
 
   async function fetchTeamDetails() {
     try {
@@ -235,6 +238,20 @@ const TeamDetails = () => {
         toast.error("An error occurred while removing player from squad");
       }
     }
+  };
+
+  // Function to open edit player modal
+  const handleEditPlayer = (player) => {
+    setEditingPlayer(player);
+    setShowEditPlayerModal(true);
+  };
+
+  // Function to close edit player modal
+  const handleCloseEditModal = () => {
+    setShowEditPlayerModal(false);
+    setEditingPlayer(null);
+    // Refresh team details to show any updates
+    fetchTeamDetails();
   };
 
   useEffect(() => {
@@ -482,7 +499,10 @@ const TeamDetails = () => {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <button className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg">
+                      <button 
+                        onClick={() => handleEditPlayer(player)}
+                        className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                      >
                         Edit
                       </button>
                       <button 
@@ -523,6 +543,13 @@ const TeamDetails = () => {
         allPlayers={allPlayers || []}
         onAddPlayer={handleAddPlayerToSquad}
         currentSquadIds={currentSquadIds}
+      />
+
+      {/* Edit Player Modal */}
+      <EditPlayerModal
+        showModal={showEditPlayerModal}
+        onClose={handleCloseEditModal}
+        player={editingPlayer}
       />
     </div>
   );

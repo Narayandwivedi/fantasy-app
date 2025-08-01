@@ -18,7 +18,7 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
     fantasyPrice: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { BACKEND_URL } = useContext(AppContext);
+  const { BACKEND_URL, setAllPlayers } = useContext(AppContext);
 
   // Set form data when player changes
   useEffect(() => {
@@ -96,6 +96,10 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
 
       if (data.success) {
         toast.success("Player updated successfully");
+        // Update the player in allPlayers context
+        setAllPlayers(prev => 
+          prev.map(p => p._id === player._id ? { ...p, ...data.updatedPlayer } : p)
+        );
         resetForm();
         onClose();
       }
