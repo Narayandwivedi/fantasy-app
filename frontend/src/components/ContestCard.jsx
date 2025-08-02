@@ -1,6 +1,6 @@
 import React from "react";
 
-const ContestCard = ({ contest }) => {
+const ContestCard = ({ contest, onJoinClick }) => {
   const spotsLeft = contest?.totalSpots - contest?.currentParticipants || 0;
   const fillPercentage =
     contest?.totalSpots > 0
@@ -23,7 +23,10 @@ const ContestCard = ({ contest }) => {
       : `${Math.round(100 / (contest?.totalSpots || 1))}%`;
 
   return (
-    <div className="bg-white rounded-xl mx-3 mb-3 overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
+    <div 
+      className="bg-white rounded-xl mx-3 mb-3 overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+      onClick={() => onJoinClick && onJoinClick(contest)}
+    >
       {/* Prize Pool Header */}
       <div className="flex items-center px-3 py-2">
         <div className="flex items-center space-x-1">

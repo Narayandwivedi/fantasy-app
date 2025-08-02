@@ -13,7 +13,6 @@ const userTeamSchema = new mongoose.Schema({
   },
   teamName: {
     type: String,
-    required: true,
     maxlength: 20
   },
   players: [{
@@ -41,11 +40,7 @@ const userTeamSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  totalCredits: {
-    type: Number,
-    required: true,
-    max: 100
-  },
+
   teamComposition: {
     wicketKeepers: { type: Number, default: 0 },
     batsmen: { type: Number, default: 0 },

@@ -643,6 +643,7 @@ async function getMatchScore(req, res) {
     });
   }
 }
+
 async function updateMatchScore(req, res) {
   const { matchId } = req.params;
   const { players } = req.body; // Array of player updates

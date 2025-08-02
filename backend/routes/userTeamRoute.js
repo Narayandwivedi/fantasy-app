@@ -1,11 +1,12 @@
 const express = require("express")
 const router = express.Router()
 
-const { createUserTeam } = require("../controllers/userTeamController")
+const { createUserTeam  , getAllTeamOfAMatch} = require("../controllers/userTeamController")
 
 
 
 router.post("/",createUserTeam)
+router.get("/:matchId",getAllTeamOfAMatch)
 
 
 

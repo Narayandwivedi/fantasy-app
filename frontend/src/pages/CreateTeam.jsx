@@ -185,19 +185,22 @@ const CreateTeam = () => {
     
     setSaving(true)
     
-    // Here you can implement the API call later
     const teamData = {
       userId: user?._id,
-      userName: user?.fullName,
       matchId: matchId,
-      players: selectedPlayers,
-      captain: captain,
-      viceCaptain: viceCaptain
+      players: selectedPlayers.map(player => player._id),
+      captainId: captain._id,
+      viceCaptainId: viceCaptain._id
     }
     
-    console.log('Team data to save:', teamData)
-    console.log('Current user:', user)
-    alert('Team saved successfully! (API implementation pending)')
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/userteam`, teamData)
+      console.log('Team saved:', response.data)
+      alert('Team saved successfully!')
+    } catch (error) {
+      console.error('Error saving team:', error)
+      alert('Failed to save team. Please try again.')
+    }
     
     setSaving(false)
   }

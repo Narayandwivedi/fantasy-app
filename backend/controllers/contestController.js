@@ -1,6 +1,7 @@
 const Contest = require("../models/Contest");
 const Match = require("../models/Match");
 const mongoose = require("mongoose");
+const User = require("../models/User");
 
 async function createContest(req, res) {
   try {
@@ -53,14 +54,13 @@ async function createContest(req, res) {
 async function getContest(req, res) {
   try {
     const { matchId } = req.params;
-    
+
     //check is match id provided
     if (!matchId) {
       return res
         .status(400)
         .json({ success: false, message: "provide match id" });
     }
-    console.log(matchId);
 
     //check is valid mongoose id
     if (!mongoose.isValidObjectId(matchId)) {
@@ -77,11 +77,52 @@ async function getContest(req, res) {
   }
 }
 
+async function joinContest(req, res) {
+  try {
+    
+    const { matchId, userId, teamId, contestId } = req.body;
+    // validate req body
+    if (!userId || !teamId || !contestId || !matchId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "missing details" });
+    }
 
-async function joinContest(req,res) {
-  
-  const {userId , teamId} = req.body
+    // validate object id
+    if (
+      !mongoose.isValidObjectId(userId) ||
+      !mongoose.isValidObjectId(teamId) ||
+      !mongoose.isValidObjectId(contestId) ||
+      !mongoose.isValidObjectId(matchId)
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid object id" });
+    }
 
+    // check user
+    const getUser = await User.findById(userId)
+    if(!getUser){
+      return res.status(400).json({success:false , message:"user not found"})
+    }
+
+
+    const getContest = await Contest.findById(contestId);
+    
+    getContest.currentParticipants+=1
+
+    getContest.joinedUsers.push({
+      user:userId,
+      team:teamId
+    })
+
+    await getContest.save()
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ success: false, message: "server error" });
+  }
 }
 
-module.exports = { createContest, getContest };
+module.exports = { createContest, getContest, joinContest };

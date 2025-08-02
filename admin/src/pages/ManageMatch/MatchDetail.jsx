@@ -5,6 +5,7 @@ import { AppContext } from '../../context/AppContext'
 import { Edit3, Plus, X, Calendar, Clock, Trophy, Save, AlertCircle, Check, ArrowUp, ArrowDown, Hash, Users, Shield, Target, Zap, Award } from 'lucide-react'
 import ScoreCard from '../../components/ScoreCard'
 import ImprovedScoreCard from '../../components/ImprovedScoreCard'
+import ContestManager from '../../components/ContestManager'
 import { useNavigate } from 'react-router-dom'
 
 const MatchDetail = () => {
@@ -657,29 +658,12 @@ const MatchDetail = () => {
                 </div>
             </div>
 
-            {/* Contest Management Button */}
-            <div className="max-w-7xl mx-auto px-6 pb-8">
-                <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
-                                <Award size={24} className="text-white" />
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-bold text-slate-800">Contest Management</h2>
-                                <p className="text-slate-600">Create and manage contests for this match</p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => navigate(`/manage-contests?matchId=${matchId}`)}
-                            className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-3 shadow-lg hover:shadow-xl hover:scale-105"
-                        >
-                            <Award size={20} />
-                            <span>Manage Contests</span>
-                        </button>
-                    </div>
+            {/* Contest Management Section - Only show for upcoming matches */}
+            {matchDetail.status === 'upcoming' && (
+                <div className="max-w-7xl mx-auto px-6 pb-8">
+                    <ContestManager matchId={matchId} matchData={matchDetail} />
                 </div>
-            </div>
+            )}
 
             {/* Scorecard Section Placeholder */}
             <div className="max-w-7xl mx-auto px-4 pb-8">

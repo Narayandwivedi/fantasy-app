@@ -31,8 +31,9 @@ const ContestManager = ({ matchId, matchData }) => {
 
   // Default contest templates
   const defaultContests = [
+    // H2H Contests
     {
-      name: 'Beginner H2H',
+      name: 'H2H',
       contestFormat: 'h2h',
       entryFee: 15,
       prizePool: 25,
@@ -41,6 +42,47 @@ const ContestManager = ({ matchId, matchData }) => {
       maxTeamPerUser: 1,
       isDefault: true
     },
+    {
+      name: 'H2H',
+      contestFormat: 'h2h',
+      entryFee: 59,
+      prizePool: 100,
+      totalSpots: 2,
+      contestType: 'public',
+      maxTeamPerUser: 1,
+      isDefault: true
+    },
+    {
+      name: 'H2H',
+      contestFormat: 'h2h',
+      entryFee: 88,
+      prizePool: 150,
+      totalSpots: 2,
+      contestType: 'public',
+      maxTeamPerUser: 1,
+      isDefault: true
+    },
+    {
+      name: 'H2H',
+      contestFormat: 'h2h',
+      entryFee: 120,
+      prizePool: 200,
+      totalSpots: 2,
+      contestType: 'public',
+      maxTeamPerUser: 1,
+      isDefault: true
+    },
+    {
+      name: 'H2H',
+      contestFormat: 'h2h',
+      entryFee: 175,
+      prizePool: 300,
+      totalSpots: 2,
+      contestType: 'public',
+      maxTeamPerUser: 1,
+      isDefault: true
+    },
+    // Winner Takes All Contests
     {
       name: 'Winner Takes All',
       contestFormat: 'winners-takes-all',
@@ -51,6 +93,37 @@ const ContestManager = ({ matchId, matchData }) => {
       maxTeamPerUser: 1,
       isDefault: true
     },
+    {
+      name: 'Winner Takes All',
+      contestFormat: 'winners-takes-all',
+      entryFee: 50,
+      prizePool: 140,
+      totalSpots: 3,
+      contestType: 'public',
+      maxTeamPerUser: 1,
+      isDefault: true
+    },
+    {
+      name: 'Winner Takes All',
+      contestFormat: 'winners-takes-all',
+      entryFee: 100,
+      prizePool: 290,
+      totalSpots: 3,
+      contestType: 'public',
+      maxTeamPerUser: 1,
+      isDefault: true
+    },
+    {
+      name: 'Winner Takes All',
+      contestFormat: 'winners-takes-all',
+      entryFee: 150,
+      prizePool: 420,
+      totalSpots: 3,
+      contestType: 'public',
+      maxTeamPerUser: 1,
+      isDefault: true
+    },
+    // Other Contest Types
     {
       name: 'Small League',
       contestFormat: 'league',
@@ -83,7 +156,7 @@ const ContestManager = ({ matchId, matchData }) => {
     }
   ];
 
-  const [selectedDefaults, setSelectedDefaults] = useState(new Set([0, 1])); // Select first two by default
+  const [selectedDefaults, setSelectedDefaults] = useState(new Set(defaultContests.map((_, index) => index))); // Select all by default
 
   useEffect(() => {
     if (matchId) {
@@ -179,6 +252,96 @@ const ContestManager = ({ matchId, matchData }) => {
     return colors[format] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
+  // Group contests by category
+  const getGroupedContests = () => {
+    const grouped = contests.reduce((acc, contest) => {
+      const category = contest.contestFormat;
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(contest);
+      return acc;
+    }, {});
+
+    // Sort categories by priority
+    const categoryOrder = ['h2h', 'winners-takes-all', 'league', 'mega-contest', 'practice'];
+    return categoryOrder
+      .filter(category => grouped[category])
+      .map(category => [category, grouped[category]]);
+  };
+
+  // Get category display name
+  const getCategoryDisplayName = (category) => {
+    const names = {
+      'h2h': 'Head to Head',
+      'winners-takes-all': 'Winner Takes All',
+      'league': 'League Contests',
+      'mega-contest': 'Mega Contests',
+      'practice': 'Practice Contests'
+    };
+    return names[category] || category.replace('-', ' ').toUpperCase();
+  };
+
+  // Get category header styling
+  const getCategoryHeaderStyle = (category) => {
+    const styles = {
+      'h2h': 'bg-blue-500 text-white',
+      'winners-takes-all': 'bg-purple-500 text-white',
+      'league': 'bg-green-500 text-white',
+      'mega-contest': 'bg-red-500 text-white',
+      'practice': 'bg-gray-500 text-white'
+    };
+    return styles[category] || 'bg-gray-500 text-white';
+  };
+
+  // Get category icon
+  const getCategoryIcon = (category, size = 20) => {
+    switch (category) {
+      case 'h2h':
+        return <Users size={size} />;
+      case 'winners-takes-all':
+        return <Trophy size={size} />;
+      case 'league':
+        return <Target size={size} />;
+      case 'mega-contest':
+        return <DollarSign size={size} />;
+      case 'practice':
+        return <Eye size={size} />;
+      default:
+        return <Trophy size={size} />;
+    }
+  };
+
+  // Group default contests by category
+  const getGroupedDefaultContests = () => {
+    const grouped = defaultContests.reduce((acc, contest, index) => {
+      const category = contest.contestFormat;
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push({ contest, originalIndex: index });
+      return acc;
+    }, {});
+
+    // Sort categories by priority
+    const categoryOrder = ['h2h', 'winners-takes-all', 'league', 'mega-contest', 'practice'];
+    return categoryOrder
+      .filter(category => grouped[category])
+      .map(category => [category, grouped[category]]);
+  };
+
+  // Get category progress bar color
+  const getCategoryProgressColor = (category) => {
+    const colors = {
+      'h2h': 'bg-gradient-to-r from-blue-400 to-blue-600',
+      'winners-takes-all': 'bg-gradient-to-r from-purple-400 to-purple-600',
+      'league': 'bg-gradient-to-r from-green-400 to-green-600',
+      'mega-contest': 'bg-gradient-to-r from-red-400 to-red-600',
+      'practice': 'bg-gradient-to-r from-gray-400 to-gray-600'
+    };
+    return colors[category] || 'bg-gradient-to-r from-gray-400 to-gray-600';
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-xl border border-slate-200">
       {/* Header */}
@@ -202,79 +365,104 @@ const ContestManager = ({ matchId, matchData }) => {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Default Contests Section */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Create - Default Contests</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            {defaultContests.map((contest, index) => (
-              <div
-                key={index}
-                className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:shadow-lg ${
-                  selectedDefaults.has(index)
-                    ? 'border-emerald-400 bg-emerald-50 shadow-md'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                onClick={() => toggleDefaultSelection(index)}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-semibold text-gray-800">{contest.name}</h4>
-                  {selectedDefaults.has(index) ? (
-                    <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
-                      <CheckCircle className="text-white" size={16} />
-                    </div>
-                  ) : (
-                    <div className="w-6 h-6 border-2 border-gray-300 rounded-full"></div>
-                  )}
+        {/* Quick Create Section - Different Design */}
+        <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl p-6 border-2 border-blue-200 shadow-lg">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <Plus size={20} className="text-white" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-800">Quick Create Templates</h3>
+              <p className="text-sm text-gray-600">Select pre-configured contest templates</p>
+            </div>
+          </div>
+          
+          <div className="space-y-4 mb-6">
+            {getGroupedDefaultContests().map(([category, categoryContests]) => (
+              <div key={category} className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 border border-blue-200/50 shadow-sm">
+                {/* Category Header */}
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${getCategoryHeaderStyle(category)} shadow-sm`}>
+                    {getCategoryIcon(category, 14)}
+                  </div>
+                  <h4 className="font-bold text-gray-800">{getCategoryDisplayName(category)}</h4>
                 </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Entry Fee:</span>
-                    <span className="font-semibold text-gray-800">₹{contest.entryFee}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Prize Pool:</span>
-                    <span className="font-semibold text-gray-800">₹{contest.prizePool}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Spots:</span>
-                    <span className="font-semibold text-gray-800">{contest.totalSpots}</span>
-                  </div>
-                  <div className="mt-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getContestFormatColor(contest.contestFormat)}`}>
-                      {contest.contestFormat.replace('-', ' ').toUpperCase()}
-                    </span>
-                  </div>
+
+                {/* Category Contests - Compact Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {categoryContests.map((contestData) => {
+                    const { contest, originalIndex } = contestData;
+                    return (
+                      <div
+                        key={originalIndex}
+                        className={`px-2 py-3 rounded-lg border-2 cursor-pointer transition-all duration-300 hover:scale-105 bg-white/80 hover:bg-white ${
+                          selectedDefaults.has(originalIndex)
+                            ? 'border-emerald-400 shadow-md scale-105'
+                            : 'border-blue-200 hover:border-blue-300'
+                        }`}
+                        onClick={() => toggleDefaultSelection(originalIndex)}
+                      >
+                        <div className="text-center">
+                          {selectedDefaults.has(originalIndex) ? (
+                            <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                              <CheckCircle className="text-white" size={12} />
+                            </div>
+                          ) : (
+                            <div className="w-5 h-5 border-2 border-blue-300 rounded-full mx-auto mb-2"></div>
+                          )}
+                          <div className="space-y-1 text-xs">
+                            <div className="font-bold text-green-600">₹{contest.entryFee}</div>
+                            <div className="text-gray-500">Prize: ₹{contest.prizePool}</div>
+                            <div className="text-gray-500">{contest.totalSpots} spots</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
           </div>
           
           {selectedDefaults.size > 0 && (
-            <button
-              onClick={createDefaultContests}
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              {loading ? 'Creating Contests...' : `Create ${selectedDefaults.size} Selected Contest${selectedDefaults.size > 1 ? 's' : ''}`}
-            </button>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-blue-200">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-sm text-gray-600">
+                  <span className="font-semibold text-blue-600">{selectedDefaults.size}</span> template{selectedDefaults.size > 1 ? 's' : ''} selected
+                </div>
+                <button
+                  onClick={createDefaultContests}
+                  disabled={loading}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-2 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  {loading ? 'Creating...' : 'Create Selected'}
+                </button>
+              </div>
+            </div>
           )}
         </div>
 
-        {/* Custom Contest Form */}
-        <div className="border-t border-gray-200 pt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Create Custom Contest</h3>
-            <button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
-            >
-              <Plus size={16} />
-              <span>{showCreateForm ? 'Cancel' : 'Create Custom'}</span>
-            </button>
-          </div>
+        {/* Custom Contest Form - Connected to Templates */}
+        <div className="mt-4">
+          <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 rounded-2xl p-6 border-2 border-blue-200/50 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
+                  <Plus size={16} className="text-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800">Create Custom Contest</h3>
+              </div>
+              <button
+                onClick={() => setShowCreateForm(!showCreateForm)}
+                className="flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-200 bg-white/70 px-3 py-2 rounded-lg hover:bg-white"
+              >
+                <Plus size={16} />
+                <span>{showCreateForm ? 'Cancel' : 'Create Custom'}</span>
+              </button>
+            </div>
 
-          {showCreateForm && (
-            <form onSubmit={createCustomContest} className="bg-gray-50 rounded-xl p-6 space-y-4">
+            {showCreateForm && (
+              <form onSubmit={createCustomContest} className="bg-white/70 backdrop-blur-sm rounded-xl p-6 space-y-4 border border-blue-200/50 mt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -364,102 +552,135 @@ const ContestManager = ({ matchId, matchData }) => {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                {loading ? 'Creating Contest...' : 'Create Custom Contest'}
-              </button>
-            </form>
-          )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  {loading ? 'Creating Contest...' : 'Create Custom Contest'}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
 
-        {/* Existing Contests */}
-        <div className="border-t border-gray-200 pt-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Existing Contests</h3>
-          {contests.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <Trophy className="mx-auto mb-4 text-gray-400" size={48} />
-              <h4 className="text-xl font-semibold text-gray-800 mb-2">No Contests Yet</h4>
-              <p className="text-gray-600">Create your first contest using the options above</p>
+        {/* Existing Contests - Separate Big Card */}
+        <div className="mt-12">
+          <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8">
+            <div className="flex items-center space-x-3 mb-8">
+              <div className="w-12 h-12 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl flex items-center justify-center shadow-lg">
+                <Trophy size={24} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800">Existing Contests</h3>
+                <p className="text-sm text-gray-600">Monitor and manage your active contests</p>
+              </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {contests.map((contest) => (
-                <div key={contest._id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getContestFormatColor(contest.contestFormat)}`}>
-                      {contest.contestFormat.replace('-', ' ').toUpperCase()}
-                    </span>
-                    <div className="flex items-center space-x-2">
-                      <button className="text-blue-500 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-colors duration-200">
-                        <Edit3 size={16} />
-                      </button>
-                      <button className="text-red-500 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors duration-200">
-                        <Trash2 size={16} />
-                      </button>
+
+            {contests.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded-xl">
+                <Trophy className="mx-auto mb-4 text-gray-400" size={48} />
+                <h4 className="text-xl font-semibold text-gray-800 mb-2">No Contests Yet</h4>
+                <p className="text-gray-600">Create your first contest using the options above</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {getGroupedContests().map(([category, categoryContests]) => (
+                  <div key={category} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200">
+                    {/* Category Header */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getCategoryHeaderStyle(category)}`}>
+                          {getCategoryIcon(category)}
+                        </div>
+                        <div>
+                          <h4 className="text-xl font-bold text-gray-800">{getCategoryDisplayName(category)}</h4>
+                          <p className="text-sm text-gray-600">{categoryContests.length} contest{categoryContests.length > 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <div className="text-right">
+                          <div className="text-sm text-gray-600">
+                            Total Participants: <span className="text-lg font-bold text-gray-800">
+                              {categoryContests.reduce((sum, contest) => sum + (contest.currentParticipants || 0), 0)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Category Contests - Compact Cards */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-3">
+                      {categoryContests.map((contest) => (
+                        <div key={contest._id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getContestFormatColor(contest.contestFormat)}`}>
+                              {contest.contestFormat.replace('-', ' ').toUpperCase()}
+                            </span>
+                            <div className="flex items-center space-x-1">
+                              <button className="text-blue-500 hover:text-blue-600 p-1.5 rounded-md hover:bg-blue-50 transition-colors duration-200" title="Edit Contest">
+                                <Edit3 size={14} />
+                              </button>
+                              <button className="text-red-500 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors duration-200" title="Delete Contest">
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Compact Info Grid */}
+                          <div className="space-y-2">
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div className="flex items-center space-x-1">
+                                <DollarSign size={12} className="text-green-600" />
+                                <span className="text-gray-600">Entry:</span>
+                              </div>
+                              <span className="font-semibold text-gray-800 text-right">₹{contest.entryFee}</span>
+                              
+                              <div className="flex items-center space-x-1">
+                                <Trophy size={12} className="text-yellow-600" />
+                                <span className="text-gray-600">Prize:</span>
+                              </div>
+                              <span className="font-semibold text-gray-800 text-right">₹{contest.prizePool?.toLocaleString()}</span>
+                              
+                              <div className="flex items-center space-x-1">
+                                <Users size={12} className="text-blue-600" />
+                                <span className="text-gray-600">Joined:</span>
+                              </div>
+                              <span className="font-semibold text-gray-800 text-right">
+                                {contest.currentParticipants || 0}/{contest.totalSpots}
+                              </span>
+                            </div>
+
+                            {/* Status and Progress Combined */}
+                            <div className="border-t border-gray-100 pt-2">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`font-medium px-2 py-1 rounded-md text-xs ${
+                                  contest.status === 'open' ? 'bg-green-100 text-green-700' : 
+                                  contest.status === 'closed' ? 'bg-red-100 text-red-700' : 
+                                  'bg-gray-100 text-gray-700'
+                                }`}>
+                                  {(contest.status || 'OPEN').toUpperCase()}
+                                </span>
+                                <span className="text-xs font-medium text-gray-600">
+                                  {Math.round(((contest.currentParticipants || 0) / contest.totalSpots) * 100)}% Full
+                                </span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                <div 
+                                  className={`h-1.5 rounded-full transition-all duration-300 ${getCategoryProgressColor(category)}`}
+                                  style={{ width: `${((contest.currentParticipants || 0) / contest.totalSpots) * 100}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <DollarSign size={16} className="text-green-600" />
-                        <span className="text-sm text-gray-600">Entry Fee</span>
-                      </div>
-                      <span className="font-semibold text-gray-800">₹{contest.entryFee}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Trophy size={16} className="text-yellow-600" />
-                        <span className="text-sm text-gray-600">Prize Pool</span>
-                      </div>
-                      <span className="font-semibold text-gray-800">₹{contest.prizePool}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Users size={16} className="text-blue-600" />
-                        <span className="text-sm text-gray-600">Participants</span>
-                      </div>
-                      <span className="font-semibold text-gray-800">
-                        {contest.currentParticipants}/{contest.totalSpots}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Target size={16} className="text-purple-600" />
-                        <span className="text-sm text-gray-600">Status</span>
-                      </div>
-                      <span className={`font-semibold ${
-                        contest.status === 'open' ? 'text-green-600' : 
-                        contest.status === 'closed' ? 'text-red-600' : 'text-gray-600'
-                      }`}>
-                        {contest.status.toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Progress bar */}
-                  <div className="mt-4">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
-                      <span>Fill Rate</span>
-                      <span>{Math.round((contest.currentParticipants / contest.totalSpots) * 100)}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${(contest.currentParticipants / contest.totalSpots) * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

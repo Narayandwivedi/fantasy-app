@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Sidebar from "./components/Sidebar";
 import { Route, Routes } from "react-router-dom";
@@ -16,13 +16,20 @@ import ManageUser from "./pages/ManageUser";
 import ManageContest from "./pages/ManageContest/ManageContest";
 
 const App = () => {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   return (
     <div>
       <ToastContainer />
 
-      <div className="flex gap-4 lg:flex-row flex-col">
-        <Sidebar />
-        <Routes>
+      <div className="flex lg:flex-row flex-col">
+        <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+        <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-0' : 'lg:ml-4'} ml-0`}>
+          <Routes>
 
           <Route path="/" element={<ManagePlayers />} />
           <Route path="/manage-user" element={<ManageUser />} />
@@ -40,7 +47,8 @@ const App = () => {
           <Route path="/manage-contests" element={<ManageContest />} />
           <Route path="/test" element={<MatchCard />} />
 
-        </Routes>
+          </Routes>
+        </div>
       </div>
     </div>
   );
