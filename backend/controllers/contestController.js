@@ -79,8 +79,8 @@ async function getContest(req, res) {
 
 async function joinContest(req, res) {
   try {
-    
     const { matchId, userId, teamId, contestId } = req.body;
+
     // validate req body
     if (!userId || !teamId || !contestId || !matchId) {
       return res
@@ -101,22 +101,91 @@ async function joinContest(req, res) {
     }
 
     // check user
-    const getUser = await User.findById(userId)
-    if(!getUser){
-      return res.status(400).json({success:false , message:"user not found"})
+    const getUser = await User.findById(userId);
+    if (!getUser) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user not found" });
     }
 
+    // check match
+
+    const getMatch = await Match.findById(matchId);
+    if (!getMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "match not found" });
+    }
+
+    // checks is match is upcoming
+    if (getMatch.status !== "upcoming") {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid request match is live" });
+    }
+
+    // validate contest
 
     const getContest = await Contest.findById(contestId);
-    
-    getContest.currentParticipants+=1
 
+    if (!getContest) {
+      return res
+        .status(400)
+        .json({ success: false, message: "contest does not exist" });
+    }
+
+    // validate is contest full
+    if (
+      getContest.currentParticipants >= getContest.totalSpots ||
+      getContest.status === "closed"
+    ) {
+      return res.status(400).json({ success: false, message: "contest full" });
+    }
+
+    // Add user to contest
     getContest.joinedUsers.push({
-      user:userId,
-      team:teamId
-    })
+      user: userId,
+      team: teamId,
+    });
 
-    await getContest.save()
+    // Increment participants count
+    getContest.currentParticipants += 1;
+
+    // Check if contest becomes full and create new one
+    if (getContest.currentParticipants === getContest.totalSpots) {
+      getContest.status = "closed";
+
+      // Create new contest in background (fire and forget)
+      Contest.create({
+        matchId,
+        contestFormat: getContest.contestFormat,
+        entryFee: getContest.entryFee,
+        prizePool: getContest.prizePool,
+        totalSpots: getContest.totalSpots,
+      }).then((newContest) => {
+        console.log(`New contest created successfully: ${newContest._id} for match: ${matchId}`);
+      }).catch((error) => {
+        console.error('❌ CRITICAL: Failed to create new contest', {
+          error: error.message,
+          matchId,
+          contestFormat: getContest.contestFormat,
+          entryFee: getContest.entryFee,
+          prizePool: getContest.prizePool,
+          totalSpots: getContest.totalSpots,
+          timestamp: new Date().toISOString()
+        });
+        
+        // TODO: Implement retry mechanism or admin notification
+        // For now, log to console - in production, you could:
+        // 1. Send to monitoring service (e.g., Sentry, DataDog)
+        // 2. Add to retry queue
+        // 3. Send admin notification
+        // 4. Store failed creation data for manual retry
+      });
+    }
+
+    // Save the updated contest
+    await getContest.save();
 
     return res.json({ success: true });
   } catch (err) {

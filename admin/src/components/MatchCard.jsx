@@ -119,29 +119,49 @@ const MatchCard = ({ match, BACKEND_URL, onStatusChange }) => {
 
               {/* Status Menu Dropdown */}
               {showStatusMenu && (
-                <div className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-10 min-w-32">
-                  <button
-                    onClick={() => handleStatusChange("live")}
-                    className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 rounded-t-lg flex items-center space-x-2"
-                  >
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>Make Live</span>
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange("completed")}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg flex items-center space-x-2"
-                  >
-                    <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-                    <span>Completed</span>
-                  </button>
+                <div className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-10 min-w-40">
+                  {/* Show different options based on current status */}
+                  {match.status !== "upcoming" && (
+                    <button
+                      onClick={() => handleStatusChange("upcoming")}
+                      className="w-full px-4 py-2 text-left text-sm text-blue-700 hover:bg-blue-50 rounded-t-lg flex items-center space-x-2"
+                    >
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span>Make Upcoming</span>
+                    </button>
+                  )}
+                  
+                  {match.status !== "live" && (
+                    <button
+                      onClick={() => handleStatusChange("live")}
+                      className={`w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 flex items-center space-x-2 ${
+                        match.status === "upcoming" ? "rounded-t-lg" : ""
+                      }`}
+                    >
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      <span>Make Live</span>
+                    </button>
+                  )}
+                  
+                  {match.status !== "completed" && (
+                    <button
+                      onClick={() => handleStatusChange("completed")}
+                      className="w-full px-4 py-2 text-left text-sm text-green-700 hover:bg-green-50 flex items-center space-x-2"
+                    >
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Mark Completed</span>
+                    </button>
+                  )}
 
-                  <button
-                    onClick={() => handleStatusChange("cancelled")}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg flex items-center space-x-2"
-                  >
-                    <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-                    <span>Cancel</span>
-                  </button>
+                  {match.status !== "cancelled" && (
+                    <button
+                      onClick={() => handleStatusChange("cancelled")}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg flex items-center space-x-2"
+                    >
+                      <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                      <span>Cancel Match</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>

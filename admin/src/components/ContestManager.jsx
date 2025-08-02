@@ -364,9 +364,9 @@ const ContestManager = ({ matchId, matchData }) => {
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="p-3 sm:p-6 space-y-6">
         {/* Quick Create Section - Different Design */}
-        <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl p-6 border-2 border-blue-200 shadow-lg">
+        <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl p-3 sm:p-6 border-2 border-blue-200 shadow-lg">
           <div className="flex items-center space-x-3 mb-6">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
               <Plus size={20} className="text-white" />
@@ -379,7 +379,7 @@ const ContestManager = ({ matchId, matchData }) => {
           
           <div className="space-y-4 mb-6">
             {getGroupedDefaultContests().map(([category, categoryContests]) => (
-              <div key={category} className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 border border-blue-200/50 shadow-sm">
+              <div key={category} className="bg-white/70 backdrop-blur-sm rounded-2xl p-2 sm:p-4 border border-blue-200/50 shadow-sm">
                 {/* Category Header */}
                 <div className="flex items-center space-x-3 mb-4">
                   <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${getCategoryHeaderStyle(category)} shadow-sm`}>
@@ -566,7 +566,7 @@ const ContestManager = ({ matchId, matchData }) => {
 
         {/* Existing Contests - Separate Big Card */}
         <div className="mt-12">
-          <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8">
+          <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-4 sm:p-8">
             <div className="flex items-center space-x-3 mb-8">
               <div className="w-12 h-12 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl flex items-center justify-center shadow-lg">
                 <Trophy size={24} className="text-white" />
@@ -586,7 +586,7 @@ const ContestManager = ({ matchId, matchData }) => {
             ) : (
               <div className="space-y-6">
                 {getGroupedContests().map(([category, categoryContests]) => (
-                  <div key={category} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200">
+                  <div key={category} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-3 sm:p-6 border border-gray-200">
                     {/* Category Header */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center space-x-3">

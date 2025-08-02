@@ -1,7 +1,8 @@
 import axios from 'axios'
 import React, { useState, useContext, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
+import { toast } from 'react-toastify'
 
 // Add custom CSS for hiding scrollbar
 const scrollbarHideStyle = `
@@ -16,6 +17,7 @@ const scrollbarHideStyle = `
 
 const CreateTeam = () => {
   const { matchId } = useParams()
+  const navigate = useNavigate()
   const { BACKEND_URL, user } = useContext(AppContext)
   
   const [matchData, setMatchData] = useState(null)
@@ -179,7 +181,7 @@ const CreateTeam = () => {
 
   const handleSaveTeam = async () => {
     if (!captain || !viceCaptain) {
-      alert('Please select both captain and vice-captain')
+      toast.error('Please select both captain and vice-captain')
       return
     }
     
@@ -196,10 +198,23 @@ const CreateTeam = () => {
     try {
       const response = await axios.post(`${BACKEND_URL}/api/userteam`, teamData)
       console.log('Team saved:', response.data)
-      alert('Team saved successfully!')
+      navigate(`/${matchId}/contest`)
+      // Show success toast with quick duration
+      toast.success('Team created successfully! 🎉', {
+        position: "top-center",
+        autoClose: 600,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      })
+      
     } catch (error) {
       console.error('Error saving team:', error)
-      alert('Failed to save team. Please try again.')
+      toast.error('Failed to save team. Please try again.', {
+        position: "top-center",
+        autoClose: 3000,
+      })
     }
     
     setSaving(false)

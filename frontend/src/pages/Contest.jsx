@@ -3,16 +3,20 @@ import ContestCard from "../components/ContestCard";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";
-import { X } from "lucide-react";
+import { X, ArrowLeft, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Contest = () => {
   const { matchId } = useParams();
   const { BACKEND_URL, user } = useContext(AppContext);
+  const navigate = useNavigate();
   const [contests, setContests] = useState([]);
   const [userTeams, setUserTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showTeamSelect, setShowTeamSelect] = useState(false);
   const [selectedContest, setSelectedContest] = useState(null);
+  const [selectedTeam, setSelectedTeam] = useState(null);
   const [joining, setJoining] = useState(false);
 
   const fetchContest = async () => {
@@ -61,13 +65,38 @@ const Contest = () => {
   const groupedContests = groupContestsByFormat(contests);
 
   const handleJoinClick = (contest) => {
+    if (!user?._id) {
+      alert('Please login to join contests');
+      return;
+    }
+
+    // If user has no teams, redirect to create team page
+    if (userTeams.length === 0) {
+      navigate(`/${matchId}/create-team`);
+      return;
+    }
+
     setSelectedContest(contest);
+    
+    // If user has only 1 team, show join modal directly
+    if (userTeams.length === 1) {
+      setSelectedTeam(userTeams[0]);
+      setShowJoinModal(true);
+    } else {
+      // If user has multiple teams, show team selection first
+      setShowTeamSelect(true);
+    }
+  };
+
+  const handleTeamSelection = (team) => {
+    setSelectedTeam(team);
+    setShowTeamSelect(false);
     setShowJoinModal(true);
   };
 
   const handleJoinContest = async () => {
-    if (!selectedContest || !user?._id || userTeams.length === 0) {
-      alert('Please create a team first before joining contests');
+    if (!selectedContest || !user?._id || !selectedTeam) {
+      alert('Please select a team first');
       return;
     }
 
@@ -75,7 +104,7 @@ const Contest = () => {
     const payload = {
       contestId: selectedContest._id,
       userId: user._id,
-      teamId: userTeams[0]._id, 
+      teamId: selectedTeam._id, 
       matchId: matchId
     };
 
@@ -87,6 +116,7 @@ const Contest = () => {
       prizePool: selectedContest.prizePool,
       totalSpots: selectedContest.totalSpots
     });
+    console.log('Selected Team:', selectedTeam);
     
     setJoining(true);
     try {
@@ -96,13 +126,15 @@ const Contest = () => {
       const {data} = await axios.post(`${BACKEND_URL}/api/contests/join`, {
       contestId: selectedContest._id,
       userId: user._id,
-      teamId: userTeams[0]._id, 
+      teamId: selectedTeam._id, 
       matchId: matchId
       })
       
       console.log('API Response:', data);
       alert('Successfully joined the contest!');
       setShowJoinModal(false);
+      setSelectedTeam(null);
+      setSelectedContest(null);
     } catch (error) {
       console.error('Error joining contest:', error);
       console.error('Error details:', error.response?.data || error.message);
@@ -159,6 +191,178 @@ const Contest = () => {
       
       {/* Bottom padding to prevent content overlap with fixed buttons */}
       <div className="h-20"></div>
+
+      {/* Team Selection Modal */}
+      {showTeamSelect && selectedContest && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end justify-center">
+          <div className="bg-white w-full max-w-md rounded-t-2xl shadow-xl max-h-[80vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-2xl">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setShowTeamSelect(false)}
+                  className="p-1 hover:bg-white/10 rounded-full"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <div>
+                  <h2 className="text-lg font-semibold">Select Team</h2>
+                  <p className="text-sm text-green-100">Choose team to join contest</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-green-100">My Teams: {userTeams.length}</p>
+              </div>
+            </div>
+
+            {/* Teams List */}
+            <div className="p-4 space-y-4">
+              <p className="text-sm text-gray-600 mb-4">You can enter with only 1 team</p>
+              
+              {userTeams.map((team, index) => {
+                const captain = team.captain;
+                const viceCaptain = team.viceCaptain;
+                
+                const getPlayerStats = (player) => {
+                  return {
+                    wk: player.playerType === 'wicket-keeper' ? 1 : 0,
+                    bat: player.playerType === 'batsman' ? 1 : 0,
+                    ar: player.playerType === 'all-rounder' ? 1 : 0,
+                    bowl: player.playerType === 'bowler' ? 1 : 0
+                  };
+                };
+
+                const teamStats = team.players?.reduce((acc, player) => {
+                  const stats = getPlayerStats(player);
+                  acc.wk += stats.wk;
+                  acc.bat += stats.bat;
+                  acc.ar += stats.ar;
+                  acc.bowl += stats.bowl;
+                  return acc;
+                }, { wk: 0, bat: 0, ar: 0, bowl: 0 });
+
+                return (
+                  <div 
+                    key={team._id}
+                    onClick={() => handleTeamSelection(team)}
+                    className="bg-gradient-to-b from-green-600 to-green-800 rounded-xl shadow-sm border-2 border-white p-3 cursor-pointer hover:from-green-700 hover:to-green-900 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-base font-semibold text-white">
+                        Team {index + 1}
+                      </h3>
+                      <div className="flex items-center space-x-2">
+                        <div className="flex items-center text-white">
+                          <Users size={14} className="mr-1" />
+                          <span className="text-xs">{team.players?.length || 0}</span>
+                        </div>
+                        <div className="w-5 h-5 border-2 border-white rounded-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full opacity-0 hover:opacity-100"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Captain and Vice Captain */}
+                    <div className="flex justify-center mb-4">
+                      <div className="flex space-x-6">
+                        {captain && (
+                          <div className="flex flex-col items-center">
+                            <div className="relative mb-1">
+                              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
+                                {captain.imgLink ? (
+                                  <img 
+                                    src={`${BACKEND_URL}${captain.imgLink}`} 
+                                    alt={`${captain.firstName} ${captain.lastName}`}
+                                    className="w-full h-full object-cover rounded-full"
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center">
+                                    <span className="text-white text-xs font-bold">
+                                      {captain.firstName?.charAt(0)}{captain.lastName?.charAt(0)}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="absolute -top-1 -right-1 w-5 h-5 bg-gray-700 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">C</span>
+                              </div>
+                            </div>
+                            <div className="bg-white border border-gray-800 rounded-full px-2 py-0.5">
+                              <span className="text-xs font-medium text-gray-800">
+                                {captain.firstName && captain.lastName 
+                                  ? `${captain.firstName} ${captain.lastName}`.length > 10 
+                                    ? `${captain.firstName} ${captain.lastName}`.substring(0, 10) + '...' 
+                                    : `${captain.firstName} ${captain.lastName}`
+                                  : 'Captain'
+                                }
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {viceCaptain && (
+                          <div className="flex flex-col items-center">
+                            <div className="relative mb-1">
+                              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
+                                {viceCaptain.imgLink ? (
+                                  <img 
+                                    src={`${BACKEND_URL}${viceCaptain.imgLink}`} 
+                                    alt={`${viceCaptain.firstName} ${viceCaptain.lastName}`}
+                                    className="w-full h-full object-cover rounded-full"
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 bg-orange-400 rounded-full flex items-center justify-center">
+                                    <span className="text-white text-xs font-bold">
+                                      {viceCaptain.firstName?.charAt(0)}{viceCaptain.lastName?.charAt(0)}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="absolute -top-1 -right-1 w-5 h-5 bg-gray-700 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">VC</span>
+                              </div>
+                            </div>
+                            <div className="bg-gray-700 rounded-full px-2 py-0.5">
+                              <span className="text-xs font-medium text-white">
+                                {viceCaptain.firstName && viceCaptain.lastName 
+                                  ? `${viceCaptain.firstName} ${viceCaptain.lastName}`.length > 10 
+                                    ? `${viceCaptain.firstName} ${viceCaptain.lastName}`.substring(0, 10) + '...' 
+                                    : `${viceCaptain.firstName} ${viceCaptain.lastName}`
+                                  : 'Vice Captain'
+                                }
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Team Composition Stats */}
+                    <div className="flex justify-center items-center space-x-8">
+                      <div className="flex items-center space-x-1">
+                        <span className="text-xs text-white">WK</span>
+                        <span className="text-xs text-white font-medium">{teamStats?.wk || 0}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <span className="text-xs text-white">BAT</span>
+                        <span className="text-xs text-white font-medium">{teamStats?.bat || 0}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <span className="text-xs text-white">AR</span>
+                        <span className="text-xs text-white font-medium">{teamStats?.ar || 0}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <span className="text-xs text-white">BOWL</span>
+                        <span className="text-xs text-white font-medium">{teamStats?.bowl || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Join Contest Modal */}
       {showJoinModal && selectedContest && (

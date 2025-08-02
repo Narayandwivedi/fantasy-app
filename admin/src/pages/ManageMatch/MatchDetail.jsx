@@ -356,12 +356,12 @@ const MatchDetail = () => {
         return (
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
                 {/* Team Header */}
-                <div className="relative bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 text-white p-6">
+                <div className="relative bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 text-white p-4 sm:p-6">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
                     <div className="relative flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-3 sm:space-x-4">
                             <div className="relative">
-                                <div className="w-16 h-16 rounded-2xl bg-white backdrop-blur-sm border border-white/20 p-2 flex items-center justify-center shadow-lg">
+                                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white backdrop-blur-sm border border-white/20 p-2 flex items-center justify-center shadow-lg">
                                     {team.logo ? (
                                         <img 
                                             src={team.logo} 
@@ -378,9 +378,9 @@ const MatchDetail = () => {
                                     <Trophy size={12} className="text-white" />
                                 </div>
                             </div>
-                            <div>
-                                <h2 className="text-2xl font-bold mb-1">{team.name}</h2>
-                                <div className="flex items-center space-x-3">
+                            <div className="min-w-0 flex-1">
+                                <h2 className="text-lg sm:text-2xl font-bold mb-1 truncate">{team.name}</h2>
+                                <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-3">
                                     <span className="text-slate-300 text-sm">({team.shortName})</span>
                                     <div className="flex items-center space-x-1 text-xs text-slate-300">
                                         <Users size={12} />
@@ -389,29 +389,29 @@ const MatchDetail = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2 flex-shrink-0">
                             {currentPlaying11.length === 11 && (
-                                <div className="flex items-center space-x-2 bg-emerald-500/20 backdrop-blur-sm px-3 py-2 rounded-full border border-emerald-400/30">
-                                    <Check size={14} className="text-emerald-300" />
-                                    <span className="text-emerald-200 text-sm font-medium">Complete</span>
+                                <div className="flex items-center space-x-1 bg-emerald-500/20 backdrop-blur-sm px-2 py-1 rounded-full border border-emerald-400/30">
+                                    <Check size={12} className="text-emerald-300" />
+                                    <span className="text-emerald-200 text-xs font-medium hidden sm:inline">Complete</span>
                                 </div>
                             )}
                             <button
                                 onClick={toggleEditMode}
-                                className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 text-sm font-medium ${
+                                className={`flex items-center space-x-1 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 text-sm font-medium ${
                                     isEditing 
                                         ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/30' 
                                         : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
                                 }`}
                             >
-                                <Edit3 size={14} />
+                                <Edit3 size={12} />
                                 <span>{isEditing ? 'Done' : 'Edit Squad'}</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="p-6 space-y-8">
+                <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
                     {/* Playing 11 Section */}
                     <div>
                         <div className="flex items-center justify-between mb-6">
@@ -562,9 +562,9 @@ const MatchDetail = () => {
             {/* Match Header */}
             <div className="relative bg-white shadow-lg border-b border-slate-200/60 backdrop-blur-sm">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
-                <div className="relative max-w-7xl mx-auto px-6 py-8">
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
                     <div className="text-center">
-                        <div className="flex items-center justify-center space-x-3 mb-4">
+                        <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3 mb-4">
                             <div className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-semibold text-sm shadow-lg">
                                 {matchDetail.matchType}
                             </div>
@@ -573,11 +573,11 @@ const MatchDetail = () => {
                             </div>
                         </div>
                         
-                        <h1 className="text-4xl font-bold text-slate-800 mb-6 tracking-tight">
-                            {matchDetail.team1.name} <span className="text-slate-400 mx-4">vs</span> {matchDetail.team2.name}
+                        <h1 className="text-2xl sm:text-4xl font-bold text-slate-800 mb-4 sm:mb-6 tracking-tight">
+                            {matchDetail.team1.name} <span className="text-slate-400 mx-2 sm:mx-4">vs</span> {matchDetail.team2.name}
                         </h1>
                         
-                        <div className="flex items-center justify-center space-x-8 text-slate-600">
+                        <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-8 text-slate-600">
                             <div className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-slate-200/60">
                                 <Calendar size={16} className="text-blue-500" />
                                 <span className="font-medium">{formatDate(matchDetail.startTime)}</span>
@@ -645,8 +645,8 @@ const MatchDetail = () => {
             )}
 
             {/* Teams Section */}
-            <div className="max-w-7xl mx-auto px-6 py-8">
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
                     <TeamSection 
                         team={matchDetail.team1} 
                         teamKey="team1"
@@ -660,13 +660,13 @@ const MatchDetail = () => {
 
             {/* Contest Management Section - Only show for upcoming matches */}
             {matchDetail.status === 'upcoming' && (
-                <div className="max-w-7xl mx-auto px-6 pb-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-6 sm:pb-8">
                     <ContestManager matchId={matchId} matchData={matchDetail} />
                 </div>
             )}
 
             {/* Scorecard Section Placeholder */}
-            <div className="max-w-7xl mx-auto px-4 pb-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-6 sm:pb-8">
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
                         Scorecard Section

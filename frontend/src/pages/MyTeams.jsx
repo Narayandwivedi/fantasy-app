@@ -52,29 +52,29 @@ const MyTeams = () => {
     }, { wk: 0, bat: 0, ar: 0, bowl: 0 });
 
     return (
-      <div className="bg-gradient-to-b from-green-600 to-green-800 rounded-2xl shadow-sm border-4 border-white p-4 mb-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">
+      <div className="bg-gradient-to-b from-green-600 to-green-800 rounded-xl shadow-sm border-2 border-white p-3 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-semibold text-white">
             Team {index + 1}
           </h3>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
             <div className="flex items-center text-white">
-              <Users size={16} className="mr-1" />
-              <span className="text-sm">{team.players?.length || 0}</span>
+              <Users size={14} className="mr-1" />
+              <span className="text-xs">{team.players?.length || 0}</span>
             </div>
-            <button className="p-2 hover:bg-green-700 rounded-lg">
-              <Edit size={16} className="text-white" />
+            <button className="p-1.5 hover:bg-green-700 rounded-lg">
+              <Edit size={14} className="text-white" />
             </button>
           </div>
         </div>
 
         {/* Captain and Vice Captain */}
-        <div className="flex justify-center mb-6">
-          <div className="flex space-x-8">
+        <div className="flex justify-center mb-4">
+          <div className="flex space-x-6">
             {captain && (
               <div className="flex flex-col items-center">
-                <div className="relative mb-2">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="relative mb-1">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
                     {captain.imgLink ? (
                       <img 
                         src={`${BACKEND_URL}${captain.imgLink}`} 
@@ -82,22 +82,22 @@ const MyTeams = () => {
                         className="w-full h-full object-cover rounded-full"
                       />
                     ) : (
-                      <div className="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-bold">
+                      <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">
                           {captain.firstName?.charAt(0)}{captain.lastName?.charAt(0)}
                         </span>
                       </div>
                     )}
                   </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center">
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-gray-700 rounded-full flex items-center justify-center">
                     <span className="text-white text-xs font-bold">C</span>
                   </div>
                 </div>
-                <div className="bg-white border-2 border-gray-800 rounded-full px-3 py-1">
+                <div className="bg-white border border-gray-800 rounded-full px-2 py-0.5">
                   <span className="text-xs font-medium text-gray-800">
                     {captain.firstName && captain.lastName 
-                      ? `${captain.firstName} ${captain.lastName}`.length > 12 
-                        ? `${captain.firstName} ${captain.lastName}`.substring(0, 12) + '...' 
+                      ? `${captain.firstName} ${captain.lastName}`.length > 10 
+                        ? `${captain.firstName} ${captain.lastName}`.substring(0, 10) + '...' 
                         : `${captain.firstName} ${captain.lastName}`
                       : 'Captain'
                     }
@@ -108,8 +108,8 @@ const MyTeams = () => {
 
             {viceCaptain && (
               <div className="flex flex-col items-center">
-                <div className="relative mb-2">
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="relative mb-1">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
                     {viceCaptain.imgLink ? (
                       <img 
                         src={`${BACKEND_URL}${viceCaptain.imgLink}`} 
@@ -117,22 +117,22 @@ const MyTeams = () => {
                         className="w-full h-full object-cover rounded-full"
                       />
                     ) : (
-                      <div className="w-12 h-12 bg-orange-400 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-bold">
+                      <div className="w-10 h-10 bg-orange-400 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">
                           {viceCaptain.firstName?.charAt(0)}{viceCaptain.lastName?.charAt(0)}
                         </span>
                       </div>
                     )}
                   </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center">
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-gray-700 rounded-full flex items-center justify-center">
                     <span className="text-white text-xs font-bold">VC</span>
                   </div>
                 </div>
-                <div className="bg-gray-700 rounded-full px-3 py-1">
+                <div className="bg-gray-700 rounded-full px-2 py-0.5">
                   <span className="text-xs font-medium text-white">
                     {viceCaptain.firstName && viceCaptain.lastName 
-                      ? `${viceCaptain.firstName} ${viceCaptain.lastName}`.length > 12 
-                        ? `${viceCaptain.firstName} ${viceCaptain.lastName}`.substring(0, 12) + '...' 
+                      ? `${viceCaptain.firstName} ${viceCaptain.lastName}`.length > 10 
+                        ? `${viceCaptain.firstName} ${viceCaptain.lastName}`.substring(0, 10) + '...' 
                         : `${viceCaptain.firstName} ${viceCaptain.lastName}`
                       : 'Vice Captain'
                     }
@@ -144,22 +144,22 @@ const MyTeams = () => {
         </div>
 
         {/* Team Composition Stats */}
-        <div className="flex justify-center items-center mb-4 space-x-12">
+        <div className="flex justify-center items-center space-x-8">
           <div className="flex items-center space-x-1">
-            <span className="text-sm text-white">WK</span>
-            <span className="text-sm text-white font-medium">{teamStats?.wk || 0}</span>
+            <span className="text-xs text-white">WK</span>
+            <span className="text-xs text-white font-medium">{teamStats?.wk || 0}</span>
           </div>
           <div className="flex items-center space-x-1">
-            <span className="text-sm text-white">BAT</span>
-            <span className="text-sm text-white font-medium">{teamStats?.bat || 0}</span>
+            <span className="text-xs text-white">BAT</span>
+            <span className="text-xs text-white font-medium">{teamStats?.bat || 0}</span>
           </div>
           <div className="flex items-center space-x-1">
-            <span className="text-sm text-white">AR</span>
-            <span className="text-sm text-white font-medium">{teamStats?.ar || 0}</span>
+            <span className="text-xs text-white">AR</span>
+            <span className="text-xs text-white font-medium">{teamStats?.ar || 0}</span>
           </div>
           <div className="flex items-center space-x-1">
-            <span className="text-sm text-white">BOWL</span>
-            <span className="text-sm text-white font-medium">{teamStats?.bowl || 0}</span>
+            <span className="text-xs text-white">BOWL</span>
+            <span className="text-xs text-white font-medium">{teamStats?.bowl || 0}</span>
           </div>
         </div>
 

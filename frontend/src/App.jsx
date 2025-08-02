@@ -8,6 +8,8 @@ import CreateTeam from './pages/CreateTeam'
 import MyTeams from './pages/MyTeams'
 import Login from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const App = () => {
   const location = useLocation()
@@ -41,6 +43,20 @@ const App = () => {
         </Routes>
         {!hideBottomNav && <BottomNav/>}
       </div>
+      
+      {/* Global Toast Container - shows notifications from any component */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   )
 }
