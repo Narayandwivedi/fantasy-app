@@ -57,6 +57,12 @@ const CreateTeam = () => {
       return
     }
 
+    // Check if we can select this position
+    if (!canSelectPosition(player.position)) {
+      alert(`Cannot select more ${player.position}s. You need to select required positions first.`)
+      return
+    }
+
     if (selectedPlayers.length >= 11) {
       alert("You can only select 11 players")
       return
@@ -96,8 +102,61 @@ const CreateTeam = () => {
     return 100 - getTotalCreditsUsed()
   }
 
+  const getTeamValidation = () => {
+    const composition = getTeamComposition()
+    const missing = []
+    
+    if (selectedPlayers.length < 11) {
+      missing.push(`${11 - selectedPlayers.length} more players`)
+    }
+    if (composition['wicket-keeper'] < 1) {
+      missing.push('1 Wicket-Keeper')
+    }
+    if (composition['batsman'] < 1) {
+      missing.push('1 Batsman')
+    }
+    if (composition['all-rounder'] < 1) {
+      missing.push('1 All-Rounder')
+    }
+    if (composition['bowler'] < 1) {
+      missing.push('1 Bowler')
+    }
+    
+    return {
+      isValid: missing.length === 0,
+      missing: missing
+    }
+  }
+
   const isValidTeam = () => {
-    return selectedPlayers.length >= 11
+    return getTeamValidation().isValid
+  }
+
+  const canSelectPosition = (position) => {
+    // If we already have 11 players, can't select more
+    if (selectedPlayers.length >= 11) return false
+    
+    const composition = getTeamComposition()
+    const remainingSlots = 11 - selectedPlayers.length
+    
+    // Calculate how many positions we still need to fill (minimum requirements)
+    const needed = {
+      'wicket-keeper': Math.max(0, 1 - composition['wicket-keeper']),
+      'batsman': Math.max(0, 1 - composition['batsman']),
+      'all-rounder': Math.max(0, 1 - composition['all-rounder']),
+      'bowler': Math.max(0, 1 - composition['bowler'])
+    }
+    
+    // Total positions we must fill
+    const totalNeeded = needed['wicket-keeper'] + needed['batsman'] + needed['all-rounder'] + needed['bowler']
+    
+    // If selecting this position would leave us without enough slots for required positions
+    if (position !== 'wicket-keeper' && needed['wicket-keeper'] > 0 && remainingSlots - 1 < totalNeeded) return false
+    if (position !== 'batsman' && needed['batsman'] > 0 && remainingSlots - 1 < totalNeeded) return false
+    if (position !== 'all-rounder' && needed['all-rounder'] > 0 && remainingSlots - 1 < totalNeeded) return false
+    if (position !== 'bowler' && needed['bowler'] > 0 && remainingSlots - 1 < totalNeeded) return false
+    
+    return true
   }
 
   const isPlayerSelected = (playerId) => {
@@ -245,6 +304,11 @@ const CreateTeam = () => {
         <div className="text-center text-sm text-gray-300 mt-1">
           Select 11 players ({selectedPlayers.length}/11)
         </div>
+        {!isValidTeam() && selectedPlayers.length > 0 && (
+          <div className="text-center text-xs text-red-300 mt-2">
+            Need: {getTeamValidation().missing.join(', ')}
+          </div>
+        )}
         
         {/* Credits Display */}
         <div className="flex justify-center items-center mt-3 space-x-6">
@@ -315,15 +379,25 @@ const CreateTeam = () => {
       {/* Players List by Position */}
       <div className="p-4">
         <div className="space-y-3">
-          {getAllPlayersByPosition()[activeTab]?.map((player) => (
+          {getAllPlayersByPosition()[activeTab]?.map((player) => {
+            const isSelected = isPlayerSelected(player._id)
+            const canSelect = isSelected || canSelectPosition(player.position)
+            
+            return (
             <div
               key={player._id}
-              className={`bg-white rounded-lg p-4 border-2 transition-all ${
-                isPlayerSelected(player._id) 
+              className={`rounded-lg p-4 border-2 transition-all ${
+                isSelected 
                   ? 'border-green-500 bg-green-50' 
-                  : 'border-gray-200'
+                  : canSelect
+                  ? 'bg-white border-gray-200 cursor-pointer hover:border-gray-300'
+                  : 'bg-gray-100 border-gray-200 opacity-50 cursor-not-allowed'
               }`}
-              onClick={() => handlePlayerSelect(player, player.teamType)}
+              onClick={() => {
+                if (canSelect) {
+                  handlePlayerSelect(player, player.teamType)
+                }
+              }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -374,7 +448,7 @@ const CreateTeam = () => {
                 </div>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       </div>
 
@@ -399,8 +473,11 @@ const CreateTeam = () => {
             }`}
             disabled={!isValidTeam()}
             onClick={() => {
-              if (isValidTeam()) {
+              const validation = getTeamValidation()
+              if (validation.isValid) {
                 setShowCaptainSelection(true)
+              } else {
+                alert(`Team incomplete! You need: ${validation.missing.join(', ')}`)
               }
             }}
           >
@@ -664,7 +741,9 @@ const CreateTeam = () => {
                                 : 'bg-white border-gray-300 text-gray-500 '
                             }`}
                           >
-                            <span className="font-bold text-sm">C</span>
+                            <span className="font-bold text-sm">
+                              {captain && captain._id === player._id ? '2x' : 'C'}
+                            </span>
                           </button>
                           <button
                             onClick={() => handleViceCaptainSelect(player)}
@@ -674,7 +753,9 @@ const CreateTeam = () => {
                                 : 'bg-white border-gray-300 text-gray-500 hover:border-purple-400'
                             }`}
                           >
-                            <span className="font-bold text-xs">VC</span>
+                            <span className="font-bold text-xs">
+                              {viceCaptain && viceCaptain._id === player._id ? '1.5x' : 'VC'}
+                            </span>
                           </button>
                         </div>
                       </div>

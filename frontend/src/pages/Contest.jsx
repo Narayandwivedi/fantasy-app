@@ -5,6 +5,7 @@ import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import { X, ArrowLeft, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const Contest = () => {
   const { matchId } = useParams();
@@ -131,14 +132,29 @@ const Contest = () => {
       })
       
       console.log('API Response:', data);
-      alert('Successfully joined the contest!');
+      
+      // Show quick success toast
+      toast.success('Contest joined successfully! 🎯', {
+        position: "top-center",
+        autoClose: 600,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
+      
       setShowJoinModal(false);
       setSelectedTeam(null);
       setSelectedContest(null);
     } catch (error) {
       console.error('Error joining contest:', error);
       console.error('Error details:', error.response?.data || error.message);
-      alert('Failed to join contest. Please try again.');
+      
+      // Show error toast
+      toast.error('Failed to join contest. Please try again.', {
+        position: "top-center",
+        autoClose: 2000,
+      });
     } finally {
       setJoining(false);
     }

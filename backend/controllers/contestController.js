@@ -69,12 +69,29 @@ async function getContest(req, res) {
         .json({ success: false, message: "invalid match id " });
     }
 
-    const allContest = await Contest.find({ matchId });
-    return res.json({ success: true, data: allContest });
+    // Fetch only open contests for the match (exclude closed and completed contests)
+    const openContests = await Contest.find({
+      matchId,
+      status: "open",
+      isCancelled: false,
+    }); // Sort by newest first
+
+    return res.json({ success: true, data: openContests });
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ success: false, message: "server error" });
   }
+}
+
+async function getJoinedContestByUser(req, res) {
+  const userId = req.params;
+  if (!userId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "user id not found" });
+  }
+
+  await Contest.find({ user: userId , });
 }
 
 async function joinContest(req, res) {
@@ -162,26 +179,30 @@ async function joinContest(req, res) {
         entryFee: getContest.entryFee,
         prizePool: getContest.prizePool,
         totalSpots: getContest.totalSpots,
-      }).then((newContest) => {
-        console.log(`New contest created successfully: ${newContest._id} for match: ${matchId}`);
-      }).catch((error) => {
-        console.error('❌ CRITICAL: Failed to create new contest', {
-          error: error.message,
-          matchId,
-          contestFormat: getContest.contestFormat,
-          entryFee: getContest.entryFee,
-          prizePool: getContest.prizePool,
-          totalSpots: getContest.totalSpots,
-          timestamp: new Date().toISOString()
+      })
+        .then((newContest) => {
+          console.log(
+            `New contest created successfully: ${newContest._id} for match: ${matchId}`
+          );
+        })
+        .catch((error) => {
+          console.error("❌ CRITICAL: Failed to create new contest", {
+            error: error.message,
+            matchId,
+            contestFormat: getContest.contestFormat,
+            entryFee: getContest.entryFee,
+            prizePool: getContest.prizePool,
+            totalSpots: getContest.totalSpots,
+            timestamp: new Date().toISOString(),
+          });
+
+          // TODO: Implement retry mechanism or admin notification
+          // For now, log to console - in production, you could:
+          // 1. Send to monitoring service (e.g., Sentry, DataDog)
+          // 2. Add to retry queue
+          // 3. Send admin notification
+          // 4. Store failed creation data for manual retry
         });
-        
-        // TODO: Implement retry mechanism or admin notification
-        // For now, log to console - in production, you could:
-        // 1. Send to monitoring service (e.g., Sentry, DataDog)
-        // 2. Add to retry queue
-        // 3. Send admin notification
-        // 4. Store failed creation data for manual retry
-      });
     }
 
     // Save the updated contest
