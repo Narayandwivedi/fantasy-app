@@ -6,6 +6,11 @@ import { Routes , Route, useLocation } from 'react-router-dom'
 import Contest from './pages/Contest'
 import CreateTeam from './pages/CreateTeam'
 import MyTeams from './pages/MyTeams'
+import MyMatches from './pages/my matches/MyMatches'
+import Wallet from './pages/user profile/Wallet'
+import ReferAndEarn from './pages/ReferAndEarn'
+import GameRules from './pages/user profile/GameRules'
+import Support from './pages/user profile/Support'
 import Login from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ToastContainer } from 'react-toastify'
@@ -19,25 +24,63 @@ const App = () => {
     <div className='max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden'>
       <div>
         <Routes>
+          
           <Route path='/login' element = {<Login/>} />
+          
           <Route path='/' element = {
             <ProtectedRoute>
               <HomePage/>
             </ProtectedRoute>
           } />
+
+
           <Route path='/:matchId/contest' element = {
             <ProtectedRoute>
               <Contest/>
             </ProtectedRoute>
           } />
+
+
           <Route path='/:matchId/create-team' element = {
             <ProtectedRoute>
               <CreateTeam/>
             </ProtectedRoute>
           } />
+
+
           <Route path='/:matchId/my-teams' element = {
             <ProtectedRoute>
               <MyTeams/>
+            </ProtectedRoute>
+          } />
+
+          <Route path='/my-matches' element = {
+            <ProtectedRoute>
+              <MyMatches/>
+            </ProtectedRoute>
+          } />
+
+          <Route path='/wallet' element = {
+            <ProtectedRoute>
+              <Wallet/>
+            </ProtectedRoute>
+          } />
+
+          <Route path='/refer' element = {
+            <ProtectedRoute>
+              <ReferAndEarn/>
+            </ProtectedRoute>
+          } />
+
+          <Route path='/game-rules' element = {
+            <ProtectedRoute>
+              <GameRules/>
+            </ProtectedRoute>
+          } />
+
+          <Route path='/support' element = {
+            <ProtectedRoute>
+              <Support/>
             </ProtectedRoute>
           } />
         </Routes>

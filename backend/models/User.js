@@ -11,8 +11,10 @@ const userSchema = new mongoose.Schema({
   },
   mobile: {
     type: Number,
-    required: true,
-    unique: true,
+    required: function() {
+      return !this.googleId; // Mobile not required if user signed up with Google
+    },
+    sparse: true, // Allows null values and maintains uniqueness
   },
   email: {
     type: String,
@@ -28,7 +30,23 @@ const userSchema = new mongoose.Schema({
 
   password: {
     type: String,
-    required: true,
+    required: function() {
+      return !this.googleId; // Password not required if user signed up with Google
+    },
+  },
+
+  // Google OAuth fields
+  googleId: {
+    type: String,
+    sparse: true, // Allows null values and maintains uniqueness
+  },
+  profilePicture: {
+    type: String,
+  },
+  authProvider: {
+    type: String,
+    enum: ["local", "google"],
+    default: "local",
   },
 
 

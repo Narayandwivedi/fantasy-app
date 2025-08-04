@@ -28,13 +28,8 @@ const ContestCard = ({ contest, onJoinClick }) => {
       onClick={() => onJoinClick && onJoinClick(contest)}
     >
       {/* Prize Pool Header */}
-      <div className="flex items-center px-3 py-2">
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 bg-green-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs">✓</span>
-          </div>
-          <span className="text-xs font-medium text-gray-700">Prize Pool</span>
-        </div>
+      <div className="px-3 py-2">
+        <span className="text-xs font-medium text-gray-700">Prize Pool</span>
       </div>
 
       {/* Main Prize Pool and Entry Fee */}

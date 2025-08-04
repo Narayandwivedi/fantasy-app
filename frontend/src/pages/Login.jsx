@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react'
 import { AppContext } from '../context/AppContext'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import GoogleLogin from '../components/GoogleLogin'
 
 const Login = () => {
   const { login, signup, BACKEND_URL } = useContext(AppContext)
@@ -157,52 +158,58 @@ const Login = () => {
   return (
     <div className="bg-gradient-to-br from-gray-900 via-slate-900 to-black min-h-screen max-w-md mx-auto relative overflow-hidden">
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-300 rounded-full"></div>
-        <div className="absolute top-32 right-8 w-16 h-16 bg-yellow-300 rounded-full"></div>
-        <div className="absolute bottom-40 left-8 w-12 h-12 bg-yellow-300 rounded-full"></div>
-        <div className="absolute bottom-20 right-12 w-24 h-24 bg-yellow-300 rounded-full"></div>
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-16 left-8 w-32 h-32 bg-yellow-300 rounded-full blur-3xl"></div>
+        <div className="absolute top-40 right-6 w-24 h-24 bg-yellow-300 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-32 left-6 w-20 h-20 bg-yellow-300 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-16 right-10 w-28 h-28 bg-yellow-300 rounded-full blur-3xl"></div>
       </div>
 
       {/* Header with Logo */}
-      <div className="pt-12 pb-8 px-6 text-center relative z-10">
-        {/* Logo Container */}
-        <div className="mb-6">
-          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto shadow-lg">
-            <div className="text-gray-900 font-bold text-2xl">
-              W11
-            </div>
-          </div>
-        </div>
-        
-        <div className="mb-2">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Winners<span className="text-yellow-300">11</span>
+      <div className="pt-16 pb-8 px-6 text-center relative z-10">
+        <div className="mb-8">
+          <h1 className="text-5xl font-bold text-white mb-3">
+            Winners<span className="text-yellow-400">11</span>
           </h1>
-          <p className="text-white text-opacity-90 text-sm">
+          <p className="text-white text-opacity-80 text-base font-medium">
             {showForgotPassword ? 'Reset Your Password' : (isLogin ? 'Welcome Back!' : 'Join the Game')}
           </p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="bg-white mx-4 rounded-t-3xl min-h-[60vh] relative z-10 shadow-2xl">
-        <div className="p-6 pt-8">
+      <div className="bg-white mx-3 rounded-t-[2rem] relative z-10 shadow-2xl min-h-[65vh]">
+        <div className="px-6 pt-10 pb-8">
         {!showForgotPassword ? (
           <>
+            {/* Google Sign-in at Top */}
+            <div className="mb-10">
+              <GoogleLogin />
+            </div>
+
+            {/* Divider */}
+            <div className="relative mb-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-400 font-medium">OR</span>
+              </div>
+            </div>
+
             {/* Login/Signup Toggle */}
-            <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+            <div className="flex bg-gray-50 rounded-2xl p-1.5 mb-8 shadow-inner">
               <button
-                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
-                  isLogin ? 'bg-yellow-500 text-black shadow-md' : 'text-gray-600'
+                className={`flex-1 py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                  isLogin ? 'bg-yellow-400 text-black shadow-lg transform scale-[1.02]' : 'text-gray-500 hover:text-gray-700'
                 }`}
                 onClick={() => setIsLogin(true)}
               >
                 Login
               </button>
               <button
-                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
-                  !isLogin ? 'bg-yellow-500 text-black shadow-md' : 'text-gray-600'
+                className={`flex-1 py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                  !isLogin ? 'bg-yellow-400 text-black shadow-lg transform scale-[1.02]' : 'text-gray-500 hover:text-gray-700'  
                 }`}
                 onClick={() => setIsLogin(false)}
               >
@@ -214,150 +221,166 @@ const Login = () => {
               /* Login Form */
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
                     Email or Mobile Number
                   </label>
                   <input
                     type="text"
                     value={loginData.emailOrMobile}
                     onChange={(e) => setLoginData({...loginData, emailOrMobile: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
-                    placeholder="Enter email or mobile number"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all text-gray-800 text-sm placeholder:text-xs"
+                    placeholder="Email or mobile"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
                     Password
                   </label>
                   <input
                     type="password"
                     value={loginData.password}
                     onChange={(e) => setLoginData({...loginData, password: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
-                    placeholder="Enter password"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all text-gray-800 text-sm placeholder:text-xs"
+                    placeholder="Password"
                     required
                   />
                 </div>
 
                 {errors.login && (
-                  <div className="text-red-500 text-sm">{errors.login}</div>
+                  <div className="text-red-500 text-sm font-medium bg-red-50 px-4 py-2 rounded-xl">{errors.login}</div>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-yellow-500 text-black py-3 px-4 rounded-xl font-medium hover:bg-yellow-600 disabled:bg-yellow-300 transition-colors shadow-lg"
-                >
-                  {loading ? 'Logging in...' : 'Login'}
-                </button>
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white py-4 px-6 rounded-2xl font-semibold hover:from-gray-900 hover:to-black disabled:from-gray-400 disabled:to-gray-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none"
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                        Logging in...
+                      </div>
+                    ) : 'Login'}
+                  </button>
+                </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowForgotPassword(true)}
-                  className="w-full text-yellow-600 text-sm hover:underline font-medium"
-                >
-                  Forgot Password?
-                </button>
+                <div className="text-center pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-yellow-600 text-sm hover:text-yellow-700 font-semibold hover:underline transition-colors"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
               </form>
             ) : (
               /* Signup Form */
               <form onSubmit={handleSignup} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
                     Full Name
                   </label>
                   <input
                     type="text"
                     value={signupData.fullName}
                     onChange={(e) => setSignupData({...signupData, fullName: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
-                    placeholder="Enter full name"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all text-gray-800 text-sm placeholder:text-xs"
+                    placeholder="Full name"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
                     Email
                   </label>
                   <input
                     type="email"
                     value={signupData.email}
                     onChange={(e) => setSignupData({...signupData, email: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
-                    placeholder="Enter email"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all text-gray-800 text-sm placeholder:text-xs"
+                    placeholder="Email"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
                     Mobile Number
                   </label>
                   <input
                     type="tel"
                     value={signupData.mobile}
                     onChange={(e) => setSignupData({...signupData, mobile: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
-                    placeholder="Enter 10-digit mobile number"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all text-gray-800 text-sm placeholder:text-xs"
+                    placeholder="Mobile number"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
                     Password
                   </label>
                   <input
                     type="password"
                     value={signupData.password}
                     onChange={(e) => setSignupData({...signupData, password: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
-                    placeholder="Enter password"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all text-gray-800 text-sm placeholder:text-xs"
+                    placeholder="Password"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
                     Confirm Password
                   </label>
                   <input
                     type="password"
                     value={signupData.confirmPassword}
                     onChange={(e) => setSignupData({...signupData, confirmPassword: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all text-gray-800 text-sm placeholder:text-xs"
                     placeholder="Confirm password"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
                     Referral Code (Optional)
                   </label>
                   <input
                     type="text"
                     value={signupData.referedBy}
                     onChange={(e) => setSignupData({...signupData, referedBy: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
-                    placeholder="Enter referral code (optional)"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all text-gray-800 text-sm placeholder:text-xs"
+                    placeholder="Referral code"
                   />
                 </div>
 
                 {errors.signup && (
-                  <div className="text-red-500 text-sm">{errors.signup}</div>
+                  <div className="text-red-500 text-sm font-medium bg-red-50 px-4 py-2 rounded-xl">{errors.signup}</div>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-yellow-500 text-black py-3 px-4 rounded-lg font-medium hover:bg-yellow-600 disabled:bg-yellow-400 transition-colors"
-                >
-                  {loading ? 'Signing up...' : 'Sign Up'}
-                </button>
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white py-4 px-6 rounded-2xl font-semibold hover:from-gray-900 hover:to-black disabled:from-gray-400 disabled:to-gray-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none"
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                        Signing up...
+                      </div>
+                    ) : 'Sign Up'}
+                  </button>
+                </div>
               </form>
             )}
           </>
@@ -367,38 +390,47 @@ const Login = () => {
             {!otpSent ? (
               <form onSubmit={handleSendOTP} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
                     Email Address
                   </label>
                   <input
                     type="email"
                     value={forgotData.email}
                     onChange={(e) => setForgotData({...forgotData, email: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
-                    placeholder="Enter your email"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all text-gray-800 text-sm placeholder:text-xs"
+                    placeholder="Email address"
                     required
                   />
                 </div>
 
                 {errors.forgot && (
-                  <div className="text-red-500 text-sm">{errors.forgot}</div>
+                  <div className="text-red-500 text-sm font-medium bg-red-50 px-4 py-2 rounded-xl">{errors.forgot}</div>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-yellow-500 text-black py-3 px-4 rounded-xl font-medium hover:bg-yellow-600 disabled:bg-yellow-300 transition-colors shadow-lg"
-                >
-                  {loading ? 'Sending OTP...' : 'Send OTP'}
-                </button>
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white py-4 px-6 rounded-2xl font-semibold hover:from-gray-900 hover:to-black disabled:from-gray-400 disabled:to-gray-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none"
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                        Sending OTP...
+                      </div>
+                    ) : 'Send OTP'}
+                  </button>
+                </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowForgotPassword(false)}
-                  className="w-full text-gray-600 text-sm hover:underline"
-                >
-                  Back to Login
-                </button>
+                <div className="text-center pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(false)}
+                    className="text-gray-600 text-sm hover:text-gray-800 font-semibold hover:underline transition-colors"
+                  >
+                    Back to Login
+                  </button>
+                </div>
               </form>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-4">
@@ -451,7 +483,7 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-yellow-500 text-black py-3 px-4 rounded-lg font-medium hover:bg-yellow-600 disabled:bg-yellow-400 transition-colors"
+                  className="w-full bg-gray-800 text-white py-3 px-4 rounded-xl font-medium hover:bg-gray-900 disabled:bg-gray-400 transition-colors shadow-lg"
                 >
                   {loading ? 'Resetting Password...' : 'Reset Password'}
                 </button>

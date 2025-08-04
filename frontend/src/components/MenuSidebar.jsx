@@ -1,9 +1,11 @@
 import { X, Wallet, HelpCircle, Headphones, FileText, Settings, LogOut, User } from 'lucide-react'
 import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 
 const MenuSidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useContext(AppContext)
+  const navigate = useNavigate()
   return (
     <>
       {/* Backdrop */}
@@ -61,21 +63,30 @@ const MenuSidebar = ({ isOpen, onClose }) => {
               icon={<Wallet size={20} />}
               title="My Wallet"
               subtitle="Add money & transactions"
-              onClick={() => console.log('Wallet clicked')}
+              onClick={() => {
+                navigate('/wallet')
+                onClose()
+              }}
             />
             
             <MenuItem 
               icon={<HelpCircle size={20} />}
               title="How to Play"
               subtitle="Learn the game rules"
-              onClick={() => console.log('How to play clicked')}
+              onClick={() => {
+                navigate('/game-rules')
+                onClose()
+              }}
             />
             
             <MenuItem 
               icon={<Headphones size={20} />}
               title="Customer Support"
               subtitle="Get help & support"
-              onClick={() => console.log('Support clicked')}
+              onClick={() => {
+                navigate('/support')
+                onClose()
+              }}
             />
             
             <MenuItem 

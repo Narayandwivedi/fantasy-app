@@ -3,6 +3,9 @@ const jwt = require("jsonwebtoken");
 const userModel = require("../models/User.js");
 const transporter = require("../config/Nodemailer.js");
 const axios = require("axios");
+const { OAuth2Client } = require('google-auth-library');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const handelUserSignup = async (req, res) => {
   try {
@@ -483,6 +486,144 @@ function maskString(str, visibleChars = 4) {
   return "*".repeat(str.length - visibleChars) + str.slice(-visibleChars);
 }
 
+// Google OAuth Handler
+const handleGoogleAuth = async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: "Google credential is required"
+      });
+    }
+
+    // Verify Google token
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const {
+      sub: googleId,
+      email,
+      name: fullName,
+      picture: profilePicture,
+      email_verified
+    } = payload;
+
+    if (!email_verified) {
+      return res.status(400).json({
+        success: false,
+        message: "Google email not verified"
+      });
+    }
+
+    // Check if user exists
+    let user = await userModel.findOne({ 
+      $or: [
+        { email: email },
+        { googleId: googleId }
+      ]
+    });
+
+    if (user) {
+      // User exists, update Google info if needed
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.profilePicture = profilePicture;
+        user.authProvider = 'google';
+        user.isEmailVerified = true;
+        await user.save();
+      }
+    } else {
+      // Create new user
+      const referralCode = generateReferralCode();
+      
+      user = new userModel({
+        fullName,
+        email,
+        googleId,
+        profilePicture,
+        isEmailVerified: email_verified,
+        referralCode,
+        authProvider: 'google',
+        // Don't set password for Google users
+        // Don't set mobile for Google users (will be null)
+      });
+
+      await user.save();
+
+      // Send new user alert
+      sendGoogleSignupAlert(user.fullName).catch((err) =>
+        console.error("Telegram Error:", err.message)
+      );
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Set cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      sameSite: 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    // Prepare user data for response
+    const userObj = user.toObject();
+    delete userObj.password;
+
+    // Handle banking info masking (same as regular login)
+    if (user.isBankAdded) {
+      userObj.accountNumber = maskString(user.bankAccount.accountNumber, 4);
+      delete userObj.bankAccount;
+    }
+
+    if (user.isUpiAdded) {
+      userObj.upi = maskUpiId(user.upiId.upi);
+      delete userObj.upiId;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Google authentication successful',
+      userData: userObj
+    });
+
+  } catch (error) {
+    console.error('Google auth error:', error);
+    return res.status(400).json({
+      success: false,
+      message: 'Google authentication failed'
+    });
+  }
+};
+
+// Send Google signup alert function
+const sendGoogleSignupAlert = async (userName) => {
+  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+  const CHAT_ID = process.env.TELEGRAM_GROUP_ID;
+
+  const message = `🔐 NEW GOOGLE SIGNUP: ${userName} signed up with Google!`;
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+  try {
+    await axios.post(url, {
+      chat_id: CHAT_ID,
+      text: message,
+    });
+  } catch (err) {
+    console.error("Telegram error:", err.message);
+  }
+};
+
 module.exports = {
   handelUserSignup,
   handelUserLogin,
@@ -491,4 +632,5 @@ module.exports = {
   generateResetPassOTP,
   submitResetPassOTP,
   isloggedin,
+  handleGoogleAuth,
 };

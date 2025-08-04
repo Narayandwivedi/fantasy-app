@@ -2,6 +2,7 @@ const Contest = require("../models/Contest");
 const Match = require("../models/Match");
 const mongoose = require("mongoose");
 const User = require("../models/User");
+const Userteam = require("../models/Userteam");
 
 async function createContest(req, res) {
   try {
@@ -51,7 +52,7 @@ async function createContest(req, res) {
   }
 }
 
-async function getContest(req, res) {
+async function getContestsByMatch(req, res) {
   try {
     const { matchId } = req.params;
 
@@ -83,15 +84,117 @@ async function getContest(req, res) {
   }
 }
 
-async function getJoinedContestByUser(req, res) {
-  const userId = req.params;
-  if (!userId) {
-    return res
-      .status(400)
-      .json({ success: false, message: "user id not found" });
-  }
+async function getUserJoinedContests(req, res) {
+  try {
+    const { userId } = req.params;
+    
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user id not found" });
+    }
 
-  await Contest.find({ user: userId , });
+    if (!mongoose.isValidObjectId(userId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid user id" });
+    }
+
+    // Find contests where user has joined
+    const joinedContests = await Contest.find({
+      "joinedUsers.user": userId
+    })
+    .populate({
+      path: "matchId",
+      select: "team1 team2 startTime status"
+    })
+    .sort({ createdAt: -1 });
+
+    return res.json({ success: true, data: joinedContests });
+  } catch (err) {
+    console.log(err.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "internal server error" });
+  }
+}
+
+async function getUserMatches(req, res) {
+  try {
+    const { userId } = req.params;
+    
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user id not found" });
+    }
+
+    if (!mongoose.isValidObjectId(userId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid user id" });
+    }
+
+    // Find contests where user has joined - only get match IDs to minimize data transfer
+    const joinedContests = await Contest.find({
+      "joinedUsers.user": userId
+    })
+    .populate({
+      path: "matchId",
+      populate: [
+        { path: "team1", select: "shortName logo" },  // Only shortName and logo needed
+        { path: "team2", select: "shortName logo" }   // Only shortName and logo needed
+      ],
+      select: "team1 team2 startTime status matchType series"  // Removed sport as it's not used in UI
+    })
+    .select("matchId")  // Only select matchId from Contest, no contest details needed
+    .sort({ createdAt: -1 });
+
+    // Group contests by match and calculate only contest count
+    const matchesMap = new Map();
+    
+    joinedContests.forEach(contest => {
+      const match = contest.matchId;
+      if (!match) return;
+      
+      const matchId = match._id.toString();
+      
+      if (!matchesMap.has(matchId)) {
+        matchesMap.set(matchId, {
+          matchId: match._id,
+          matchType: match.matchType,
+          series: match.series,
+          team1: match.team1,
+          team2: match.team2,
+          startTime: match.startTime,
+          status: match.status,
+          contestsCount: 0
+        });
+      }
+      
+      const matchData = matchesMap.get(matchId);
+      matchData.contestsCount += 1;
+    });
+
+    // Convert map to array and sort by startTime
+    const userMatches = Array.from(matchesMap.values()).sort((a, b) => {
+      return new Date(b.startTime) - new Date(a.startTime);
+    });
+
+    // Categorize matches by status
+    const categorizedMatches = {
+      upcoming: userMatches.filter(match => match.status === 'upcoming'),
+      live: userMatches.filter(match => match.status === 'live'),
+      completed: userMatches.filter(match => match.status === 'completed')
+    };
+
+    return res.json({ success: true, data: categorizedMatches });
+  } catch (err) {
+    console.log(err.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "internal server error" });
+  }
 }
 
 async function joinContest(req, res) {
@@ -215,4 +318,4 @@ async function joinContest(req, res) {
   }
 }
 
-module.exports = { createContest, getContest, joinContest };
+module.exports = { createContest, getContestsByMatch, joinContest, getUserJoinedContests, getUserMatches };

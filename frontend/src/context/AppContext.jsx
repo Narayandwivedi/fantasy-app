@@ -6,8 +6,8 @@ export const AppContext = createContext();
 export const AppContextProvider = (props) => {
 
   // const BACKEND_URL = "https://fantasy-backend-three.vercel.app";
-  // const BACKEND_URL = 'http://localhost:4000'
-  const BACKEND_URL = 'https://fantasybackend.winnersclubs.fun'
+  const BACKEND_URL = 'http://localhost:4000'
+  // const BACKEND_URL = 'https://fantasybackend.winnersclubs.fun'
 
   // Auth states
   const [user, setUser] = useState(null)
@@ -130,6 +130,29 @@ export const AppContextProvider = (props) => {
   const updateUser = useCallback((userData) => {
     setUser(prevUser => ({ ...prevUser, ...userData }))
   }, [])
+
+  // Get user's matches (contests grouped by matches)
+  const getUserMatches = useCallback(async (userId) => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/contests/matches/${userId}`, {
+        withCredentials: true
+      })
+      
+      if (response.data.success) {
+        return { success: true, data: response.data.data }
+      } else {
+        return { 
+          success: false, 
+          error: response.data.message || 'Failed to fetch matches' 
+        }
+      }
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Failed to fetch matches' 
+      }
+    }
+  }, [BACKEND_URL])
  
   // Memoize context value to prevent unnecessary re-renders
   const value = useMemo(() => ({
@@ -143,8 +166,10 @@ export const AppContextProvider = (props) => {
     logout,
     refreshUser,
     updateUser,
-    checkAuthStatus
-  }), [user, isAuthenticated, loading, login, signup, logout, refreshUser, updateUser, checkAuthStatus]);
+    checkAuthStatus,
+    // Match data
+    getUserMatches
+  }), [user, isAuthenticated, loading, login, signup, logout, refreshUser, updateUser, checkAuthStatus, getUserMatches]);
 
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>

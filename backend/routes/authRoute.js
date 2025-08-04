@@ -8,6 +8,7 @@ const {
   generateResetPassOTP,
   submitResetPassOTP,
   isloggedin,
+  handleGoogleAuth,
 } = require("../controllers/authController.js");
 
 const router = express.Router();
@@ -41,6 +42,7 @@ const otpLimiter = rateLimit({
 // User Authentication Routes
 router.post("/signup", handelUserSignup);
 router.post("/login", authLimiter, handelUserLogin);
+router.post("/google", authLimiter, handleGoogleAuth);
 router.post("/logout", handleUserLogout);
 
 // Admin Authentication Routes
