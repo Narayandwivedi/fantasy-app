@@ -38,7 +38,10 @@ const Wallet = () => {
     }
     
     const transactionId = generateTransactionId()
-    const phonepeURL = `phonepe://pay?pa=6262330338@ybl&pn=Winners11&am=${selectedAmount}&cu=INR&tn=${transactionId}`
+    const phonepeURL = `phonepe://pay?pa=6262330338@ybl&am=${selectedAmount}&cu=INR&tn=Payment for Winners11 ${transactionId}`
+    
+    console.log('PhonePe URL:', phonepeURL)
+    alert(`PhonePe Link: ${phonepeURL}`)
     
     window.location.href = phonepeURL
     
@@ -55,7 +58,10 @@ const Wallet = () => {
     }
     
     const transactionId = generateTransactionId()
-    const gpayURL = `tez://upi/pay?pa=manojdwivedi777@oksbi&pn=Winners11&am=${selectedAmount}&cu=INR&tn=${transactionId}`
+    const gpayURL = `tez://upi/pay?pa=manojdwivedi777@oksbi&am=${selectedAmount}&cu=INR&tn=Payment for Winners11 ${transactionId}`
+    
+    console.log('Google Pay URL:', gpayURL)
+    alert(`Google Pay Link: ${gpayURL}`)
     
     window.location.href = gpayURL
     
