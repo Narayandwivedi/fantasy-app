@@ -11,10 +11,11 @@ const userSchema = new mongoose.Schema({
   },
   mobile: {
     type: Number,
+    unique: true,
+    sparse: true, // Allows null values for Google users, maintains uniqueness
     required: function() {
-      return !this.googleId; // Mobile not required if user signed up with Google
+      return this.authProvider !== 'google'; // Required for local signup, optional for Google
     },
-    sparse: true, // Allows null values and maintains uniqueness
   },
   email: {
     type: String,
@@ -140,6 +141,8 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
 },{timestamps:true});
+
+
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

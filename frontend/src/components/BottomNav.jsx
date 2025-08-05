@@ -1,7 +1,8 @@
+import React, { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { Home, Trophy, Share2, User } from 'lucide-react'
 
-const BottomNav = () => {
+const BottomNav = memo(() => {
   return (
     <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[440px] bg-white shadow-lg border-t border-gray-200 z-50">
       <div className="flex justify-around items-center py-3 px-4">
@@ -23,6 +24,8 @@ const BottomNav = () => {
       </div>
     </div>
   )
-}
+})
+
+BottomNav.displayName = 'BottomNav'
 
 export default BottomNav

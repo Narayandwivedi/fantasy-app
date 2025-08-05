@@ -1,26 +1,36 @@
-import React from "react";
+import React, { memo, useMemo } from "react";
 
-const ContestCard = ({ contest, onJoinClick }) => {
-  const spotsLeft = contest?.totalSpots - contest?.currentParticipants || 0;
-  const fillPercentage =
-    contest?.totalSpots > 0
-      ? (contest?.currentParticipants / contest?.totalSpots) * 100
-      : 0;
+const ContestCard = memo(({ contest, onJoinClick }) => {
+  const contestData = useMemo(() => {
+    const spotsLeft = contest?.totalSpots - contest?.currentParticipants || 0;
+    const fillPercentage =
+      contest?.totalSpots > 0
+        ? (contest?.currentParticipants / contest?.totalSpots) * 100
+        : 0;
 
-  const formatPrize = (amount) => {
-    if (amount >= 100000) {
-      return `₹${(amount / 100000).toFixed(2)} Lakhs`;
-    }
-    return `₹${amount?.toLocaleString() || 0}`;
-  };
+    const formatPrize = (amount) => {
+      if (amount >= 100000) {
+        return `₹${(amount / 100000).toFixed(2)} Lakhs`;
+      }
+      return `₹${amount?.toLocaleString() || 0}`;
+    };
 
-  const firstPlacePrize =
-    contest?.prizeDistribution?.[0]?.prize ||
-    Math.floor((contest?.prizePool || 0) * 0.6);
-  const winPercentage =
-    contest?.contestFormat === "h2h"
-      ? "50%"
-      : `${Math.round(100 / (contest?.totalSpots || 1))}%`;
+    const firstPlacePrize =
+      contest?.prizeDistribution?.[0]?.prize ||
+      Math.floor((contest?.prizePool || 0) * 0.6);
+    const winPercentage =
+      contest?.contestFormat === "h2h"
+        ? "50%"
+        : `${Math.round(100 / (contest?.totalSpots || 1))}%`;
+
+    return {
+      spotsLeft,
+      fillPercentage,
+      formatPrize,
+      firstPlacePrize,
+      winPercentage
+    };
+  }, [contest]);
 
   return (
     <div 
@@ -36,7 +46,7 @@ const ContestCard = ({ contest, onJoinClick }) => {
       <div className="px-3 pb-3">
         <div className="flex items-center justify-between mb-3">
           <div className="text-2xl font-bold text-gray-900">
-            {formatPrize(contest?.prizePool)}
+            {contestData.formatPrize(contest?.prizePool)}
           </div>
           <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 py-1.5 rounded-lg font-semibold text-xs shadow-md hover:shadow-lg transition-all duration-200">
             ₹{contest?.entryFee || 0}
@@ -53,7 +63,7 @@ const ContestCard = ({ contest, onJoinClick }) => {
               <div className="w-4 h-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
                 <span className="text-blue-600 text-xs font-bold">🏆</span>
               </div>
-              <span className="text-xs font-medium text-gray-700">{winPercentage}</span>
+              <span className="text-xs font-medium text-gray-700">{contestData.winPercentage}</span>
             </div>
             <div className="flex items-center space-x-1">
               <div className="w-4 h-4 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full flex items-center justify-center">
@@ -65,13 +75,13 @@ const ContestCard = ({ contest, onJoinClick }) => {
 
           {/* Right side - Spots info with centered progress bar */}
           <div className="flex items-center space-x-2">
-            <span className="text-red-500 font-medium text-xs whitespace-nowrap">{spotsLeft} Left</span>
+            <span className="text-red-500 font-medium text-xs whitespace-nowrap">{contestData.spotsLeft} Left</span>
             
             {/* Progress Bar - centered between spots */}
             <div className="w-12 bg-gray-300 rounded-full h-1.5">
               <div
                 className="bg-gradient-to-r from-red-400 to-red-500 h-1.5 rounded-full transition-all duration-300"
-                style={{ width: `${Math.min(fillPercentage, 100)}%` }}
+                style={{ width: `${Math.min(contestData.fillPercentage, 100)}%` }}
               ></div>
             </div>
             
@@ -81,6 +91,8 @@ const ContestCard = ({ contest, onJoinClick }) => {
       </div>
     </div>
   );
-};
+});
+
+ContestCard.displayName = 'ContestCard';
 
 export default ContestCard;

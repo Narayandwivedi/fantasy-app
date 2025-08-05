@@ -3,11 +3,10 @@ import axios from "axios";
 
 export const AppContext = createContext();
 
-export const AppContextProvider = (props) => {
+// Move BACKEND_URL outside component to prevent recreating on every render
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'
 
-  // const BACKEND_URL = "https://fantasy-backend-three.vercel.app";
-  const BACKEND_URL = 'http://localhost:4000'
-  // const BACKEND_URL = 'https://fantasybackend.winnersclubs.fun'
+export const AppContextProvider = (props) => {
 
   // Auth states
   const [user, setUser] = useState(null)
@@ -44,7 +43,7 @@ export const AppContextProvider = (props) => {
       setLoading(false)
       setIsCheckingAuth(false)
     }
-  }, [BACKEND_URL, isCheckingAuth])
+  }, []) // Removed isCheckingAuth from dependencies to prevent infinite loop
 
   // Check authentication status on app load
   useEffect(() => {
@@ -79,7 +78,7 @@ export const AppContextProvider = (props) => {
         error: error.response?.data?.message || 'Login failed' 
       }
     }
-  }, [BACKEND_URL])
+  }, [])
 
   // Signup function
   const signup = useCallback(async (signupData) => {
@@ -105,7 +104,7 @@ export const AppContextProvider = (props) => {
         error: error.response?.data?.message || 'Signup failed' 
       }
     }
-  }, [BACKEND_URL])
+  }, [])
 
   // Logout function
   const logout = useCallback(async () => {
@@ -119,7 +118,7 @@ export const AppContextProvider = (props) => {
       setIsAuthenticated(false)
       setUser(null)
     }
-  }, [BACKEND_URL])
+  }, [])
 
   // Refresh user data (useful after profile updates, balance changes, etc.)
   const refreshUser = useCallback(async () => {
@@ -152,7 +151,7 @@ export const AppContextProvider = (props) => {
         error: error.response?.data?.message || 'Failed to fetch matches' 
       }
     }
-  }, [BACKEND_URL])
+  }, [])
  
   // Memoize context value to prevent unnecessary re-renders
   const value = useMemo(() => ({

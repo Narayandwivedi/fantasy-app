@@ -1,9 +1,9 @@
-  import React, { useContext, useState, useEffect } from "react";
+  import React, { useContext, useState, useEffect, memo, useCallback } from "react";
   import { AppContext } from "../context/AppContext";
   import { Clock } from "lucide-react";
   import { useNavigate } from "react-router-dom";
 
-  const MatchCard = ({
+  const MatchCard = memo(({
     team1Name,
     team1Img,
     team2Name,
@@ -15,6 +15,10 @@
     const { BACKEND_URL } = useContext(AppContext);
     const [timeLeft, setTimeLeft] = useState("");
     const navigate = useNavigate();
+
+    const handleClick = useCallback(() => {
+      navigate(`/${matchId}/contest`);
+    }, [navigate, matchId]);
 
     useEffect(() => {
       const calculateTimeLeft = () => {
@@ -44,16 +48,15 @@
       };
 
       calculateTimeLeft();
-      const timer = setInterval(calculateTimeLeft, 60000); // Update every minute
+      // Only update every minute for optimization
+      const timer = setInterval(calculateTimeLeft, 60000);
 
       return () => clearInterval(timer);
     }, [startTime]);
 
     return (
       <div
-        onClick={() => {
-          navigate(`/${matchId}/contest`);
-        }}
+        onClick={handleClick}
         className="bg-white rounded-lg w-full shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100 cursor-pointer"
       >
         {/* top strip */}
@@ -118,6 +121,8 @@
         </div>
       </div>
     );
-  };
+  });
+
+  MatchCard.displayName = 'MatchCard';
 
   export default MatchCard;

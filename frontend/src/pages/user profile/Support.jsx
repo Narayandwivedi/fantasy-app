@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
-import { Phone, Mail, MessageCircle, Clock, Headphones, CreditCard, Banknote, FileCheck, Gamepad2, HelpCircle } from 'lucide-react';
+import { Phone, Mail, MessageCircle, Clock, Headphones, CreditCard, Banknote, FileCheck, Gamepad2, HelpCircle, Send, X } from 'lucide-react';
+import { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AppContext } from '../../context/AppContext';
+import ChatPopup from '../../components/ChatPopup';
+import FloatingChatButton from '../../components/FloatingChatButton';
 
 const Support = () => {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('Deposit Related');
+  const [showChatFromButton, setShowChatFromButton] = useState(false);
+  const [hasActiveChat, setHasActiveChat] = useState(false);
+  const { BACKEND_URL } = useContext(AppContext);
 
   const categories = [
     { id: 'Deposit Related', label: 'Deposit Related', icon: <CreditCard className="w-4 h-4" /> },
@@ -65,17 +74,13 @@ const Support = () => {
     }
   };
 
-  const handleCallNow = () => {
-    window.location.href = 'tel:+919202469725';
-  };
 
   const handleEmailNow = () => {
     window.location.href = 'mailto:support@winners11.com';
   };
 
   const handleChatNow = () => {
-    // You can integrate with your chat system here
-    alert('Chat feature will be available soon!');
+    navigate('/chat');
   };
 
   return (
@@ -158,30 +163,6 @@ const Support = () => {
             </div>
           </div>
 
-          {/* Call Option */}
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-              <div className="flex items-center space-x-3">
-                <div className="bg-blue-100 p-2 rounded-lg flex-shrink-0">
-                  <Phone className="w-5 h-5 text-blue-600" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-gray-800 text-sm">Call Support</h3>
-                  <p className="text-xs text-gray-600">+91 9202469725</p>
-                  <div className="flex items-center space-x-1 mt-1">
-                    <Clock className="w-3 h-3 text-gray-500" />
-                    <span className="text-xs text-gray-500">Available 9 AM to 12 AM</span>
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={handleCallNow}
-                className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded-lg transition-all duration-200 shadow-lg text-sm"
-              >
-                Call Now
-              </button>
-            </div>
-          </div>
 
           {/* Email Option */}
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
@@ -213,7 +194,6 @@ const Support = () => {
         <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200 rounded-lg p-4">
           <h4 className="font-semibold text-yellow-800 mb-2">Support Hours</h4>
           <div className="space-y-1 text-sm text-yellow-700">
-            <p>📞 Phone Support: 9 AM to 12 AM (Daily)</p>
             <p>💬 Live Chat: 9 AM to 12 AM (Daily)</p>
             <p>📧 Email Support: Response within 24 hours</p>
           </div>
@@ -230,6 +210,16 @@ const Support = () => {
         {/* Bottom padding for navigation */}
         <div className="h-20"></div>
       </div>
+
+      {/* Chat from "Chat Now" button */}
+      <ChatPopup 
+        isOpen={showChatFromButton} 
+        onClose={() => setShowChatFromButton(false)}
+        onMessageSent={() => setHasActiveChat(true)}
+      />
+      
+      {/* Floating Chat Button - only shows when user has sent a message and popup is closed */}
+      {hasActiveChat && !showChatFromButton && <FloatingChatButton />}
     </div>
   );
 };

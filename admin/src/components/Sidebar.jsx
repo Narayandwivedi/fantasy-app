@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Users, Shield, Trophy, Calendar, Play, CheckCircle, UserCheck, Zap, Home, Target, Award, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, Shield, Trophy, Calendar, Play, CheckCircle, UserCheck, Zap, Home, Target, Award, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 
 const Sidebar = ({ collapsed, onToggle }) => {
   const location = useLocation();
@@ -14,7 +14,8 @@ const Sidebar = ({ collapsed, onToggle }) => {
     { path: '/upcoming-matches', label: 'Upcoming Matches', icon: Calendar },
     { path: '/live-matches', label: 'Live Matches', icon: Zap },
     { path: '/completed-matches', label: 'Completed Matches', icon: CheckCircle },
-    { path: '/manage-contests', label: 'Manage Contests', icon: Award }
+    { path: '/manage-contests', label: 'Manage Contests', icon: Award },
+    { path: '/chat-support', label: 'Chat Support', icon: MessageCircle }
   ];
 
   const getNavItemStyles = (path) => {

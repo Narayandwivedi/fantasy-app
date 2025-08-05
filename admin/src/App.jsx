@@ -14,6 +14,7 @@ import MatchCard from "./components/MatchCard";
 import MatchDetail from "./pages/ManageMatch/MatchDetail";
 import ManageUser from "./pages/ManageUser";
 import ManageContest from "./pages/ManageContest/ManageContest";
+import ChatSupport from "./pages/ChatSupport";
 
 const App = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -45,6 +46,7 @@ const App = () => {
           <Route path="/completed-matches" element={<CompletedMatch />} />
           <Route path="/matches/:matchId" element={<MatchDetail />} />
           <Route path="/manage-contests" element={<ManageContest />} />
+          <Route path="/chat-support" element={<ChatSupport />} />
           <Route path="/test" element={<MatchCard />} />
 
           </Routes>

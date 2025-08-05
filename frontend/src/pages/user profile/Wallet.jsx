@@ -27,13 +27,42 @@ const Wallet = () => {
     setCustomAmount('')
   }
 
-  const handleAddCash = () => {
+  const generateTransactionId = () => {
+    return 'TXN' + Date.now() + Math.random().toString(36).substr(2, 9)
+  }
+
+  const redirectToPhonePe = () => {
     if (!selectedAmount) {
       alert('Please select or enter an amount')
       return
     }
-    // TODO: Implement payment gateway integration
-    console.log('Adding cash:', selectedAmount)
+    
+    const transactionId = generateTransactionId()
+    const phonepeURL = `phonepe://pay?pa=8602145864@ybl&pn=Winners11&am=${selectedAmount}&cu=INR&tn=${transactionId}`
+    
+    window.location.href = phonepeURL
+    
+    // Fallback for web
+    setTimeout(() => {
+      window.open(`https://phonepe.com/`, '_blank')
+    }, 1000)
+  }
+
+  const redirectToGooglePay = () => {
+    if (!selectedAmount) {
+      alert('Please select or enter an amount')
+      return
+    }
+    
+    const transactionId = generateTransactionId()
+    const gpayURL = `tez://upi/pay?pa=desinplus1@okicici&pn=Winners11&am=${selectedAmount}&cu=INR&tn=${transactionId}`
+    
+    window.location.href = gpayURL
+    
+    // Fallback for web
+    setTimeout(() => {
+      window.open(`https://pay.google.com/`, '_blank')
+    }, 1000)
   }
 
   return (
@@ -93,20 +122,45 @@ const Wallet = () => {
         </div>
       </div>
 
-      {/* Add Cash Button */}
-      <div className="fixed bottom-20 left-0 right-0 p-4 bg-white shadow-lg">
-        <button
-          onClick={handleAddCash}
-          disabled={!selectedAmount}
-          className={`w-full py-4 rounded-lg font-bold text-lg transition-all duration-200 ${
-            selectedAmount
-              ? 'bg-gradient-to-r from-gray-900 via-slate-900 to-black text-white hover:from-gray-800 hover:via-slate-800 hover:to-gray-900 shadow-xl'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
-        >
-          ADD CASH ₹{selectedAmount || '0'}
-        </button>
-      </div>
+      {/* Payment Options */}
+      {selectedAmount && (
+        <div className="fixed bottom-20 left-0 right-0 p-4 bg-white shadow-lg">
+          <h3 className="text-center text-gray-600 text-sm mb-4">Choose Payment Method</h3>
+          <div className="flex gap-3">
+            <button
+              onClick={redirectToPhonePe}
+              className="flex-1 flex items-center justify-center gap-2 py-4 rounded-lg bg-purple-600 text-white font-bold text-lg hover:bg-purple-700 transition-colors"
+            >
+              <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                <span className="text-purple-600 font-bold text-sm">P</span>
+              </div>
+              PhonePe
+            </button>
+            <button
+              onClick={redirectToGooglePay}
+              className="flex-1 flex items-center justify-center gap-2 py-4 rounded-lg bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition-colors"
+            >
+              <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                <span className="text-blue-600 font-bold text-sm">G</span>
+              </div>
+              Google Pay
+            </button>
+          </div>
+          <p className="text-center text-gray-500 text-xs mt-2">Amount: ₹{selectedAmount}</p>
+        </div>
+      )}
+
+      {/* Add Cash Button (when no amount selected) */}
+      {!selectedAmount && (
+        <div className="fixed bottom-20 left-0 right-0 p-4 bg-white shadow-lg">
+          <button
+            disabled
+            className="w-full py-4 rounded-lg font-bold text-lg bg-gray-300 text-gray-500 cursor-not-allowed"
+          >
+            SELECT AMOUNT TO PROCEED
+          </button>
+        </div>
+      )}
     </div>
   )
 }

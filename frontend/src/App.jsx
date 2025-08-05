@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import MatchCard from './components/MatchCard'
 import HomePage from './pages/HomePage'
 import BottomNav from './components/BottomNav'
@@ -11,6 +11,7 @@ import Wallet from './pages/user profile/Wallet'
 import ReferAndEarn from './pages/ReferAndEarn'
 import GameRules from './pages/user profile/GameRules'
 import Support from './pages/user profile/Support'
+import ChatPage from './pages/ChatPage'
 import Login from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ToastContainer } from 'react-toastify'
@@ -18,7 +19,11 @@ import 'react-toastify/dist/ReactToastify.css'
 
 const App = () => {
   const location = useLocation()
-  const hideBottomNav = location.pathname.includes('/create-team') || location.pathname.includes('/login') || location.pathname.includes('/my-teams') || location.pathname.includes('/contest')
+  
+  const hideBottomNav = useMemo(() => {
+    const hidePaths = ['/create-team', '/login', '/my-teams', '/contest', '/chat']
+    return hidePaths.some(path => location.pathname.includes(path))
+  }, [location.pathname])
 
   return (
     <div className='max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden'>
@@ -83,6 +88,12 @@ const App = () => {
               <Support/>
             </ProtectedRoute>
           } />
+
+          <Route path='/chat' element = {
+            <ProtectedRoute>
+              <ChatPage/>
+            </ProtectedRoute>
+          } />
         </Routes>
         {!hideBottomNav && <BottomNav/>}
       </div>
@@ -100,6 +111,7 @@ const App = () => {
         pauseOnHover
         theme="light"
       />
+      
     </div>
   )
 }

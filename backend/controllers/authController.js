@@ -25,7 +25,7 @@ const handelUserSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing field" });
     }
 
-    // Validate Indian mobile number
+    // Validate Indian mobile number (now mandatory)
     if (mobile < 6000000000 || mobile > 9999999999) {
       return res.status(400).json({
         success: false,
@@ -35,7 +35,7 @@ const handelUserSignup = async (req, res) => {
 
     // Check if user already exists by email or mobile
     const existingUser = await userModel.findOne({
-      $or: [{ email }, { mobile }],
+      $or: [{ email }, { mobile }]
     });
 
     if (existingUser) {
@@ -74,9 +74,9 @@ const handelUserSignup = async (req, res) => {
     const newUserData = {
       fullName,
       email,
-      mobile,
       password: hashedPassword,
       referralCode,
+      mobile, // Mobile is now mandatory for normal signup
     };
 
     if (referedBy) {
