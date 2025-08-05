@@ -38,7 +38,7 @@ const Wallet = () => {
     }
     
     const transactionId = generateTransactionId()
-    const phonepeURL = `phonepe://pay?pa=8602145864@ybl&pn=Winners11&am=${selectedAmount}&cu=INR&tn=${transactionId}`
+    const phonepeURL = `phonepe://pay?pa=6262330338@ybl&pn=Winners11&am=${selectedAmount}&cu=INR&tn=${transactionId}`
     
     window.location.href = phonepeURL
     
@@ -55,7 +55,7 @@ const Wallet = () => {
     }
     
     const transactionId = generateTransactionId()
-    const gpayURL = `tez://upi/pay?pa=desinplus1@okicici&pn=Winners11&am=${selectedAmount}&cu=INR&tn=${transactionId}`
+    const gpayURL = `tez://upi/pay?pa=manojdwivedi777@oksbi&pn=Winners11&am=${selectedAmount}&cu=INR&tn=${transactionId}`
     
     window.location.href = gpayURL
     
