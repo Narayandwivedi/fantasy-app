@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { X } from 'lucide-react'
+import { X, Upload, Check } from 'lucide-react'
 import { AppContext } from '../../context/AppContext'
 import Navbar from '../../components/Navbar'
 
@@ -7,6 +7,10 @@ const Wallet = () => {
   const { user } = useContext(AppContext)
   const [selectedAmount, setSelectedAmount] = useState('')
   const [customAmount, setCustomAmount] = useState('')
+  const [showPaymentProof, setShowPaymentProof] = useState(false)
+  const [transactionId, setTransactionId] = useState('')
+  const [screenshot, setScreenshot] = useState(null)
+  const [currentTxnId, setCurrentTxnId] = useState('')
 
   // Predefined amount options
   const predefinedAmounts = [50, 100, 500, 1000, 2000, 5000]
@@ -38,16 +42,16 @@ const Wallet = () => {
     }
     
     const transactionId = generateTransactionId()
-    const phonepeURL = `phonepe://pay?pa=6262330338@ybl&am=${selectedAmount}&cu=INR&tn=Payment for Winners11 ${transactionId}`
+    const upiURL = `upi://pay?pa=6262330338@ybl&am=${selectedAmount}&cu=INR&tn=${transactionId}`
     
-    console.log('PhonePe URL:', phonepeURL)
-    alert(`PhonePe Link: ${phonepeURL}`)
+    console.log('UPI URL:', upiURL)
     
-    window.location.href = phonepeURL
+    window.location.href = upiURL
     
-    // Fallback for web
+    // Fallback - copy to clipboard
     setTimeout(() => {
-      window.open(`https://phonepe.com/`, '_blank')
+      navigator.clipboard.writeText(upiURL)
+      alert('UPI link copied to clipboard. Open any UPI app and paste.')
     }, 1000)
   }
 
@@ -58,16 +62,16 @@ const Wallet = () => {
     }
     
     const transactionId = generateTransactionId()
-    const gpayURL = `tez://upi/pay?pa=manojdwivedi777@oksbi&am=${selectedAmount}&cu=INR&tn=Payment for Winners11 ${transactionId}`
+    const upiURL = `upi://pay?pa=manojdwivedi777@oksbi&am=${selectedAmount}&cu=INR&tn=${transactionId}`
     
-    console.log('Google Pay URL:', gpayURL)
-    alert(`Google Pay Link: ${gpayURL}`)
+    console.log('UPI URL:', upiURL)
     
-    window.location.href = gpayURL
+    window.location.href = upiURL
     
-    // Fallback for web
+    // Fallback - copy to clipboard
     setTimeout(() => {
-      window.open(`https://pay.google.com/`, '_blank')
+      navigator.clipboard.writeText(upiURL)
+      alert('UPI link copied to clipboard. Open any UPI app and paste.')
     }, 1000)
   }
 
