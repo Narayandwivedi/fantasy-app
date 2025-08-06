@@ -1,18 +1,14 @@
-import React, { useState, useContext, useEffect } from 'react'
-import { X, Upload, Check, QrCode, Copy, CheckCircle } from 'lucide-react'
+import React, { useState, useContext } from 'react'
+import { X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../../context/AppContext'
 import Navbar from '../../components/Navbar'
-import QRCode from 'qrcode'
 
 const Wallet = () => {
   const { user } = useContext(AppContext)
+  const navigate = useNavigate()
   const [selectedAmount, setSelectedAmount] = useState('')
   const [customAmount, setCustomAmount] = useState('')
-  const [showPaymentProof, setShowPaymentProof] = useState(false)
-  const [screenshot, setScreenshot] = useState(null)
-  const [currentTxnId, setCurrentTxnId] = useState('')
-  const [qrCodeSVG, setQrCodeSVG] = useState('')
-  const [copySuccess, setCopySuccess] = useState(false)
 
   // Predefined amount options
   const predefinedAmounts = [50, 100, 500, 1000, 2000, 5000]
@@ -33,87 +29,11 @@ const Wallet = () => {
     setCustomAmount('')
   }
 
-
-  // Generate QR Code using proper qrcode library
-  const generateQRCode = async (upiString) => {
-    try {
-      const svg = await QRCode.toString(upiString, {
-        type: 'svg',
-        errorCorrectionLevel: 'H',
-        margin: 1,
-        width: 200,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF'
-        }
-      })
-      setQrCodeSVG(svg)
-    } catch (err) {
-      console.error('QR code generation failed:', err)
-    }
-  }
-
-  // Generate UPI payment string (using PhonePe UPI for QR code too)
-  const generateUPIString = (amount) => {
-    return `upi://pay?pa=6262330338@ybl&am=${amount}&cu=INR`
-  }
-
-  // Copy UPI ID to clipboard
-  const copyUPIId = async () => {
-    try {
-      await navigator.clipboard.writeText('6262330338@ybl')
-      setCopySuccess(true)
-      setTimeout(() => setCopySuccess(false), 2000)
-    } catch (err) {
-      alert('Failed to copy. UPI ID: 6262330338@ybl')
-    }
-  }
-
-  // Copy UPI payment string to clipboard
-  const copyPaymentString = async () => {
-    if (!selectedAmount) {
-      alert('Please select an amount first')
-      return
-    }
-    
-    const upiString = generateUPIString(selectedAmount)
-    try {
-      await navigator.clipboard.writeText(upiString)
-      alert('UPI payment link copied! Open any UPI app and paste.')
-    } catch (err) {
-      alert(`Copy this UPI link: ${upiString}`)
-    }
-  }
-
-  // Open PhonePe app directly
-  const openPhonePe = () => {
-    if (!selectedAmount) {
-      alert('Please select an amount first')
-      return
-    }
-    
-    // PhonePe specific deep link
-    const phonePeURL = `phonepe://pay?pa=6262330338@ybl&am=${selectedAmount}&cu=INR`
-    
-    console.log('PhonePe Deep Link:', phonePeURL)
-    
-    // Try to open PhonePe app directly
-    window.location.href = phonePeURL
-    
-    // Fallback for PhonePe web if app not installed
-    setTimeout(() => {
-      const fallbackURL = `https://phon.pe/ru_phonepe?pa=6262330338@ybl&am=${selectedAmount}&cu=INR`
-      window.open(fallbackURL, '_blank')
-    }, 1000)
-  }
-
-  // Generate QR code when amount is selected
-  useEffect(() => {
+  const handleProceedToPayment = () => {
     if (selectedAmount) {
-      const upiString = generateUPIString(selectedAmount)
-      generateQRCode(upiString)
+      navigate('/qr-payment', { state: { amount: selectedAmount } })
     }
-  }, [selectedAmount])
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -172,87 +92,15 @@ const Wallet = () => {
         </div>
       </div>
 
-      {/* QR Code Payment Section */}
+      {/* Proceed to Payment Button */}
       {selectedAmount && (
         <div className="fixed bottom-20 left-0 right-0 p-4 bg-white shadow-lg border-t">
-          <div className="max-w-sm mx-auto">
-            <h3 className="text-center text-gray-800 font-semibold mb-4">Scan QR Code to Pay</h3>
-            
-            {/* QR Code Display */}
-            <div className="bg-white p-4 rounded-xl border-2 border-gray-200 mb-4">
-              <div className="flex justify-center">
-                {qrCodeSVG ? (
-                  <div 
-                    className="w-48 h-48"
-                    dangerouslySetInnerHTML={{ __html: qrCodeSVG }} 
-                  />
-                ) : (
-                  <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <QrCode size={48} className="text-gray-400" />
-                  </div>
-                )}
-              </div>
-              
-              {/* Amount Display */}
-              <div className="text-center mt-3">
-                <p className="text-2xl font-bold text-green-600">₹{selectedAmount}</p>
-                <p className="text-sm text-gray-500">Scan with any UPI app</p>
-              </div>
-            </div>
-            
-            {/* UPI ID Display */}
-            <div className="bg-gray-50 rounded-lg p-3 mb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500">UPI ID</p>
-                  <p className="font-mono font-medium text-gray-800">6262330338@ybl</p>
-                </div>
-                <button
-                  onClick={copyUPIId}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-200 transition-colors"
-                >
-                  {copySuccess ? <CheckCircle size={16} /> : <Copy size={16} />}
-                  {copySuccess ? 'Copied!' : 'Copy'}
-                </button>
-              </div>
-              
-            </div>
-            
-            {/* Quick Payment Methods */}
-            <div className="space-y-3">
-              <p className="text-center text-sm font-medium text-gray-700">Quick Payment</p>
-              
-              {/* PhonePe Button Only */}
-              <button
-                onClick={openPhonePe}
-                className="w-full flex items-center justify-center gap-3 py-4 px-4 bg-purple-600 text-white font-bold text-lg rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
-              >
-                <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center">
-                  <span className="text-purple-600 font-bold text-sm">P</span>
-                </div>
-                Open PhonePe App
-              </button>
-              
-              {/* Divider */}
-              <div className="flex items-center my-3">
-                <div className="flex-1 border-t border-gray-300"></div>
-                <span className="px-3 text-xs text-gray-500">OR</span>
-                <div className="flex-1 border-t border-gray-300"></div>
-              </div>
-              
-              {/* Copy Link Button */}
-              <button
-                onClick={copyPaymentString}
-                className="w-full py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors border border-gray-300"
-              >
-                Copy Payment Link
-              </button>
-              
-              <p className="text-center text-xs text-gray-500 mt-2">
-                Scan QR code above or click PhonePe button for direct app access
-              </p>
-            </div>
-          </div>
+          <button
+            onClick={handleProceedToPayment}
+            className="w-full py-4 bg-green-600 text-white font-bold text-lg rounded-lg hover:bg-green-700 transition-colors"
+          >
+            PROCEED TO PAYMENT - ₹{selectedAmount}
+          </button>
         </div>
       )}
 
