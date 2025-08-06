@@ -4,7 +4,6 @@ import QRCode from 'qrcode';
 
 const UPIQRCode = ({
   upiId = '6262330338@ybl',
-  name = 'Winners11',
   amount, // optional
   size = 200,
 }) => {
@@ -38,7 +37,7 @@ const UPIQRCode = ({
     };
 
     generateQRCode();
-  }, [upiId, name, amount, size]);
+  }, [upiId, amount, size]);
 
   return (
     <div

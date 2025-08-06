@@ -9,7 +9,6 @@ const Wallet = () => {
   const [selectedAmount, setSelectedAmount] = useState('')
   const [customAmount, setCustomAmount] = useState('')
   const [showPaymentProof, setShowPaymentProof] = useState(false)
-  const [transactionId, setTransactionId] = useState('')
   const [screenshot, setScreenshot] = useState(null)
   const [currentTxnId, setCurrentTxnId] = useState('')
   const [qrCodeSVG, setQrCodeSVG] = useState('')
@@ -34,9 +33,6 @@ const Wallet = () => {
     setCustomAmount('')
   }
 
-  const generateTransactionId = () => {
-    return 'TXN' + Date.now() + Math.random().toString(36).substr(2, 9)
-  }
 
   // Generate QR Code using proper qrcode library
   const generateQRCode = async (upiString) => {
