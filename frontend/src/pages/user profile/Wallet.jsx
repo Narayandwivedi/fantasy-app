@@ -85,47 +85,25 @@ const Wallet = () => {
     }
   }
 
-  // Redirect to PhonePe (clean UPI without notes)
-  const redirectToPhonePe = () => {
+  // Open PhonePe app directly
+  const openPhonePe = () => {
     if (!selectedAmount) {
       alert('Please select an amount first')
       return
     }
     
-    // Clean UPI string - only essential parameters
-    const upiURL = `upi://pay?pa=6262330338@ybl&am=${selectedAmount}&cu=INR`
+    // PhonePe specific deep link
+    const phonePeURL = `phonepe://pay?pa=6262330338@ybl&am=${selectedAmount}&cu=INR`
     
-    console.log('PhonePe UPI URL:', upiURL)
+    console.log('PhonePe Deep Link:', phonePeURL)
     
-    // Try to open PhonePe directly
-    window.location.href = upiURL
+    // Try to open PhonePe app directly
+    window.location.href = phonePeURL
     
-    // Fallback - copy to clipboard
+    // Fallback for PhonePe web if app not installed
     setTimeout(() => {
-      navigator.clipboard.writeText(upiURL)
-      alert('UPI link copied to clipboard. Open PhonePe and paste.')
-    }, 1000)
-  }
-
-  // Redirect to Google Pay (same UPI as PhonePe for consistency)
-  const redirectToGooglePay = () => {
-    if (!selectedAmount) {
-      alert('Please select an amount first')
-      return
-    }
-    
-    // Clean UPI string - only essential parameters
-    const upiURL = `upi://pay?pa=6262330338@ybl&am=${selectedAmount}&cu=INR`
-    
-    console.log('Google Pay UPI URL:', upiURL)
-    
-    // Try to open Google Pay directly
-    window.location.href = upiURL
-    
-    // Fallback - copy to clipboard
-    setTimeout(() => {
-      navigator.clipboard.writeText(upiURL)
-      alert('UPI link copied to clipboard. Open Google Pay and paste.')
+      const fallbackURL = `https://phon.pe/ru_phonepe?pa=6262330338@ybl&am=${selectedAmount}&cu=INR`
+      window.open(fallbackURL, '_blank')
     }, 1000)
   }
 
@@ -242,30 +220,18 @@ const Wallet = () => {
             
             {/* Quick Payment Methods */}
             <div className="space-y-3">
-              <p className="text-center text-sm font-medium text-gray-700">Choose Payment Method</p>
+              <p className="text-center text-sm font-medium text-gray-700">Quick Payment</p>
               
-              {/* PhonePe and Google Pay Buttons */}
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={redirectToPhonePe}
-                  className="flex items-center justify-center gap-2 py-3 px-4 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors shadow-md"
-                >
-                  <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
-                    <span className="text-purple-600 font-bold text-xs">P</span>
-                  </div>
-                  PhonePe
-                </button>
-                
-                <button
-                  onClick={redirectToGooglePay}
-                  className="flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-md"
-                >
-                  <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 font-bold text-xs">G</span>
-                  </div>
-                  Google Pay
-                </button>
-              </div>
+              {/* PhonePe Button Only */}
+              <button
+                onClick={openPhonePe}
+                className="w-full flex items-center justify-center gap-3 py-4 px-4 bg-purple-600 text-white font-bold text-lg rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
+              >
+                <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center">
+                  <span className="text-purple-600 font-bold text-sm">P</span>
+                </div>
+                Open PhonePe App
+              </button>
               
               {/* Divider */}
               <div className="flex items-center my-3">
@@ -283,7 +249,7 @@ const Wallet = () => {
               </button>
               
               <p className="text-center text-xs text-gray-500 mt-2">
-                Scan QR code above or use payment buttons for quick access
+                Scan QR code above or click PhonePe button for direct app access
               </p>
             </div>
           </div>
