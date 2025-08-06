@@ -1,6 +1,4 @@
-import { useEffect } from "react";
-import { useState } from "react";
-import { createContext } from "react";
+import { useEffect, useState, createContext, useMemo, useCallback } from "react";
 import axios from "axios";
 
 export const AppContext = createContext();
@@ -31,10 +29,13 @@ export const AppContextProvider = (props) => {
     fetchAllPlayers();
   }, []);
 
-  const value = {
+  const fetchAllPlayersCallback = useCallback(fetchAllPlayers, [BACKEND_URL]);
+
+  const value = useMemo(() => ({
     BACKEND_URL,
     allPlayers,
-  };
+    fetchAllPlayers: fetchAllPlayersCallback,
+  }), [BACKEND_URL, allPlayers, fetchAllPlayersCallback]);
 
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Users, Shield, Trophy, Calendar, Play, CheckCircle, UserCheck, Zap, Home, Target, Award, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 
-const Sidebar = ({ collapsed, onToggle }) => {
+const Sidebar = memo(({ collapsed, onToggle }) => {
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
@@ -133,6 +133,8 @@ const Sidebar = ({ collapsed, onToggle }) => {
       )}
     </div>
   );
-};
+});
+
+Sidebar.displayName = 'Sidebar';
 
 export default Sidebar;

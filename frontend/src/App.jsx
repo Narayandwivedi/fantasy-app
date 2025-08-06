@@ -7,6 +7,7 @@ import Contest from './pages/Contest'
 import CreateTeam from './pages/CreateTeam'
 import MyTeams from './pages/MyTeams'
 import MyMatches from './pages/my matches/MyMatches'
+import MyContests from './pages/MyContests'
 import Wallet from './pages/user profile/Wallet'
 import ReferAndEarn from './pages/ReferAndEarn'
 import GameRules from './pages/user profile/GameRules'
@@ -21,7 +22,7 @@ const App = () => {
   const location = useLocation()
   
   const hideBottomNav = useMemo(() => {
-    const hidePaths = ['/create-team', '/login', '/my-teams', '/contest', '/chat']
+    const hidePaths = ['/create-team', '/login', '/my-teams', '/contest', '/chat', '/my-contests', '/my-matches']
     return hidePaths.some(path => location.pathname.includes(path))
   }, [location.pathname])
 
@@ -62,6 +63,12 @@ const App = () => {
           <Route path='/my-matches' element = {
             <ProtectedRoute>
               <MyMatches/>
+            </ProtectedRoute>
+          } />
+
+          <Route path='/my-contests/:matchId' element = {
+            <ProtectedRoute>
+              <MyContests/>
             </ProtectedRoute>
           } />
 

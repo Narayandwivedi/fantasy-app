@@ -1,9 +1,8 @@
 import axios from 'axios'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useMemo, useCallback, memo } from 'react'
 import { useParams } from 'react-router-dom'
 import { AppContext } from '../../context/AppContext'
 import { Edit3, Plus, X, Calendar, Clock, Trophy, Save, AlertCircle, Check, ArrowUp, ArrowDown, Hash, Users, Shield, Target, Zap, Award } from 'lucide-react'
-import ScoreCard from '../../components/ScoreCard'
 import ImprovedScoreCard from '../../components/ImprovedScoreCard'
 import ContestManager from '../../components/ContestManager'
 import { useNavigate } from 'react-router-dom'
@@ -26,7 +25,7 @@ const MatchDetail = () => {
     // Track if there are unsaved changes
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
     
-    const fetchMatchDetail = async () => {
+    const fetchMatchDetail = useCallback(async () => {
         try {
             setLoading(true)
             const { data } = await axios.get(`${BACKEND_URL}/api/matches/${matchId}`)
@@ -59,11 +58,11 @@ const MatchDetail = () => {
         } finally {
             setLoading(false)
         }
-    }
+    }, [matchId, BACKEND_URL])
 
     useEffect(() => {
         fetchMatchDetail()
-    }, [])
+    }, [fetchMatchDetail])
 
     // Check for unsaved changes
     useEffect(() => {
@@ -91,23 +90,23 @@ const MatchDetail = () => {
         setHasUnsavedChanges(hasChanges)
     }, [localPlaying11, matchDetail])
 
-    const formatDate = (dateString) => {
+    const formatDate = useMemo(() => (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         })
-    }
+    }, [])
 
-    const formatTime = (dateString) => {
+    const formatTime = useMemo(() => (dateString) => {
         return new Date(dateString).toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit'
         })
-    }
+    }, [])
 
-    const getPositionColor = (position) => {
+    const getPositionColor = useMemo(() => (position) => {
         const colors = {
             'batsman': 'bg-blue-100 text-blue-800',
             'bowler': 'bg-red-100 text-red-800',
@@ -115,9 +114,9 @@ const MatchDetail = () => {
             'wicket-keeper': 'bg-purple-100 text-purple-800'
         }
         return colors[position] || 'bg-gray-100 text-gray-800'
-    }
+    }, [])
 
-    const togglePlayer = (playerId, teamKey) => {
+    const togglePlayer = useCallback((playerId, teamKey) => {
         setLocalPlaying11(prev => {
             const currentPlaying11 = prev[teamKey]
             const existingPlayerIndex = currentPlaying11.findIndex(p => p.playerId === playerId)
@@ -151,9 +150,9 @@ const MatchDetail = () => {
                 return prev // Don't add if already 11 players
             }
         })
-    }
+    }, [])
 
-    const moveBattingOrder = (playerId, teamKey, direction) => {
+    const moveBattingOrder = useCallback((playerId, teamKey, direction) => {
         setLocalPlaying11(prev => {
             const currentPlaying11 = [...prev[teamKey]]
             const playerIndex = currentPlaying11.findIndex(p => p.playerId === playerId)
@@ -180,9 +179,9 @@ const MatchDetail = () => {
                 [teamKey]: currentPlaying11
             }
         })
-    }
+    }, [])
 
-    const savePlayingSquads = async () => {
+    const savePlayingSquads = useCallback(async () => {
         try {
             
             setSaving(true)
@@ -216,9 +215,9 @@ const MatchDetail = () => {
         } finally {
             setSaving(false)
         }
-    }
+    }, [matchId, localPlaying11, BACKEND_URL])
 
-    const resetChanges = () => {
+    const resetChanges = useCallback(() => {
         if (!matchDetail) return
         
         const initializeTeamPlaying11 = (playingSquad) => {
@@ -239,9 +238,9 @@ const MatchDetail = () => {
             team2: initializeTeamPlaying11(matchDetail.team2PlayingSquad)
         })
         setEditingTeam(null)
-    }
+    }, [matchDetail])
 
-    const PlayerCard = ({ player, isInPlaying11, battingOrder, onToggle, onMoveUp, onMoveDown, showActions = false, teamKey, canAdd = true, canMoveUp = false, canMoveDown = false }) => (
+    const PlayerCard = memo(({ player, isInPlaying11, battingOrder, onToggle, onMoveUp, onMoveDown, showActions = false, teamKey, canAdd = true, canMoveUp = false, canMoveDown = false }) => (
         <div className={`group relative bg-white rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
             isInPlaying11 
                 ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 shadow-sm' 
@@ -337,9 +336,11 @@ const MatchDetail = () => {
                 </div>
             </div>
         </div>
-    )
+    ))
 
-    const TeamSection = ({ team, teamKey }) => {
+    PlayerCard.displayName = 'PlayerCard'
+
+    const TeamSection = memo(({ team, teamKey }) => {
         const isEditing = editingTeam === teamKey
         const currentPlaying11 = localPlaying11[teamKey]
         const canAddMore = currentPlaying11.length < 11
@@ -364,7 +365,7 @@ const MatchDetail = () => {
                                 <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white backdrop-blur-sm border border-white/20 p-2 flex items-center justify-center shadow-lg">
                                     {team.logo ? (
                                         <img 
-                                            src={team.logo} 
+                                            src={`${BACKEND_URL}${team.logo}`} 
                                             alt={team.name}
                                             className="w-full h-full object-contain rounded-xl"
                                         />
@@ -374,6 +375,13 @@ const MatchDetail = () => {
                                         </div>
                                     )}
                                 </div>
+                                <button
+                                    onClick={() => navigate(`/team-detail/${team._id}`)}
+                                    className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center shadow-md transition-all duration-200 hover:scale-110"
+                                    title="Edit Team"
+                                >
+                                    <Edit3 size={10} className="text-white" />
+                                </button>
                                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-md">
                                     <Trophy size={12} className="text-white" />
                                 </div>
@@ -532,7 +540,9 @@ const MatchDetail = () => {
                 </div>
             </div>
         )
-    }
+    })
+
+    TeamSection.displayName = 'TeamSection'
 
     if (loading) {
         return (
@@ -555,7 +565,10 @@ const MatchDetail = () => {
         )
     }
 
-    const bothTeamsComplete = localPlaying11.team1.length === 11 && localPlaying11.team2.length === 11
+    const bothTeamsComplete = useMemo(() => 
+        localPlaying11.team1.length === 11 && localPlaying11.team2.length === 11, 
+        [localPlaying11.team1.length, localPlaying11.team2.length]
+    )
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">

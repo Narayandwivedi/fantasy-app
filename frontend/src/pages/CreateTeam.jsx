@@ -197,6 +197,15 @@ const CreateTeam = () => {
       }
     })
 
+    // Sort players by fantasyPrice in descending order (highest first)
+    Object.keys(playersByPosition).forEach(position => {
+      playersByPosition[position].sort((a, b) => {
+        const priceA = a.fantasyPrice || 8
+        const priceB = b.fantasyPrice || 8
+        return priceB - priceA
+      })
+    })
+
     return playersByPosition
   }
 

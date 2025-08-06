@@ -1,8 +1,15 @@
 import React, { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../../context/AppContext'
 
 const Completed = ({ matches = [] }) => {
   const { BACKEND_URL } = useContext(AppContext)
+  const navigate = useNavigate()
+
+  const handleMatchClick = (matchId) => {
+    console.log('Clicking completed match with ID:', matchId)
+    navigate(`/my-contests/${matchId}`)
+  }
 
   const formatDate = (dateString) => {
     const date = new Date(dateString)
@@ -43,7 +50,11 @@ const Completed = ({ matches = [] }) => {
     <div className="space-y-4">
       {matches.length > 0 ? (
         matches.map((match) => (
-          <div key={match.matchId} className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-gray-400">
+          <div 
+            key={match.matchId} 
+            onClick={() => handleMatchClick(match.matchId)}
+            className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-gray-400 cursor-pointer hover:shadow-md transition-shadow"
+          >
             {/* Match Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-2">

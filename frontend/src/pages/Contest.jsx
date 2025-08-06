@@ -133,6 +133,15 @@ const Contest = () => {
       
       console.log('API Response:', data);
       
+      // Update the contest's current participants count in the UI
+      setContests(prevContests => 
+        prevContests.map(contest => 
+          contest._id === selectedContest._id 
+            ? { ...contest, currentParticipants: (contest.currentParticipants || 0) + 1 }
+            : contest
+        )
+      );
+      
       // Show quick success toast
       toast.success('Contest joined successfully! 🎯', {
         position: "top-center",

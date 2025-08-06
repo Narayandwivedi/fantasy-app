@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { ToastContainer } from "react-toastify";
 import Sidebar from "./components/Sidebar";
 import { Route, Routes } from "react-router-dom";
@@ -19,9 +19,9 @@ import ChatSupport from "./pages/ChatSupport";
 const App = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed(prev => !prev);
+  }, []);
 
   return (
     <div>

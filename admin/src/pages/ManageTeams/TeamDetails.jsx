@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback, memo } from "react";
 import { AppContext } from "../../context/AppContext";
 import { useParams } from "react-router-dom";
 import { Plus, Search, X, UserPlus, Crown, Shield, Star, Users, Trophy, Target } from "lucide-react";
@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import EditPlayerModal from "../ManagePlayers/EditPlayerModal";
 
 // Search Player Modal Component
-const SearchPlayerModal = ({ 
+const SearchPlayerModal = memo(({ 
   BACKEND_URL,
   showModal, 
   onClose, 
@@ -169,9 +169,11 @@ const SearchPlayerModal = ({
       </div>
     </div>
   );
-};
+});
 
-const TeamDetails = () => {
+SearchPlayerModal.displayName = 'SearchPlayerModal';
+
+const TeamDetails = memo(() => {
   const { id } = useParams();
   const [teamDetails, setTeamDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -182,7 +184,7 @@ const TeamDetails = () => {
 
   const { BACKEND_URL, allPlayers, setAllPlayers } = useContext(AppContext);
 
-  async function fetchTeamDetails() {
+  const fetchTeamDetails = useCallback(async () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`${BACKEND_URL}/api/teams/${id}`);
@@ -197,10 +199,10 @@ const TeamDetails = () => {
     } finally {
       setLoading(false);
     }
-  }
+  }, [id, BACKEND_URL]);
 
   // Function to add player to team squad
-  const handleAddPlayerToSquad = async (player) => {
+  const handleAddPlayerToSquad = useCallback(async (player) => {
     try {
       const { data } = await axios.post(`${BACKEND_URL}/api/teams/${id}/add-player`, {
         playerId: player._id
@@ -215,10 +217,10 @@ const TeamDetails = () => {
       console.error(err);
       toast.error("An error occurred while adding player to squad");
     }
-  };
+  }, [id, BACKEND_URL]);
 
   // Function to remove player from squad
-  const handleRemovePlayerFromSquad = async (playerId, playerFirstName, playerLastName) => {
+  const handleRemovePlayerFromSquad = useCallback(async (playerId, playerFirstName, playerLastName) => {
     const fullName = `${playerFirstName} ${playerLastName}`;
     if (window.confirm(`Are you sure you want to remove ${fullName} from the squad?`))
        
@@ -238,21 +240,21 @@ const TeamDetails = () => {
         toast.error("An error occurred while removing player from squad");
       }
     }
-  };
+  }, [id, BACKEND_URL, fetchTeamDetails]);
 
   // Function to open edit player modal
-  const handleEditPlayer = (player) => {
+  const handleEditPlayer = useCallback((player) => {
     setEditingPlayer(player);
     setShowEditPlayerModal(true);
-  };
+  }, []);
 
   // Function to close edit player modal
-  const handleCloseEditModal = () => {
+  const handleCloseEditModal = useCallback(() => {
     setShowEditPlayerModal(false);
     setEditingPlayer(null);
     // Refresh team details to show any updates
     fetchTeamDetails();
-  };
+  }, [fetchTeamDetails]);
 
   useEffect(() => {
     fetchTeamDetails();
@@ -321,7 +323,7 @@ const TeamDetails = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl blur opacity-20"></div>
                 <img
-                  src={teamDetails.logo}
+                  src={`${BACKEND_URL}${teamDetails.logo}`}
                   alt={`${teamDetails.name} logo`}
                   className="w-20 h-20 object-contain rounded-2xl relative z-10 bg-white p-2 shadow-lg border border-gray-100"
                 />
@@ -553,6 +555,8 @@ const TeamDetails = () => {
       />
     </div>
   );
-};
+});
+
+TeamDetails.displayName = 'TeamDetails';
 
 export default TeamDetails;

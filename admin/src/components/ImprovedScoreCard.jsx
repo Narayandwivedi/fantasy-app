@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useMemo, useCallback, memo } from 'react';
 import { Save, X, Zap, Users, Activity, RotateCcw } from 'lucide-react';
 import axios from 'axios';
 import { AppContext } from '../context/AppContext';
 
-const ImprovedScoreCard = ({ matchId }) => {
+const ImprovedScoreCard = memo(({ matchId }) => {
   const { BACKEND_URL } = useContext(AppContext);
   const [matchData, setMatchData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,7 +24,7 @@ const ImprovedScoreCard = ({ matchId }) => {
     }, 0);
   };
 
-  const fetchScore = async () => {
+  const fetchScore = useCallback(async () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`${BACKEND_URL}/api/matches/${matchId}/scores`);
@@ -43,12 +43,12 @@ const ImprovedScoreCard = ({ matchId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [matchId, BACKEND_URL]);
 
 
   useEffect(() => {
     fetchScore();
-  }, [matchId]);
+  }, [fetchScore]);
 
   // Add Ctrl+S keyboard shortcut for saving
   useEffect(() => {
@@ -65,35 +65,32 @@ const ImprovedScoreCard = ({ matchId }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showQuickUpdate, quickUpdateData]);
 
-  const getBattingTeamPlayers = () => {
+  const getBattingTeamPlayers = useMemo(() => {
     if (!matchData || !matchData.matchScore || !battingTeam) return [];
     const battingTeamData = matchData.matchScore.find(team => team.teamName === battingTeam);
     if (!battingTeamData) return [];
     
     // Sort batting team players by batting order in ascending order (1 to 11)
     return battingTeamData.players.sort((a, b) => (a.batting.battingOrder || 0) - (b.batting.battingOrder || 0));
-  };
+  }, [matchData, battingTeam]);
 
-  const getBowlingTeamPlayers = () => {
+  const getBowlingTeamPlayers = useMemo(() => {
     if (!matchData || !matchData.matchScore || !battingTeam) return [];
     const bowlingTeam = matchData.matchScore.find(team => team.teamName !== battingTeam);
     if (!bowlingTeam) return [];
     
     // Sort players by batting order in descending order (11 to 1) to show bowlers first
     return bowlingTeam.players.sort((a, b) => (b.batting.battingOrder || 0) - (a.batting.battingOrder || 0));
-  };
+  }, [matchData, battingTeam]);
 
-  const getFieldingTeamPlayers = () => {
-    // Use the same order as bowling team (11 to 1) to show bowlers first
-    return getBowlingTeamPlayers();
-  };
+  const getFieldingTeamPlayers = getBowlingTeamPlayers;
 
-  const getBowlingTeamName = () => {
+  const getBowlingTeamName = useMemo(() => {
     if (!availableTeams.length || !battingTeam) return '';
     return availableTeams.find(team => team !== battingTeam) || '';
-  };
+  }, [availableTeams, battingTeam]);
 
-  const getMatchTitle = () => {
+  const getMatchTitle = useMemo(() => {
     if (!matchData || !matchData.matchScore || matchData.matchScore.length < 2) {
       return 'Match Scorecard';
     }
@@ -103,9 +100,9 @@ const ImprovedScoreCard = ({ matchId }) => {
     const series = matchData.matchScore[0].series || '';
     
     return `${team1} vs ${team2}${series ? ` • ${series}` : ''}`;
-  };
+  }, [matchData]);
 
-  const getTeamTotals = (teamPlayers) => {
+  const getTeamTotals = useCallback((teamPlayers) => {
     return teamPlayers.reduce((totals, player) => {
       const battingStats = player.batting;
       const bowlingStats = player.bowling;
@@ -115,7 +112,7 @@ const ImprovedScoreCard = ({ matchId }) => {
         overs: totals.overs + (bowlingStats.oversBowled || 0)
       };
     }, { runs: 0, wickets: 0, overs: 0 });
-  };
+  }, []);
 
   const initializeQuickUpdate = () => {
     const battingPlayers = getBattingTeamPlayers();
@@ -955,6 +952,8 @@ const ImprovedScoreCard = ({ matchId }) => {
       </div>
     </div>
   );
-};
+});
+
+ImprovedScoreCard.displayName = 'ImprovedScoreCard';
 
 export default ImprovedScoreCard;

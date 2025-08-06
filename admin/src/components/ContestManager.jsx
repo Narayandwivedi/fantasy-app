@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo, useCallback, memo } from 'react';
 import axios from 'axios';
 import { AppContext } from '../context/AppContext';
 import { toast } from 'react-toastify';
@@ -15,7 +15,7 @@ import {
   EyeOff
 } from 'lucide-react';
 
-const ContestManager = ({ matchId, matchData }) => {
+const ContestManager = memo(({ matchId, matchData }) => {
   const { BACKEND_URL } = useContext(AppContext);
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -164,7 +164,7 @@ const ContestManager = ({ matchId, matchData }) => {
     }
   }, [matchId]);
 
-  const fetchContests = async () => {
+  const fetchContests = useCallback(async () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`${BACKEND_URL}/api/contests/${matchId}`);
@@ -177,9 +177,9 @@ const ContestManager = ({ matchId, matchData }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [BACKEND_URL, matchId]);
 
-  const createDefaultContests = async () => {
+  const createDefaultContests = useCallback(async () => {
     try {
       setLoading(true);
       const contestsToCreate = defaultContests.filter((_, index) => selectedDefaults.has(index));
@@ -204,9 +204,9 @@ const ContestManager = ({ matchId, matchData }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [BACKEND_URL, matchId, selectedDefaults, fetchContests]);
 
-  const createCustomContest = async (e) => {
+  const createCustomContest = useCallback(async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
@@ -229,9 +229,9 @@ const ContestManager = ({ matchId, matchData }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [BACKEND_URL, matchId, formData, fetchContests]);
 
-  const toggleDefaultSelection = (index) => {
+  const toggleDefaultSelection = useCallback((index) => {
     const newSelected = new Set(selectedDefaults);
     if (newSelected.has(index)) {
       newSelected.delete(index);
@@ -239,7 +239,7 @@ const ContestManager = ({ matchId, matchData }) => {
       newSelected.add(index);
     }
     setSelectedDefaults(newSelected);
-  };
+  }, [selectedDefaults]);
 
   const getContestFormatColor = (format) => {
     const colors = {
@@ -685,6 +685,8 @@ const ContestManager = ({ matchId, matchData }) => {
       </div>
     </div>
   );
-};
+});
+
+ContestManager.displayName = 'ContestManager';
 
 export default ContestManager;
