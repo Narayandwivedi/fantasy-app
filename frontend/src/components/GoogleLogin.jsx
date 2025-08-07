@@ -10,6 +10,27 @@ const GoogleLogin = () => {
   const isGoogleLoaded = useRef(false);
 
   useEffect(() => {
+    // Inject CSS to ensure Google button stays centered
+    const style = document.createElement('style');
+    style.textContent = `
+      /* Google button alignment fix */
+      .g_id_signin {
+        margin: 0 auto !important;
+        display: block !important;
+      }
+      
+      .g_id_signin > div {
+        margin: 0 auto !important;
+        display: flex !important;
+        justify-content: center !important;
+      }
+      
+      .g_id_signin iframe {
+        margin: 0 auto !important;
+      }
+    `;
+    document.head.appendChild(style);
+
     // Check if Google script is loaded
     const checkGoogleLoaded = () => {
       if (window.google && window.google.accounts && !isGoogleLoaded.current) {
@@ -22,6 +43,11 @@ const GoogleLogin = () => {
     };
 
     checkGoogleLoaded();
+
+    // Cleanup
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   const initializeGoogleSignIn = () => {
@@ -104,8 +130,13 @@ const GoogleLogin = () => {
       {/* Custom styled button that will be replaced by Google */}
       <div 
         ref={googleButtonRef}
-        className="w-full max-w-sm mx-auto"
-        style={{ minHeight: '44px' }}
+        className="w-full max-w-sm mx-auto flex justify-center"
+        style={{ 
+          minHeight: '44px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
       >
         {/* Fallback button if Google doesn't load */}
         <button
