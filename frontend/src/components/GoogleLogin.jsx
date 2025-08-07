@@ -113,16 +113,19 @@ const GoogleLogin = () => {
 
   const handleGoogleLogin = () => {
     if (window.google && window.google.accounts) {
-      // Try to trigger the prompt first
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // If prompt doesn't work, click the hidden Google button
-          const hiddenButton = googleButtonRef.current?.querySelector('iframe');
-          if (hiddenButton) {
-            hiddenButton.click();
-          }
+      // Try to click the actual Google button
+      setTimeout(() => {
+        const googleButton = googleButtonRef.current?.querySelector('div[role="button"], iframe');
+        if (googleButton) {
+          // Temporarily make it clickable and click it
+          googleButton.style.pointerEvents = 'all';
+          googleButton.click();
+          googleButton.style.pointerEvents = 'none';
+        } else {
+          // Fallback to prompt
+          window.google.accounts.id.prompt();
         }
-      });
+      }, 50);
     } else {
       toast.error('Google Sign-In is not loaded. Please refresh and try again.');
     }
@@ -145,10 +148,10 @@ const GoogleLogin = () => {
         <span className="text-base">Sign in with Google</span>
       </button>
       
-      {/* Hidden Google button for fallback */}
+      {/* Google button for fallback - temporarily visible for debugging */}
       <div 
         ref={googleButtonRef}
-        style={{ position: 'absolute', left: '-9999px', visibility: 'hidden' }}
+        style={{ opacity: 0.1, position: 'absolute', top: '100px', left: '10px', pointerEvents: 'none' }}
       />
     </div>
   );
