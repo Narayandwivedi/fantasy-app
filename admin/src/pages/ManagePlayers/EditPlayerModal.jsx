@@ -66,7 +66,7 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
 
     setIsSubmitting(true);
     try {
-      let imageUrl = formData.imgLink;
+      let imgLink = formData.imgLink;
       
       // Upload new image if provided
       if (formData.image) {
@@ -75,7 +75,9 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
         const res = await axios.post(`${BACKEND_URL}/api/upload/player`, form, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        imageUrl = res.data.image_url;
+        
+        // Store only WebP URL
+        imgLink = res.data.image_url;
       }
 
       // Update player
@@ -89,7 +91,7 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
           battingStyle: formData.battingStyle,
           bowlingStyle: formData.bowlingStyle,
           country: formData.country.trim(),
-          imgLink: imageUrl,
+          imgLink: imgLink,
           fantasyPrice: formData.fantasyPrice ? parseFloat(formData.fantasyPrice) : undefined,
         }
       );

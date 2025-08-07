@@ -4,6 +4,15 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
 
+// WebP support detection
+const supportsWebP = (() => {
+  try {
+    return document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0;
+  } catch (e) {
+    return false;
+  }
+})();
+
 // Add custom CSS for hiding scrollbar
 const scrollbarHideStyle = `
   .scrollbar-hide {
@@ -411,7 +420,7 @@ const CreateTeam = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center relative">
-                    {player.imgLink ? (
+                    {player.imgLink && supportsWebP ? (
                       <>
                         <img 
                           src={`${BACKEND_URL}${player.imgLink}`} 
@@ -520,7 +529,7 @@ const CreateTeam = () => {
                     <div key={rowIndex} className="flex justify-around">
                       {getSelectedPlayersByPosition()['wicket-keeper'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
                         <div key={player._id} className="flex flex-col items-center">
-                          {player.imgLink ? (
+                          {player.imgLink && supportsWebP ? (
                             <img 
                               src={`${BACKEND_URL}${player.imgLink}`} 
                               alt={`${player.firstName} ${player.lastName}`}
@@ -554,7 +563,7 @@ const CreateTeam = () => {
                     <div key={rowIndex} className="flex justify-around">
                       {getSelectedPlayersByPosition()['batsman'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
                         <div key={player._id} className="flex flex-col items-center">
-                          {player.imgLink ? (
+                          {player.imgLink && supportsWebP ? (
                             <img 
                               src={`${BACKEND_URL}${player.imgLink}`} 
                               alt={`${player.firstName} ${player.lastName}`}
@@ -588,7 +597,7 @@ const CreateTeam = () => {
                     <div key={rowIndex} className="flex justify-around">
                       {getSelectedPlayersByPosition()['all-rounder'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
                         <div key={player._id} className="flex flex-col items-center">
-                          {player.imgLink ? (
+                          {player.imgLink && supportsWebP ? (
                             <img 
                               src={`${BACKEND_URL}${player.imgLink}`} 
                               alt={`${player.firstName} ${player.lastName}`}
@@ -622,7 +631,7 @@ const CreateTeam = () => {
                     <div key={rowIndex} className="flex justify-around">
                       {getSelectedPlayersByPosition()['bowler'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
                         <div key={player._id} className="flex flex-col items-center">
-                          {player.imgLink ? (
+                          {player.imgLink && supportsWebP ? (
                             <img 
                               src={`${BACKEND_URL}${player.imgLink}`} 
                               alt={`${player.firstName} ${player.lastName}`}
@@ -703,7 +712,7 @@ const CreateTeam = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center relative">
-                          {player.imgLink ? (
+                          {player.imgLink && supportsWebP ? (
                             <>
                               <img 
                                 src={`${BACKEND_URL}${player.imgLink}`} 

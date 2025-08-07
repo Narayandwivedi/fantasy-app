@@ -240,6 +240,11 @@ const MatchDetail = () => {
         setEditingTeam(null)
     }, [matchDetail])
 
+    const bothTeamsComplete = useMemo(() => 
+        localPlaying11.team1.length === 11 && localPlaying11.team2.length === 11, 
+        [localPlaying11.team1.length, localPlaying11.team2.length]
+    )
+
     const PlayerCard = memo(({ player, isInPlaying11, battingOrder, onToggle, onMoveUp, onMoveDown, showActions = false, teamKey, canAdd = true, canMoveUp = false, canMoveDown = false }) => (
         <div className={`group relative bg-white rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
             isInPlaying11 
@@ -565,10 +570,6 @@ const MatchDetail = () => {
         )
     }
 
-    const bothTeamsComplete = useMemo(() => 
-        localPlaying11.team1.length === 11 && localPlaying11.team2.length === 11, 
-        [localPlaying11.team1.length, localPlaying11.team2.length]
-    )
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">

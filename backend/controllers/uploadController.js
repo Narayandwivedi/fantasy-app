@@ -12,31 +12,26 @@ async function handlePlayerImgUpload(req, res) {
     const fileExtension = path.extname(filename);
     const baseFilename = path.basename(filename, fileExtension);
 
-    // Create compressed filename and path
-    const compressedFilename = `${baseFilename}_compressed.png`;
-    const compressedPath = path.join(
-      "upload/images/players",
-      compressedFilename
-    );
+    // Create compressed WebP filename and path
+    const compressedFilename = `${baseFilename}_compressed.webp`;
+    const compressedPath = path.join("upload/images/players", compressedFilename);
 
-    // Aggressive compression with fixed 80x80 size and reduced color palette
+    // Generate WebP with high compression
     await sharp(originalPath)
       .resize(152, 152, {
         fit: "cover",
         position: "center",
       })
-      .png({
-        progressive: true,         // Disable progressive for smaller files
-        compressionLevel: 2,        // Maximum PNG compression
-        quality: 70,                
+      .webp({
+        quality: 75,
       })
       .toFile(compressedPath);
 
-    // Check final file size
+    // Check file size
     const stats = await fs.stat(compressedPath);
     const fileSizeKB = stats.size / 1024;
     
-    console.log(`Compressed image size: ${fileSizeKB.toFixed(2)} KB`);
+    console.log(`WebP image size: ${fileSizeKB.toFixed(2)} KB`);
 
     // Try to delete original file
     try {
@@ -45,15 +40,12 @@ async function handlePlayerImgUpload(req, res) {
       console.warn("Could not delete original file:", unlinkError.message);
     }
 
-    // Get final file size for response
-    const finalStats = await fs.stat(compressedPath);
-    const finalSizeKB = finalStats.size / 1024;
-
     res.json({
       success: true,
       image_url: `/images/players/${compressedFilename}`,
-      file_size_kb: parseFloat(finalSizeKB.toFixed(2)),
-      dimensions: "80x80"
+      file_size_kb: parseFloat(fileSizeKB.toFixed(2)),
+      dimensions: "152x152",
+      format: "webp"
     });
   } catch (err) {
     console.error("Error processing player image:", err);

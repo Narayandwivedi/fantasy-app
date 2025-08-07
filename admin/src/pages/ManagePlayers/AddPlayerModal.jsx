@@ -32,7 +32,7 @@ const AddPlayerModal = ({ showModal, onClose}) => {
 
     setIsSubmitting(true);
     try {
-      let imageUrl = "";
+      let imgLink = "";
       
       // Upload image if provided
       if (formData.image) {
@@ -41,7 +41,9 @@ const AddPlayerModal = ({ showModal, onClose}) => {
         const res = await axios.post(`${BACKEND_URL}/api/upload/player`, form, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        imageUrl = res.data.image_url;
+        
+        // Store only WebP URL
+        imgLink = res.data.image_url;
       }
 
       // Create player
@@ -53,7 +55,7 @@ const AddPlayerModal = ({ showModal, onClose}) => {
         battingStyle: formData.battingStyle,
         bowlingStyle: formData.bowlingStyle,
         country: formData.country.trim(),
-        imgLink: imageUrl,
+        imgLink: imgLink,
       });
 
       if (data.success) {

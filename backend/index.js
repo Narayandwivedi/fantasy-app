@@ -21,6 +21,7 @@ const authRoute = require("./routes/authRoute")
 const contestRoute = require("./routes/contestRoute")
 const userTeamRoute = require("./routes/userTeamRoute")
 const chatRoute = require("./routes/chatRoute")
+const depositRoute = require("./routes/depositRoute")
 
 
 
@@ -78,6 +79,8 @@ app.use("/api/userteam",userTeamRoute)
 
 app.use("/api/chat",chatRoute)
 
+app.use("/api/deposits",depositRoute)
+
 
 
 // Error handling middleware (add this)
@@ -89,8 +92,8 @@ app.use((err, req, res, next) => {
 // DB and server connection
 connectToDb()
   .then(() => {
-    app.listen(process.env.PORT || 4000, () => {
-      console.log("server connected");
+    const server = app.listen(process.env.PORT || 4000, () => {
+      console.log(`Server running on port ${process.env.PORT || 4000}`);
     });
 
     // Start chat cleanup job - runs twice daily at 2 AM and 1 PM
@@ -129,10 +132,43 @@ connectToDb()
     // Run cleanup immediately on startup
     cleanupOldChatMessages();
 
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
-      console.log('Server shutting down gracefully...');
-      process.exit(0);
+    // Graceful shutdown handling
+    const gracefulShutdown = (signal) => {
+      console.log(`\n${signal} received. Starting graceful shutdown...`);
+      
+      // Stop accepting new connections
+      server.close(() => {
+        console.log('HTTP server closed.');
+        
+        // Close database connection
+        require('mongoose').connection.close(() => {
+          console.log('Database connection closed.');
+          console.log('Graceful shutdown complete.');
+          process.exit(0);
+        });
+      });
+      
+      // Force shutdown after 30 seconds
+      setTimeout(() => {
+        console.error('Forceful shutdown after timeout.');
+        process.exit(1);
+      }, 30000);
+    };
+
+    // Handle different shutdown signals
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+    
+    // Handle uncaught exceptions
+    process.on('uncaughtException', (err) => {
+      console.error('Uncaught Exception:', err);
+      gracefulShutdown('UNCAUGHT_EXCEPTION');
+    });
+    
+    // Handle unhandled promise rejections
+    process.on('unhandledRejection', (reason, promise) => {
+      console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+      gracefulShutdown('UNHANDLED_REJECTION');
     });
   })
   .catch((err) => {
