@@ -60,6 +60,21 @@ const GoogleLogin = () => {
         auto_select: false,
         cancel_on_tap_outside: true,
       });
+
+      // Create a hidden Google button as fallback
+      if (googleButtonRef.current) {
+        window.google.accounts.id.renderButton(
+          googleButtonRef.current,
+          {
+            theme: 'outline',
+            size: 'large',
+            width: '100%',
+            text: 'signin_with',
+            shape: 'rectangular',
+            logo_alignment: 'center'
+          }
+        );
+      }
     } catch (error) {
       console.error('Google initialization error:', error);
     }
@@ -98,11 +113,14 @@ const GoogleLogin = () => {
 
   const handleGoogleLogin = () => {
     if (window.google && window.google.accounts) {
-      // Trigger Google One Tap or popup
+      // Try to trigger the prompt first
       window.google.accounts.id.prompt((notification) => {
         if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // If one-tap is not available, try popup
-          console.log('One-tap not available, trying popup');
+          // If prompt doesn't work, click the hidden Google button
+          const hiddenButton = googleButtonRef.current?.querySelector('iframe');
+          if (hiddenButton) {
+            hiddenButton.click();
+          }
         }
       });
     } else {
@@ -126,6 +144,12 @@ const GoogleLogin = () => {
         </svg>
         <span className="text-base">Sign in with Google</span>
       </button>
+      
+      {/* Hidden Google button for fallback */}
+      <div 
+        ref={googleButtonRef}
+        style={{ position: 'absolute', left: '-9999px', visibility: 'hidden' }}
+      />
     </div>
   );
 };
