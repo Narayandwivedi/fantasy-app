@@ -156,7 +156,7 @@ const Login = () => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-slate-900 to-black min-h-screen max-w-md mx-auto relative overflow-hidden">
+    <div className={`bg-gradient-to-br from-gray-900 via-slate-900 to-black ${isLogin && !showForgotPassword ? 'h-screen' : 'min-h-screen'} max-w-md mx-auto relative overflow-hidden`}>
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-16 left-8 w-32 h-32 bg-yellow-300 rounded-full blur-3xl"></div>
@@ -166,9 +166,9 @@ const Login = () => {
       </div>
 
       {/* Header with Logo */}
-      <div className="pt-16 pb-8 px-6 text-center relative z-10">
-        <div className="mb-8">
-          <h1 className="text-5xl font-bold text-white mb-3">
+      <div className={`${isLogin && !showForgotPassword ? 'pt-12 pb-6' : 'pt-16 pb-8'} px-6 text-center relative z-10`}>
+        <div className="mb-6">
+          <h1 className={`${isLogin && !showForgotPassword ? 'text-4xl' : 'text-5xl'} font-bold text-white mb-3`}>
             Winners<span className="text-yellow-400">11</span>
           </h1>
           <p className="text-white text-opacity-80 text-base font-medium">
@@ -178,17 +178,17 @@ const Login = () => {
       </div>
 
       {/* Main Content */}
-      <div className="bg-white mx-3 rounded-t-[2rem] relative z-10 shadow-2xl min-h-[65vh]">
-        <div className="px-6 pt-10 pb-8">
+      <div className={`bg-white mx-3 rounded-t-[2rem] relative z-10 shadow-2xl ${isLogin && !showForgotPassword ? 'flex-1 overflow-hidden' : 'min-h-[65vh]'}`}>
+        <div className={`px-6 ${isLogin && !showForgotPassword ? 'pt-8 pb-6' : 'pt-10 pb-8'} ${!isLogin ? 'max-h-[calc(100vh-200px)] overflow-y-auto' : ''}`}>
         {!showForgotPassword ? (
           <>
             {/* Google Sign-in at Top */}
-            <div className="mb-10">
+            <div className={`${isLogin && !showForgotPassword ? 'mb-6' : 'mb-10'}`}>
               <GoogleLogin />
             </div>
 
             {/* Divider */}
-            <div className="relative mb-8">
+            <div className={`relative ${isLogin && !showForgotPassword ? 'mb-6' : 'mb-8'}`}>
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200"></div>
               </div>
@@ -198,7 +198,7 @@ const Login = () => {
             </div>
 
             {/* Login/Signup Toggle */}
-            <div className="flex bg-gray-50 rounded-2xl p-1.5 mb-8 shadow-inner">
+            <div className={`flex bg-gray-50 rounded-2xl p-1.5 ${isLogin && !showForgotPassword ? 'mb-6' : 'mb-8'} shadow-inner`}>
               <button
                 className={`flex-1 py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
                   isLogin ? 'bg-yellow-400 text-black shadow-lg transform scale-[1.02]' : 'text-gray-500 hover:text-gray-700'
@@ -219,7 +219,7 @@ const Login = () => {
 
             {isLogin ? (
               /* Login Form */
-              <form onSubmit={handleLogin} className="space-y-4">
+              <form onSubmit={handleLogin} className={`${isLogin && !showForgotPassword ? 'space-y-3' : 'space-y-4'}`}>
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
                     Email or Mobile Number
@@ -252,11 +252,11 @@ const Login = () => {
                   <div className="text-red-500 text-sm font-medium bg-red-50 px-4 py-2 rounded-xl">{errors.login}</div>
                 )}
 
-                <div className="pt-2">
+                <div className={`${isLogin && !showForgotPassword ? 'pt-1' : 'pt-2'}`}>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white py-4 px-6 rounded-2xl font-semibold hover:from-gray-900 hover:to-black disabled:from-gray-400 disabled:to-gray-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none"
+                    className={`w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white ${isLogin && !showForgotPassword ? 'py-3' : 'py-4'} px-6 rounded-2xl font-semibold hover:from-gray-900 hover:to-black disabled:from-gray-400 disabled:to-gray-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none`}
                   >
                     {loading ? (
                       <div className="flex items-center justify-center">
@@ -267,7 +267,7 @@ const Login = () => {
                   </button>
                 </div>
 
-                <div className="text-center pt-4">
+                <div className={`text-center ${isLogin && !showForgotPassword ? 'pt-2' : 'pt-4'}`}>
                   <button
                     type="button"
                     onClick={() => setShowForgotPassword(true)}

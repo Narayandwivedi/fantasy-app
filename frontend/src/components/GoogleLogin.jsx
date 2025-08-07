@@ -10,27 +10,6 @@ const GoogleLogin = () => {
   const isGoogleLoaded = useRef(false);
 
   useEffect(() => {
-    // Inject CSS to ensure Google button stays centered
-    const style = document.createElement('style');
-    style.textContent = `
-      /* Google button alignment fix */
-      .g_id_signin {
-        margin: 0 auto !important;
-        display: block !important;
-      }
-      
-      .g_id_signin > div {
-        margin: 0 auto !important;
-        display: flex !important;
-        justify-content: center !important;
-      }
-      
-      .g_id_signin iframe {
-        margin: 0 auto !important;
-      }
-    `;
-    document.head.appendChild(style);
-
     // Check if Google script is loaded
     const checkGoogleLoaded = () => {
       if (window.google && window.google.accounts && !isGoogleLoaded.current) {
@@ -43,11 +22,6 @@ const GoogleLogin = () => {
     };
 
     checkGoogleLoaded();
-
-    // Cleanup
-    return () => {
-      document.head.removeChild(style);
-    };
   }, []);
 
   const initializeGoogleSignIn = () => {
@@ -61,7 +35,7 @@ const GoogleLogin = () => {
         cancel_on_tap_outside: true,
       });
 
-      // Create a hidden Google button as fallback
+      // Render the Google button
       if (googleButtonRef.current) {
         window.google.accounts.id.renderButton(
           googleButtonRef.current,
@@ -111,21 +85,15 @@ const GoogleLogin = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
+  const handleManualClick = () => {
     if (window.google && window.google.accounts) {
-      // Try to click the actual Google button
-      setTimeout(() => {
-        const googleButton = googleButtonRef.current?.querySelector('div[role="button"], iframe');
-        if (googleButton) {
-          // Temporarily make it clickable and click it
-          googleButton.style.pointerEvents = 'all';
-          googleButton.click();
-          googleButton.style.pointerEvents = 'none';
-        } else {
-          // Fallback to prompt
-          window.google.accounts.id.prompt();
+      // Trigger Google One Tap or popup
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          // If one-tap is not available, try popup
+          console.log('One-tap not available, trying popup');
         }
-      }, 50);
+      });
     } else {
       toast.error('Google Sign-In is not loaded. Please refresh and try again.');
     }
@@ -133,26 +101,26 @@ const GoogleLogin = () => {
 
   return (
     <div className="w-full flex justify-center">
-      {/* Custom Google Login Button - Bigger */}
-      <button
-        onClick={handleGoogleLogin}
-        className="w-full flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3.5 px-5 border-2 border-gray-300 rounded-xl transition-all duration-200 hover:shadow-md active:scale-[0.98] max-w-sm mx-auto"
-        style={{ minHeight: '50px' }}
-      >
-        <svg className="w-6 h-6" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        <span className="text-base">Sign in with Google</span>
-      </button>
-      
-      {/* Google button for fallback - temporarily visible for debugging */}
+      {/* Custom styled button that will be replaced by Google */}
       <div 
         ref={googleButtonRef}
-        style={{ opacity: 0.1, position: 'absolute', top: '100px', left: '10px', pointerEvents: 'none' }}
-      />
+        className="w-full max-w-sm mx-auto"
+        style={{ minHeight: '44px' }}
+      >
+        {/* Fallback button if Google doesn't load */}
+        <button
+          onClick={handleManualClick}
+          className="w-full flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 border border-gray-300 rounded-lg transition-colors"
+        >
+          <svg className="w-6 h-6" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>Sign in with Google</span>
+        </button>
+      </div>
     </div>
   );
 };
