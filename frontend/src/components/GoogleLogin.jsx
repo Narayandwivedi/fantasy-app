@@ -10,13 +10,15 @@ const GoogleLogin = () => {
   const isGoogleLoaded = useRef(false);
 
   useEffect(() => {
-    // Inject CSS to ensure Google button stays centered
+    // Inject CSS to ensure Google button stays centered and make it bigger
     const style = document.createElement('style');
     style.textContent = `
-      /* Google button alignment fix */
+      /* Google button alignment fix and size enhancement */
       .g_id_signin {
         margin: 0 auto !important;
         display: block !important;
+        transform: scale(1.1); /* Make button 10% bigger */
+        transform-origin: center; /* Scale from center */
       }
       
       .g_id_signin > div {
@@ -68,7 +70,7 @@ const GoogleLogin = () => {
           {
             theme: 'outline',
             size: 'large',
-            width: '100%',
+            width: 350, // Set explicit width in pixels (range: 240px - 400px)
             text: 'signin_with',
             shape: 'rectangular',
             logo_alignment: 'center'
