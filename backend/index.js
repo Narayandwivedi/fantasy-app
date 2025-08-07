@@ -30,9 +30,8 @@ const corsOptions = {
   origin: [
     "http://localhost:5173",
     "http://localhost:5174", 
-    "https://fantasy-app-73q4.vercel.app",
-    "https://fantasy-backend-three.vercel.app",
-    "https://fantasybackend.winnersclubs.fun",
+    "https://winners11.in",
+    "https://api.winners11.in",
     "https://winners11.vercel.app"
   ],
   credentials: true
