@@ -1,0 +1,43 @@
+User-agent: *
+
+# Allow public pages for SEO
+Allow: /
+Allow: /about
+Allow: /contact  
+Allow: /blogs
+Allow: /blog/
+Allow: /game-rules
+Allow: /support
+Allow: /login
+
+# Block protected/private pages
+Disallow: /wallet
+Disallow: /my-*
+Disallow: /create-team
+Disallow: /contest
+Disallow: /chat
+Disallow: /qr-payment
+Disallow: /refer
+
+# Block admin area
+Disallow: /admin
+
+# Allow search engines to access static assets
+Allow: /favicon-dark.svg
+Allow: /favicon.svg
+Allow: /*.jpg
+Allow: /*.png
+Allow: /*.gif
+Allow: /*.css
+Allow: /*.js
+
+# Block sensitive files
+Disallow: /.env
+Disallow: /package.json
+Disallow: /node_modules
+
+# Sitemap location
+Sitemap: https://winners11.in/sitemap.xml
+
+# Crawl-delay for being respectful to server
+Crawl-delay: 1
