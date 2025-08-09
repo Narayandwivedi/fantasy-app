@@ -1,4 +1,4 @@
-import { X, Wallet, HelpCircle, Headphones, FileText, Settings, LogOut, User, BookOpen, Info, Phone } from 'lucide-react'
+import { X, Wallet, HelpCircle, Headphones, FileText, Settings, LogOut, User, Info, Phone } from 'lucide-react'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
@@ -79,25 +79,18 @@ const MenuSidebar = ({ isOpen, onClose }) => {
               }}
             />
             
-            <MenuItem 
-              icon={<BookOpen size={20} />}
-              title="Cricket Blog"
-              subtitle="Tips, analysis & news"
-              onClick={() => {
-                navigate('/blogs')
-                onClose()
-              }}
-            />
             
-            <MenuItem 
-              icon={<Headphones size={20} />}
-              title="Customer Support"
-              subtitle="Get help & support"
-              onClick={() => {
-                navigate('/support')
-                onClose()
-              }}
-            />
+            {user && (
+              <MenuItem 
+                icon={<Headphones size={20} />}
+                title="Customer Support"
+                subtitle="Get help & support"
+                onClick={() => {
+                  navigate('/support')
+                  onClose()
+                }}
+              />
+            )}
             
             <MenuItem 
               icon={<Info size={20} />}

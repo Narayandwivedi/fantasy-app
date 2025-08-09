@@ -4,10 +4,7 @@ User-agent: *
 Allow: /
 Allow: /about
 Allow: /contact  
-Allow: /blogs
-Allow: /blog/
 Allow: /game-rules
-Allow: /support
 Allow: /login
 
 # Block protected/private pages
@@ -18,6 +15,7 @@ Disallow: /contest
 Disallow: /chat
 Disallow: /qr-payment
 Disallow: /refer
+Disallow: /support
 
 # Block admin area
 Disallow: /admin
