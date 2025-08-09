@@ -98,37 +98,51 @@ const QRPayment = () => {
       return
     }
 
-    if (utr.trim().length < 8) {
-      alert('Please enter a valid UTR/Transaction ID (minimum 8 characters)')
+    if (utr.trim().length < 10 || utr.trim().length > 20) {
+      alert('Please enter a valid UTR (10-20 characters)')
       return
     }
 
     setIsSubmitting(true)
     
     try {
-      // Here you would typically send UTR to your backend
-      // const response = await fetch('/api/payment/verify-utr', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ 
-      //     utr: utr.trim(), 
-      //     amount, 
-      //     userId: user?.id 
-      //   })
-      // })
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/deposit/create`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // if you use JWT
+        },
+        body: JSON.stringify({ 
+          userId: user?._id,
+          amount: amount,
+          UTR: utr.trim()
+        })
+      })
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      const data = await response.json()
       
-      alert(`UTR ${utr} submitted successfully! Your payment will be verified shortly.`)
-      
-      // Reset form and navigate back
-      setUtr('')
-      navigate('/wallet')
+      if (data.success) {
+        // Show success message based on deposit status
+        if (data.data.status === 'auto-approved') {
+          alert(`Payment successful! ₹${amount} has been added to your wallet instantly.`)
+        } else {
+          alert(`UTR ${utr} submitted successfully! Your payment is under review.`)
+        }
+        
+        // Reset form and navigate back
+        setUtr('')
+        navigate('/wallet')
+        
+        // Refresh user data to show updated balance
+        window.location.reload()
+        
+      } else {
+        alert(`Error: ${data.message}`)
+      }
       
     } catch (error) {
       console.error('UTR submission error:', error)
-      alert('Failed to submit UTR. Please try again.')
+      alert('Failed to submit payment. Please check your connection and try again.')
     } finally {
       setIsSubmitting(false)
     }
