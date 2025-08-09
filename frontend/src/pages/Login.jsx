@@ -183,7 +183,7 @@ const Login = () => {
         {!showForgotPassword ? (
           <>
             {/* Google Sign-in at Top */}
-            <div className={`${isLogin && !showForgotPassword ? 'mb-6' : 'mb-10'}`}>
+            <div className={`w-full flex justify-center ${isLogin && !showForgotPassword ? 'mb-6' : 'mb-10'}`}>
               <GoogleLogin />
             </div>
 
