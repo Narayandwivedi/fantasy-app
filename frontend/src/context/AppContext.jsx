@@ -1,5 +1,6 @@
 import { useEffect, useState, createContext, useMemo, useCallback } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const AppContext = createContext();
 
@@ -8,6 +9,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.winners11.i
 
 
 export const AppContextProvider = (props) => {
+  const navigate = useNavigate()
 
   // Auth states
   const [user, setUser] = useState(null)
@@ -118,8 +120,9 @@ export const AppContextProvider = (props) => {
     } finally {
       setIsAuthenticated(false)
       setUser(null)
+      navigate('/')
     }
-  }, [])
+  }, [navigate])
 
   // Refresh user data (useful after profile updates, balance changes, etc.)
   const refreshUser = useCallback(async () => {

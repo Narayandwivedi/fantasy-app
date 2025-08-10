@@ -106,7 +106,10 @@ const MenuSidebar = ({ isOpen, onClose }) => {
               icon={<FileText size={20} />}
               title="Terms & Conditions"
               subtitle="Read our policies"
-              onClick={() => console.log('Terms clicked')}
+              onClick={() => {
+                navigate('/terms')
+                onClose()
+              }}
             />
             
             <MenuItem 
