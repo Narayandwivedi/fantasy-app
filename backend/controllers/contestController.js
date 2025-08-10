@@ -228,7 +228,7 @@ async function joinContest(req, res) {
         .json({ success: false, message: "user not found" });
     }
 
-    // check match
+    // check match exist or not
 
     const getMatch = await Match.findById(matchId);
     if (!getMatch) {

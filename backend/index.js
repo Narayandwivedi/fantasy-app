@@ -37,7 +37,7 @@ const corsOptions = {
     "http://localhost:5174", 
     "https://winners11.in",
     "https://api.winners11.in",
-    "https://winners11.vercel.app"
+    "https://fantasy-app-73q4.vercel.app"
   ],
   credentials: true
 };
