@@ -5,7 +5,6 @@ export const AppContext = createContext();
 
 // Move BACKEND_URL outside component to prevent recreating on every render
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.winners11.in'
-console.log(BACKEND_URL);
 
 
 export const AppContextProvider = (props) => {

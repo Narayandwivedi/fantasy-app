@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Copy, CheckCircle } from 'lucide-react'
 import { AppContext } from '../context/AppContext'
 import QRCode from 'qrcode'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const QRPayment = () => {
   const location = useLocation()
@@ -85,7 +87,7 @@ const QRPayment = () => {
       setCopySuccess(true)
       setTimeout(() => setCopySuccess(false), 2000)
     } catch (err) {
-      alert('Failed to copy. UPI ID: 6262330338@ybl')
+      toast.error('Failed to copy. UPI ID: 6262330338@ybl', { autoClose: 600 })
     }
   }
 
@@ -94,39 +96,38 @@ const QRPayment = () => {
     e.preventDefault()
     
     if (!utr.trim()) {
-      alert('Please enter UTR/Transaction ID')
+      toast.error('Please enter UTR/Transaction ID', { autoClose: 600 })
       return
     }
 
     if (utr.trim().length < 10 || utr.trim().length > 20) {
-      alert('Please enter a valid UTR (10-20 characters)')
+      toast.error('Please enter a valid UTR (10-20 characters)', { autoClose: 600 })
       return
     }
 
     setIsSubmitting(true)
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/deposit/create`, {
-        method: 'POST',
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/deposits`, {
+        userId: user?._id,
+        amount: amount,
+        UTR: utr.trim()
+      }, {
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // if you use JWT
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ 
-          userId: user?._id,
-          amount: amount,
-          UTR: utr.trim()
-        })
+        withCredentials: true // Include cookies for auth
       })
       
-      const data = await response.json()
+      const data = response.data
       
       if (data.success) {
         // Show success message based on deposit status
         if (data.data.status === 'auto-approved') {
-          alert(`Payment successful! ₹${amount} has been added to your wallet instantly.`)
+          toast.success(`Payment successful! ₹${amount} has been added to your wallet instantly.`, { autoClose: 600 })
         } else {
-          alert(`UTR ${utr} submitted successfully! Your payment is under review.`)
+          toast.success(`UTR ${utr} submitted successfully! Your payment is under review.`, { autoClose: 600 })
         }
         
         // Reset form and navigate back
@@ -137,12 +138,13 @@ const QRPayment = () => {
         window.location.reload()
         
       } else {
-        alert(`Error: ${data.message}`)
+        toast.error(`Error: ${data.message}`, { autoClose: 600 })
       }
       
     } catch (error) {
       console.error('UTR submission error:', error)
-      alert('Failed to submit payment. Please check your connection and try again.')
+      const errorMessage = error.response?.data?.message || 'Failed to submit payment. Please check your connection and try again.'
+      toast.error(`Error: ${errorMessage}`, { autoClose: 600 })
     } finally {
       setIsSubmitting(false)
     }

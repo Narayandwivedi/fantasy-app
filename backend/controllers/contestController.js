@@ -262,6 +262,23 @@ async function joinContest(req, res) {
       return res.status(400).json({ success: false, message: "contest full" });
     }
 
+    // Check if user has sufficient balance (allow negative balance)
+    if (getUser.balance < getContest.entryFee) {
+      return res.status(400).json({ 
+        success: false, 
+        message: `Insufficient balance. Required: ₹${getContest.entryFee}, Available: ₹${getUser.balance}. Please add funds to your account.`,
+        requiredAmount: getContest.entryFee,
+        currentBalance: getUser.balance,
+        shortfall: getContest.entryFee - getUser.balance
+      });
+    }
+
+    // Deduct entry fee from user balance
+    getUser.balance -= getContest.entryFee;
+    await getUser.save();
+
+    console.log(`Entry fee deducted: User ${userId} paid ₹${getContest.entryFee} for contest ${contestId}. New balance: ₹${getUser.balance}`);
+
     // Add user to contest
     getContest.joinedUsers.push({
       user: userId,

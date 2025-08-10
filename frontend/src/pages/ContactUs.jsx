@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { ArrowLeft, Phone, Mail, MessageCircle, Clock, HeadphonesIcon, Send } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { AppContext } from '../context/AppContext';
 
 const ContactUs = () => {
+  const navigate = useNavigate();
+  const { user } = useContext(AppContext);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -32,6 +35,14 @@ const ContactUs = () => {
 
   const handleEmail = () => {
     window.location.href = 'mailto:winners11assist@gmail.com';
+  };
+
+  const handleChatNow = () => {
+    if (user) {
+      navigate('/chat');
+    } else {
+      navigate('/login');
+    }
   };
 
   useEffect(() => {
@@ -93,8 +104,37 @@ const ContactUs = () => {
         </div>
       </div>
 
+      {/* Live Chat Support - Only for logged-in users */}
+      {user && (
+        <div className="px-4 py-4">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+              <div className="flex items-center space-x-3">
+                <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
+                  <MessageCircle className="w-5 h-5 text-green-600" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-gray-800 text-sm">Live Chat</h3>
+                  <p className="text-xs text-gray-600">Get instant help from our support team</p>
+                  <div className="flex items-center space-x-1 mt-1">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <span className="text-xs text-green-600 font-medium">9 AM to 12 AM</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={handleChatNow}
+                className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded-lg transition-all duration-200 shadow-lg text-sm"
+              >
+                Chat Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Quick Contact Options */}
-      <div className="px-4 py-6">
+      <div className="px-4 py-2">
         <div className="grid grid-cols-1 gap-4 mb-6">
           {/* Phone Support */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
@@ -287,6 +327,7 @@ const ContactUs = () => {
           </div>
         </div>
       </div>
+
     </div>
   );
 };

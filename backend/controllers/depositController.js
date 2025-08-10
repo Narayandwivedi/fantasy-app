@@ -22,7 +22,7 @@ async function createDeposit(req, res) {
 
     // Parse and validate amount once
     const parsedAmount = parseInt(amount);
-    
+
     if (isNaN(parsedAmount) || parsedAmount !== Number(amount)) {
       return res.status(400).json({
         success: false,
@@ -58,8 +58,8 @@ async function createDeposit(req, res) {
     }
 
     // Check if user exists
-    const userExists = await User.findById(userId).session(session);
-    if (!userExists) {
+    const getUser = await User.findById(userId).session(session);
+    if (!getUser) {
       await session.abortTransaction();
       return res
         .status(404)
@@ -82,10 +82,10 @@ async function createDeposit(req, res) {
       UTR: UTR.trim(),
     };
 
-    // Auto-approve for deposits <= 300
+    // Auto-approve for deposits <= 300 and add balance immediately
     if (parsedAmount <= 300) {
-      userExists.balance += parsedAmount;
-      await userExists.save({ session });
+      getUser.balance += parsedAmount;
+      await getUser.save({ session });
       depositData.status = "auto-approved";
     }
 
@@ -116,7 +116,10 @@ async function createDeposit(req, res) {
         success: false,
         message: "UTR already exists. Duplicate deposit not allowed.",
       });
-    }
+    } 
+
+    console.log(err.message);
+    
 
     return res.status(500).json({
       success: false,
@@ -196,4 +199,192 @@ async function getAllDeposits(req, res) {
   }
 }
 
-module.exports = { createDeposit, getUserDeposits, getAllDeposits };
+// Admin approve deposit (for both auto-approved and pending)
+async function approveDeposit(req, res) {
+  const session = await mongoose.startSession();
+  
+  try {
+    session.startTransaction();
+    
+    const { depositId } = req.params;
+    const { adminId } = req.body;
+
+    if (!mongoose.isValidObjectId(depositId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid deposit ID format",
+      });
+    }
+
+    // Find deposit
+    const deposit = await Deposit.findById(depositId).session(session);
+    if (!deposit) {
+      await session.abortTransaction();
+      return res.status(404).json({
+        success: false,
+        message: "Deposit not found",
+      });
+    }
+
+    // Check if already approved or rejected
+    if (deposit.status === "approved") {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: "Deposit already approved",
+      });
+    }
+
+    if (deposit.status === "rejected") {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: "Cannot approve a rejected deposit",
+      });
+    }
+
+    // Find user
+    const user = await User.findById(deposit.userId).session(session);
+    if (!user) {
+      await session.abortTransaction();
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Only add balance for pending deposits (auto-approved already have balance added)
+    if (deposit.status === "pending") {
+      user.balance += deposit.amount;
+      await user.save({ session });
+    }
+    
+    deposit.status = "approved";
+    deposit.processedBy = adminId;
+    await deposit.save({ session });
+
+    await session.commitTransaction();
+
+    return res.json({
+      success: true,
+      message: "Deposit approved successfully",
+      data: {
+        depositId: deposit._id,
+        amount: deposit.amount,
+        status: deposit.status,
+        newBalance: user.balance,
+      },
+    });
+
+  } catch (err) {
+    await session.abortTransaction();
+    console.error("Error approving deposit:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  } finally {
+    session.endSession();
+  }
+}
+
+// Admin reject deposit
+async function rejectDeposit(req, res) {
+  const session = await mongoose.startSession();
+  
+  try {
+    session.startTransaction();
+    
+    const { depositId } = req.params;
+    const { adminId, rejectionReason } = req.body;
+
+    if (!mongoose.isValidObjectId(depositId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid deposit ID format",
+      });
+    }
+
+    const deposit = await Deposit.findById(depositId).session(session);
+    if (!deposit) {
+      await session.abortTransaction();
+      return res.status(404).json({
+        success: false,
+        message: "Deposit not found",
+      });
+    }
+
+    if (deposit.status === "approved") {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: "Cannot reject an approved deposit",
+      });
+    }
+
+    if (deposit.status === "rejected") {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: "Deposit already rejected",
+      });
+    }
+
+    // If deposit was auto-approved, revert the balance from user account
+    if (deposit.status === "auto-approved") {
+      const user = await User.findById(deposit.userId).session(session);
+      if (!user) {
+        await session.abortTransaction();
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      // Revert the balance (allow negative balance)
+      const previousBalance = user.balance;
+      user.balance -= deposit.amount;
+      await user.save({ session });
+      
+      console.log(`Balance reverted: User ${user._id} balance changed from ₹${previousBalance} to ₹${user.balance} due to fake UTR rejection`);
+    }
+
+    deposit.status = "rejected";
+    deposit.processedBy = adminId;
+    deposit.rejectionReason = rejectionReason || "Not specified";
+    await deposit.save({ session });
+
+    await session.commitTransaction();
+
+    return res.json({
+      success: true,
+      message: deposit.status === "auto-approved" ? 
+        `Deposit rejected and ₹${deposit.amount} deducted from user balance (negative balance allowed)` : 
+        "Deposit rejected successfully",
+      data: {
+        depositId: deposit._id,
+        status: deposit.status,
+        rejectionReason: deposit.rejectionReason,
+        amountReverted: deposit.status === "auto-approved" ? deposit.amount : 0,
+      },
+    });
+
+  } catch (err) {
+    await session.abortTransaction();
+    console.error("Error rejecting deposit:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  } finally {
+    session.endSession();
+  }
+}
+
+module.exports = { 
+  createDeposit, 
+  getUserDeposits, 
+  getAllDeposits, 
+  approveDeposit, 
+  rejectDeposit 
+};

@@ -80,27 +80,6 @@ const MenuSidebar = ({ isOpen, onClose }) => {
             />
             
             
-            {user && (
-              <MenuItem 
-                icon={<Headphones size={20} />}
-                title="Customer Support"
-                subtitle="Get help & support"
-                onClick={() => {
-                  navigate('/support')
-                  onClose()
-                }}
-              />
-            )}
-            
-            <MenuItem 
-              icon={<Info size={20} />}
-              title="About Us"
-              subtitle="Learn about Winners11"
-              onClick={() => {
-                navigate('/about')
-                onClose()
-              }}
-            />
             
             <MenuItem 
               icon={<Phone size={20} />}
@@ -111,6 +90,17 @@ const MenuSidebar = ({ isOpen, onClose }) => {
                 onClose()
               }}
             />
+            
+            <MenuItem 
+              icon={<Info size={20} />}
+              title="About Us"
+              subtitle="Learn about Winners11"
+              onClick={() => {
+                navigate('/about')
+                onClose()
+              }}
+            />
+
             
             <MenuItem 
               icon={<FileText size={20} />}

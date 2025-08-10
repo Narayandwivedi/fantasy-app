@@ -43,7 +43,7 @@ const Wallet = () => {
       <div className="bg-white p-4 shadow-sm border-b">
         <div className="flex items-center justify-between">
           <span className="text-gray-600 text-sm">Total Balance Available</span>
-          <span className="text-xl font-bold text-gray-900">₹{user?.balance || 25.00}</span>
+          <span className="text-xl font-bold text-gray-900">₹{user?.balance || 0}</span>
         </div>
       </div>
 
