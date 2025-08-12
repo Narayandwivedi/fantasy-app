@@ -25,15 +25,23 @@ const GoogleLogin = () => {
   }, []);
 
   const initializeGoogleSignIn = () => {
-    if (!window.google) return;
+    if (!window.google) {
+      console.error('Google SDK not loaded');
+      return;
+    }
 
     try {
+      console.log('Initializing Google Sign-In with client ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID);
+      console.log('Current domain:', window.location.origin);
+      
       window.google.accounts.id.initialize({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         callback: handleCredentialResponse,
         auto_select: false,
         cancel_on_tap_outside: true,
       });
+
+      console.log('Google Sign-In initialized successfully');
 
       // Render the Google button
       if (googleButtonRef.current) {
@@ -48,15 +56,27 @@ const GoogleLogin = () => {
             logo_alignment: 'center'
           }
         );
+        console.log('Google button rendered successfully');
       }
     } catch (error) {
       console.error('Google initialization error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        domain: window.location.origin
+      });
     }
   };
 
   const handleCredentialResponse = async (response) => {
     try {
       console.log('Google credential received:', response);
+      console.log('Credential details:', {
+        hasCredential: !!response.credential,
+        credentialLength: response.credential?.length,
+        backendUrl: BACKEND_URL
+      });
       
       const result = await fetch(`${BACKEND_URL}/api/auth/google`, {
         method: 'POST',
@@ -69,18 +89,29 @@ const GoogleLogin = () => {
         }),
       });
 
+      console.log('Backend response status:', result.status);
+      console.log('Backend response headers:', Object.fromEntries(result.headers.entries()));
+
       const data = await result.json();
-      console.log('Backend response:', data);
+      console.log('Backend response data:', data);
 
       if (data.success) {
+        console.log('Login successful, updating auth state');
         // Update auth state and redirect
         await checkAuthStatus();
         navigate('/');
       } else {
+        console.error('Backend login failed:', data.message);
         toast.error(data.message || 'Google login failed');
       }
     } catch (error) {
       console.error('Google login error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        backendUrl: BACKEND_URL
+      });
       toast.error('Google login failed. Please try again.');
     }
   };

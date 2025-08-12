@@ -489,22 +489,42 @@ function maskString(str, visibleChars = 4) {
 // Google OAuth Handler
 const handleGoogleAuth = async (req, res) => {
   try {
+    console.log('=== GOOGLE AUTH DEBUG START ===');
+    console.log('Request body:', req.body);
+    console.log('Headers:', req.headers);
+    console.log('Environment variables:');
+    console.log('- GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'SET' : 'NOT SET');
+    console.log('- NODE_ENV:', process.env.NODE_ENV);
+    
     const { credential } = req.body;
 
     if (!credential) {
+      console.log('ERROR: No credential provided');
       return res.status(400).json({
         success: false,
         message: "Google credential is required"
       });
     }
 
+    console.log('Credential received (length):', credential.length);
+
     // Verify Google token
+    console.log('Attempting to verify Google token...');
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
+    console.log('Token payload:', {
+      sub: payload.sub,
+      email: payload.email,
+      name: payload.name,
+      email_verified: payload.email_verified,
+      aud: payload.aud,
+      iss: payload.iss
+    });
+
     const {
       sub: googleId,
       email,
@@ -514,12 +534,14 @@ const handleGoogleAuth = async (req, res) => {
     } = payload;
 
     if (!email_verified) {
+      console.log('ERROR: Email not verified by Google');
       return res.status(400).json({
         success: false,
         message: "Google email not verified"
       });
     }
 
+    console.log('Searching for existing user...');
     // Check if user exists
     let user = await userModel.findOne({ 
       $or: [
@@ -529,8 +551,10 @@ const handleGoogleAuth = async (req, res) => {
     });
 
     if (user) {
+      console.log('Existing user found:', user._id);
       // User exists, update Google info if needed
       if (!user.googleId) {
+        console.log('Updating user with Google info');
         user.googleId = googleId;
         user.profilePicture = profilePicture;
         user.authProvider = 'google';
@@ -538,6 +562,7 @@ const handleGoogleAuth = async (req, res) => {
         await user.save();
       }
     } else {
+      console.log('Creating new user...');
       // Create new user
       const referralCode = generateReferralCode();
       
@@ -554,6 +579,7 @@ const handleGoogleAuth = async (req, res) => {
       });
 
       await user.save();
+      console.log('New user created:', user._id);
 
       // Send new user alert
       sendGoogleSignupAlert(user.fullName).catch((err) =>
@@ -561,12 +587,20 @@ const handleGoogleAuth = async (req, res) => {
       );
     }
 
+    console.log('Generating JWT token...');
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
+
+    console.log('Setting cookie with settings:', {
+      httpOnly: true,
+      sameSite: 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
 
     // Set cookie
     res.cookie('token', token, {
@@ -591,6 +625,9 @@ const handleGoogleAuth = async (req, res) => {
       delete userObj.upiId;
     }
 
+    console.log('SUCCESS: Sending response');
+    console.log('=== GOOGLE AUTH DEBUG END ===');
+
     return res.status(200).json({
       success: true,
       message: 'Google authentication successful',
@@ -598,10 +635,25 @@ const handleGoogleAuth = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Google auth error:', error);
+    console.error('=== GOOGLE AUTH ERROR ===');
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Error name:', error.name);
+    
+    if (error.message.includes('Token used too late')) {
+      console.error('Token timestamp issue detected');
+    }
+    if (error.message.includes('Invalid token audience')) {
+      console.error('CLIENT_ID mismatch detected');
+      console.error('Expected audience:', process.env.GOOGLE_CLIENT_ID);
+    }
+    
+    console.error('=== END GOOGLE AUTH ERROR ===');
+    
     return res.status(400).json({
       success: false,
-      message: 'Google authentication failed'
+      message: 'Google authentication failed',
+      error: error.message
     });
   }
 };
