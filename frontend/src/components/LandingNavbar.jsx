@@ -37,12 +37,12 @@ const LandingNavbar = () => {
           </div>
         
           {/* Center - Logo/Brand */}
-          <div className="flex items-center space-x-3 md:space-x-4">
+          <div className="flex items-center space-x-3 md:space-x-4 md:mr-2">
             <div className="bg-white bg-opacity-20 p-2 md:p-3 rounded-lg">
               <Trophy className="w-7 h-7 md:w-8 md:h-8 lg:w-9 lg:h-9 text-yellow-300" />
             </div>
             <h1 className="text-white text-xl md:text-2xl lg:text-3xl font-bold tracking-wide">
-              Winners<span className="text-yellow-300">11</span>
+              MySeries<span className="text-yellow-300">11</span>
             </h1>
           </div>
         

@@ -37,13 +37,6 @@ const ContactUs = () => {
     window.location.href = 'mailto:winners11assist@gmail.com';
   };
 
-  const handleChatNow = () => {
-    if (user) {
-      navigate('/chat');
-    } else {
-      navigate('/login');
-    }
-  };
 
   useEffect(() => {
     // Update meta tags for Contact Us page
@@ -87,65 +80,38 @@ const ContactUs = () => {
       <Navbar />
       
       {/* Header */}
-      <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-6 px-6 shadow-xl">
-        <div className="flex items-center justify-between">
+      <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-6 px-6 lg:px-16 shadow-xl">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center">
             <Link to="/" className="mr-4">
               <ArrowLeft className="w-6 h-6 text-white hover:text-yellow-300 transition-colors" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-wide">Contact Us</h1>
-              <p className="text-gray-300 text-sm mt-1">We're here to help you</p>
+              <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-wide">Contact Us</h1>
+              <p className="text-gray-300 text-sm lg:text-base mt-1">We're here to help you</p>
             </div>
           </div>
           <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-            <HeadphonesIcon className="w-8 h-8 text-yellow-300" />
+            <HeadphonesIcon className="w-8 h-8 lg:w-10 lg:h-10 text-yellow-300" />
           </div>
         </div>
       </div>
 
-      {/* Live Chat Support - Only for logged-in users */}
-      {user && (
-        <div className="px-4 py-4">
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-              <div className="flex items-center space-x-3">
-                <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
-                  <MessageCircle className="w-5 h-5 text-green-600" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-gray-800 text-sm">Live Chat</h3>
-                  <p className="text-xs text-gray-600">Get instant help from our support team</p>
-                  <div className="flex items-center space-x-1 mt-1">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                    <span className="text-xs text-green-600 font-medium">9 AM to 12 AM</span>
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={handleChatNow}
-                className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded-lg transition-all duration-200 shadow-lg text-sm"
-              >
-                Chat Now
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Quick Contact Options */}
-      <div className="px-4 py-2">
-        <div className="grid grid-cols-1 gap-4 mb-6">
-          {/* Phone Support */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+      <div className="px-4 lg:px-16 py-2">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 mb-6">
+            {/* Phone Support */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center">
-                <div className="bg-yellow-100 p-2 rounded-lg mr-3">
-                  <Phone className="w-5 h-5 text-yellow-600" />
+                <div className="bg-yellow-100 p-2 lg:p-3 rounded-lg mr-3">
+                  <Phone className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-800 text-sm">Phone Support</h3>
-                  <p className="text-gray-600 text-xs">Call us for immediate assistance</p>
+                  <h3 className="font-semibold text-gray-800 text-sm lg:text-base">Phone Support</h3>
+                  <p className="text-gray-600 text-xs lg:text-sm">Call us for immediate assistance</p>
                 </div>
               </div>
             </div>
@@ -175,8 +141,8 @@ const ContactUs = () => {
             </div>
           </div>
 
-          {/* Email Support */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+            {/* Email Support */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center flex-1">
                 <div className="bg-yellow-100 p-2 rounded-lg mr-3">
@@ -199,8 +165,8 @@ const ContactUs = () => {
             </div>
           </div>
 
-          {/* Business Hours */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+            {/* Business Hours */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 lg:p-6">
             <div className="flex items-start">
               <div className="bg-yellow-100 p-2 rounded-lg mr-3">
                 <Clock className="w-5 h-5 text-yellow-600" />
@@ -223,11 +189,11 @@ const ContactUs = () => {
                 </div>
               </div>
             </div>
+            </div>
           </div>
-        </div>
 
-        {/* Contact Form */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6">
+          {/* Contact Form */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 lg:p-6 mb-6">
           <div className="flex items-center mb-4">
             <div className="bg-yellow-100 p-2 rounded-lg mr-3">
               <MessageCircle className="w-5 h-5 text-yellow-600" />
@@ -238,7 +204,7 @@ const ContactUs = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
               <input
@@ -308,8 +274,8 @@ const ContactUs = () => {
           </form>
         </div>
 
-        {/* FAQ Link */}
-        <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+          {/* FAQ Link */}
+          <div className="bg-yellow-50 rounded-lg p-4 lg:p-6 border border-yellow-200">
           <div className="flex items-center">
             <div className="bg-yellow-100 p-2 rounded-lg mr-3">
               <HeadphonesIcon className="w-5 h-5 text-yellow-600" />
@@ -324,6 +290,7 @@ const ContactUs = () => {
             >
               View FAQ
             </Link>
+          </div>
           </div>
         </div>
       </div>

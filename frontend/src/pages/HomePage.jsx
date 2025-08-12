@@ -18,15 +18,18 @@ const HomePage = () => {
       
       {/* Hero Section - Mobile Layout */}
       <div className="md:hidden px-6 py-12 text-center">
-        <h1 className="text-3xl font-bold text-white mb-2 leading-tight">
-          CHOOSE YOUR BEST
+        <h1 className="text-3xl font-bold text-white mb-3 leading-tight">
+          PLAY SMART
         </h1>
-        <h2 className="text-3xl font-bold mb-8 leading-tight">
-          <span className="text-yellow-400">WINNERS 11</span> <span className="text-white">NOW</span>
+        <h2 className="text-3xl font-bold text-white mb-3 leading-tight">
+          WIN BIG, CLAIM
         </h2>
+        <h3 className="text-3xl font-bold mb-8 leading-tight">
+          <span className="text-white">YOUR </span><span className="text-yellow-400">SERIES</span>
+        </h3>
         
         {/* Mobile App Preview */}
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-6">
           <div className="relative">
             <img 
               src="/winners11 img.png" 
@@ -47,7 +50,7 @@ const HomePage = () => {
         </div>
         
         {/* Features - Mobile */}
-        <div className="mt-16 grid grid-cols-1 gap-8">
+        <div className="mt-12 grid grid-cols-1 gap-8">
           <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 text-white">
             <div className="text-3xl mb-4">🏆</div>
             <h3 className="text-xl font-bold mb-2">Win Big Prizes</h3>
@@ -75,12 +78,15 @@ const HomePage = () => {
         <div className="flex-1 pr-16 flex flex-col justify-between h-full">
           {/* Top Text */}
           <div className="pt-2">
-            <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 leading-tight">
-              CHOOSE YOUR BEST
+            <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight">
+              PLAY SMART
             </h1>
-            <h2 className="text-5xl lg:text-6xl xl:text-7xl font-bold mb-8 leading-tight">
-              <span className="text-yellow-400">WINNERS 11</span> <span className="text-white">NOW</span>
+            <h2 className="text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight">
+              WIN BIG, CLAIM
             </h2>
+            <h3 className="text-5xl lg:text-6xl xl:text-7xl font-bold mb-8 leading-tight">
+              <span className="text-white">YOUR </span><span className="text-yellow-400">SERIES</span>
+            </h3>
           </div>
           
           {/* Bottom Features */}

@@ -39,6 +39,16 @@ const Wallet = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 p-4">
+        <div className="flex items-center">
+          <div>
+            <h1 className="text-xl font-bold text-gray-800">Add Money</h1>
+            <p className="text-gray-500 text-sm">Add funds to your wallet</p>
+          </div>
+        </div>
+      </div>
+
       {/* Balance Section */}
       <div className="bg-white p-4 shadow-sm border-b">
         <div className="flex items-center justify-between">

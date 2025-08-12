@@ -10,7 +10,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-4 px-6 shadow-xl">
+      <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-3 px-6 shadow-xl">
         <div className="flex justify-between items-center">
           {/* Left side - Menu (only for logged-in users) */}
           {user ? (
@@ -25,12 +25,12 @@ const Navbar = () => {
           )}
         
         {/* Center - Logo/Brand */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center justify-center space-x-2">
           <div className="bg-white bg-opacity-20 p-2 rounded-lg">
             <Trophy className="w-6 h-6 text-yellow-300" />
           </div>
           <h1 className="text-white text-xl font-bold tracking-wide">
-            Winners<span className="text-yellow-300">11</span>
+            MySeries<span className="text-yellow-300">11</span>
           </h1>
         </div>
         

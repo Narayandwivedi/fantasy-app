@@ -169,7 +169,7 @@ const Login = () => {
       <div className={`${isLogin && !showForgotPassword ? 'pt-12 pb-6' : 'pt-16 pb-8'} px-6 text-center relative z-10`}>
         <div className="mb-6">
           <h1 className={`${isLogin && !showForgotPassword ? 'text-4xl' : 'text-5xl'} font-bold text-white mb-3`}>
-            Winners<span className="text-yellow-400">11</span>
+            MySeries<span className="text-yellow-400">11</span>
           </h1>
           <p className="text-white text-opacity-80 text-base font-medium">
             {showForgotPassword ? 'Reset Your Password' : (isLogin ? 'Welcome Back!' : 'Join the Game')}

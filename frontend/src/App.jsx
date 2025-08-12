@@ -11,6 +11,7 @@ import MyTeams from './pages/MyTeams'
 import MyMatches from './pages/my matches/MyMatches'
 import MyContests from './pages/MyContests'
 import Wallet from './pages/user profile/Wallet'
+import Withdraw from './pages/user profile/Withdraw'
 import QRPayment from './pages/QRPayment'
 import ReferAndEarn from './pages/ReferAndEarn'
 import GameRules from './pages/user profile/GameRules'
@@ -18,6 +19,7 @@ import ChatPage from './pages/ChatPage'
 import Login from './pages/Login'
 import AboutUs from './pages/AboutUs'
 import ContactUs from './pages/ContactUs'
+import CustomerSupport from './pages/CustomerSupport'
 import TermsConditions from './pages/TermsConditions'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ToastContainer } from 'react-toastify'
@@ -43,9 +45,11 @@ const App = () => {
     return hidePaths.some(path => location.pathname.includes(path))
   }, [location.pathname, user])
 
-  // Mobile-first container for all pages except homepage
+  // Full width for homepage, contact, and about pages, mobile-first for others
   const isHomePage = location.pathname === '/'
-  const containerClasses = isHomePage 
+  const isContactPage = location.pathname === '/contact'
+  const isAboutPage = location.pathname === '/about'
+  const containerClasses = (isHomePage || isContactPage || isAboutPage)
     ? 'w-full min-h-screen relative overflow-hidden' 
     : 'max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden'
 
@@ -100,6 +104,12 @@ const App = () => {
             </ProtectedRoute>
           } />
 
+          <Route path='/withdraw' element = {
+            <ProtectedRoute>
+              <Withdraw/>
+            </ProtectedRoute>
+          } />
+
           <Route path='/qr-payment' element = {
             <ProtectedRoute>
               <QRPayment/>
@@ -124,6 +134,12 @@ const App = () => {
           <Route path='/fantasy-sport' element = {
             <ProtectedRoute>
               <FantasySport/>
+            </ProtectedRoute>
+          } />
+
+          <Route path='/support' element = {
+            <ProtectedRoute>
+              <CustomerSupport/>
             </ProtectedRoute>
           } />
 

@@ -1,4 +1,4 @@
-import { X, Wallet, HelpCircle, Headphones, FileText, Settings, LogOut, User, Info, Phone } from 'lucide-react'
+import { X, Wallet, HelpCircle, Headphones, FileText, LogOut, User, Info, Phone, MessageSquare } from 'lucide-react'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
@@ -44,14 +44,25 @@ const MenuSidebar = ({ isOpen, onClose }) => {
 
         {/* Balance Section */}
         <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b">
-          <div className="flex items-center space-x-3">
-            <div className="bg-green-500 p-2 rounded-lg">
-              <Wallet className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="bg-green-500 p-2 rounded-lg">
+                <Wallet className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Current Balance</p>
+                <p className="text-xl font-bold text-green-600">₹{user?.balance || 0}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Current Balance</p>
-              <p className="text-xl font-bold text-green-600">₹{user?.balance || 0}</p>
-            </div>
+            <button 
+              onClick={() => {
+                navigate('/withdraw')
+                onClose()
+              }}
+              className="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors"
+            >
+              Withdraw
+            </button>
           </div>
         </div>
 
@@ -70,23 +81,21 @@ const MenuSidebar = ({ isOpen, onClose }) => {
             />
             
             <MenuItem 
+              icon={<MessageSquare size={20} />}
+              title="Customer Support"
+              subtitle="Get priority help & live chat"
+              onClick={() => {
+                navigate('/support')
+                onClose()
+              }}
+            />
+
+            <MenuItem 
               icon={<HelpCircle size={20} />}
               title="How to Play"
               subtitle="Learn the game rules"
               onClick={() => {
                 navigate('/game-rules')
-                onClose()
-              }}
-            />
-            
-            
-            
-            <MenuItem 
-              icon={<Phone size={20} />}
-              title="Contact Us"
-              subtitle="Get in touch with us"
-              onClick={() => {
-                navigate('/contact')
                 onClose()
               }}
             />
@@ -110,13 +119,6 @@ const MenuSidebar = ({ isOpen, onClose }) => {
                 navigate('/terms')
                 onClose()
               }}
-            />
-            
-            <MenuItem 
-              icon={<Settings size={20} />}
-              title="Settings"
-              subtitle="App preferences"
-              onClick={() => console.log('Settings clicked')}
             />
             
           </div>
