@@ -33,7 +33,7 @@ const CustomerSupport = () => {
   };
 
   const handleEmail = () => {
-    window.location.href = 'mailto:winners11assist@gmail.com';
+    window.location.href = 'mailto:myseries11assist@gmail.com';
   };
 
   const handleChatNow = () => {
@@ -42,16 +42,16 @@ const CustomerSupport = () => {
 
   useEffect(() => {
     // Update meta tags for Customer Support page
-    document.title = 'Customer Support - Winners11 | Priority Help for Users';
+    document.title = 'Customer Support - MySeries11 | Priority Help for Users';
     
     // Update meta description
     let metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'Get priority customer support for Winners11 users. Live chat, priority tickets, account help, and instant assistance for fantasy cricket gaming.');
+      metaDescription.setAttribute('content', 'Get priority customer support for MySeries11 users. Live chat, priority tickets, account help, and instant assistance for fantasy cricket gaming.');
     }
 
     return () => {
-      document.title = 'Winners11 - Skill Based Fantasy Cricket Gaming Platform | Play & Win Cash';
+      document.title = 'MySeries11 - Skill Based Fantasy Cricket Gaming Platform | Play & Win Cash';
     };
   }, []);
 
@@ -314,7 +314,7 @@ const CustomerSupport = () => {
                   </div>
                   <div>
                     <div className="font-semibold text-gray-900">Email Support</div>
-                    <div className="text-sm text-gray-500">winners11assist@gmail.com</div>
+                    <div className="text-sm text-gray-500">myseries11assist@gmail.com</div>
                   </div>
                 </div>
                 <button

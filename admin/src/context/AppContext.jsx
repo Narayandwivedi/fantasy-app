@@ -5,7 +5,7 @@ export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
 
-  const BACKEND_URL = "https://api.winners11.in";
+  const BACKEND_URL = "https://api.myseries11.com";
   // const BACKEND_URL = 'http://localhost:4000'
 
 

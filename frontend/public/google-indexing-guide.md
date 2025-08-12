@@ -1,4 +1,4 @@
-# Winners11 - Google Search Console Setup Guide
+# MySeries11 - Google Search Console Setup Guide
 
 ## Step 1: Google Search Console Setup
 
@@ -9,7 +9,7 @@
 2. **Add Your Property**
    - Click "Add Property"
    - Choose "URL prefix" 
-   - Enter: `https://winners11.in`
+   - Enter: `https://myseries11.com`
    - Click "Continue"
 
 3. **Verify Ownership**
@@ -21,7 +21,7 @@
    **Option B: HTML File Upload**
    - Download the verification file from Google
    - Upload it to your `public` folder
-   - Make sure it's accessible at: `https://winners11.in/google[code].html`
+   - Make sure it's accessible at: `https://myseries11.com/google[code].html`
 
 ## Step 2: Submit Sitemap
 
@@ -40,13 +40,13 @@
 1. **URL Inspection Tool**
    - In Search Console, use "URL inspection"
    - Enter each URL manually:
-     - `https://winners11.in/`
-     - `https://winners11.in/about`
-     - `https://winners11.in/contact`
-     - `https://winners11.in/blogs`
-     - `https://winners11.in/game-rules`
-     - `https://winners11.in/support`
-     - `https://winners11.in/login`
+     - `https://myseries11.com/`
+     - `https://myseries11.com/about`
+     - `https://myseries11.com/contact`
+     - `https://myseries11.com/blogs`
+     - `https://myseries11.com/game-rules`
+     - `https://myseries11.com/support`
+     - `https://myseries11.com/login`
 
 2. **Request Indexing**
    - For each URL, click "Request indexing"
@@ -89,7 +89,7 @@
    - "fantasy cricket india"
    - "skill based gaming"
    - "cricket fantasy app"
-   - "winners11"
+   - "myseries11"
 
 ## Troubleshooting
 
@@ -100,7 +100,7 @@
 - Wait 24 hours and try again
 
 **If sitemap submission fails:**
-- Verify sitemap.xml is accessible at: https://winners11.in/sitemap.xml
+- Verify sitemap.xml is accessible at: https://myseries11.com/sitemap.xml
 - Check XML syntax is valid
 - Ensure all URLs in sitemap are accessible
 

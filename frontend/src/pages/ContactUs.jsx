@@ -34,44 +34,44 @@ const ContactUs = () => {
   };
 
   const handleEmail = () => {
-    window.location.href = 'mailto:winners11assist@gmail.com';
+    window.location.href = 'mailto:myseries11assist@gmail.com';
   };
 
 
   useEffect(() => {
     // Update meta tags for Contact Us page
-    document.title = 'Contact Winners11 - Customer Support | Phone +91-6264682508 | Email Support';
+    document.title = 'Contact MySeries11 - Customer Support | Phone +91-6264682508 | Email Support';
     
     // Update meta description
     let metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'Contact Winners11 customer support. Call +91-6264682508 or +91-9202469725, email winners11assist@gmail.com. Get help with fantasy cricket gaming, account issues, and withdrawals.');
+      metaDescription.setAttribute('content', 'Contact MySeries11 customer support. Call +91-6264682508 or +91-9202469725, email myseries11assist@gmail.com. Get help with fantasy cricket gaming, account issues, and withdrawals.');
     }
 
     // Update Open Graph tags
     let ogTitle = document.querySelector('meta[property="og:title"]');
     if (ogTitle) {
-      ogTitle.setAttribute('content', 'Contact Winners11 - Customer Support & Help');
+      ogTitle.setAttribute('content', 'Contact MySeries11 - Customer Support & Help');
     }
 
     let ogDescription = document.querySelector('meta[property="og:description"]');
     if (ogDescription) {
-      ogDescription.setAttribute('content', 'Get support for Winners11 fantasy cricket platform. Multiple contact options available including phone, email, and contact form.');
+      ogDescription.setAttribute('content', 'Get support for MySeries11 fantasy cricket platform. Multiple contact options available including phone, email, and contact form.');
     }
 
     let ogUrl = document.querySelector('meta[property="og:url"]');
     if (ogUrl) {
-      ogUrl.setAttribute('content', 'https://winners11.in/contact');
+      ogUrl.setAttribute('content', 'https://myseries11.com/contact');
     }
 
     // Update canonical URL
     let canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) {
-      canonical.setAttribute('href', 'https://winners11.in/contact');
+      canonical.setAttribute('href', 'https://myseries11.com/contact');
     }
 
     return () => {
-      document.title = 'Winners11 - Skill Based Fantasy Cricket Gaming Platform | Play & Win Cash';
+      document.title = 'MySeries11 - Skill Based Fantasy Cricket Gaming Platform | Play & Win Cash';
     };
   }, []);
 
@@ -161,7 +161,7 @@ const ContactUs = () => {
               </button>
             </div>
             <div className="mt-3 p-3 bg-yellow-50 rounded-lg">
-              <p className="text-gray-800 font-medium text-sm">winners11assist@gmail.com</p>
+              <p className="text-gray-800 font-medium text-sm">myseries11assist@gmail.com</p>
             </div>
           </div>
 

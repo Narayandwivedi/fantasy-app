@@ -35,7 +35,7 @@ Disallow: /package.json
 Disallow: /node_modules
 
 # Sitemap location
-Sitemap: https://winners11.in/sitemap.xml
+Sitemap: https://myseries11.com/sitemap.xml
 
 # Crawl-delay for being respectful to server
 Crawl-delay: 1
