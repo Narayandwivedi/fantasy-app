@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Mail, Phone, MapPin } from 'lucide-react';
+import { Trophy, Mail, Phone, MapPin, Twitter, Instagram } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -118,14 +118,13 @@ const Footer = () => {
               © {new Date().getFullYear()} MySeries11. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm">
-              <Link to="/terms-and-conditions" className="text-gray-400 hover:text-white transition-colors">
-                Terms
-              </Link>
-              <Link to="/privacy-policy" className="text-gray-400 hover:text-white transition-colors">
-                Privacy
-              </Link>
-              <a href="mailto:myseries11assist@gmail.com" className="text-gray-400 hover:text-white transition-colors">
-                Support
+              <a href="https://x.com/myseries11" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors cursor-pointer relative z-10">
+                <Twitter className="w-4 h-4" />
+                <span>Twitter</span>
+              </a>
+              <a href="https://www.instagram.com/myseries11official" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors cursor-pointer relative z-10">
+                <Instagram className="w-4 h-4" />
+                <span>Instagram</span>
               </a>
             </div>
           </div>
