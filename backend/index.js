@@ -23,6 +23,7 @@ const matchRoute = require("./routes/matchRoute")
 const teamRoute = require("./routes/teamRoute")
 const userRoute = require("./routes/userRoute")
 const authRoute = require("./routes/authRoute")
+const adminRoute = require("./routes/adminRoute")
 const contestRoute = require("./routes/contestRoute")
 const userTeamRoute = require("./routes/userTeamRoute")
 const chatRoute = require("./routes/chatRoute")
@@ -77,6 +78,8 @@ app.use("/api/matches",matchRoute)
 app.use("/api/users",userRoute)
 
 app.use("/api/auth",authRoute)
+
+app.use("/api/admin",adminRoute)
 
 app.use("/api/contests",contestRoute)
 

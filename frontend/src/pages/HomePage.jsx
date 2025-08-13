@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect } from 'react'
 import LandingNavbar from "../components/LandingNavbar"
 import Footer from "../components/Footer"
 import { Link, useNavigate } from 'react-router-dom'
@@ -7,23 +7,12 @@ import { AppContext } from '../context/AppContext'
 const HomePage = () => {
   const { user } = useContext(AppContext)
   const navigate = useNavigate()
-  const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
     if (user) {
       navigate('/fantasy-sport')
     }
   }, [user, navigate])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      setIsScrolled(scrollY > 100)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
       <LandingNavbar/> 
@@ -160,7 +149,7 @@ const HomePage = () => {
       </div>
       
       {/* Fixed Bottom CTA Button */}
-      <div className={`fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent transition-transform duration-300 ${isScrolled ? 'md:translate-y-0 translate-y-full' : 'translate-y-0'}`}>
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
         <div className="max-w-[440px] mx-auto">
           <Link 
             to="/fantasy-sport"

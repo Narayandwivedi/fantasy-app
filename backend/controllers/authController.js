@@ -7,6 +7,29 @@ const { OAuth2Client } = require('google-auth-library');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Helper functions for masking sensitive data
+function maskUpiId(upiId) {
+  if (!upiId) return upiId;
+
+  const atIndex = upiId.indexOf("@");
+  if (atIndex === -1) return maskString(upiId, 4);
+
+  const namePart = upiId.substring(0, atIndex);
+  const domainPart = upiId.substring(atIndex);
+
+  const maskedName =
+    namePart.length > 4
+      ? "*".repeat(namePart.length - 4) + namePart.slice(-4)
+      : namePart;
+
+  return maskedName + domainPart;
+}
+
+function maskString(str, visibleChars = 4) {
+  if (!str || str.length <= visibleChars) return str;
+  return "*".repeat(str.length - visibleChars) + str.slice(-visibleChars);
+}
+
 const handelUserSignup = async (req, res) => {
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
@@ -61,8 +84,6 @@ const handelUserSignup = async (req, res) => {
           .status(400)
           .json({ success: false, message: "Invalid referral code" });
       }
-      referer.totalReferrals += 1;
-      await referer.save();
     }
 
     // Generate unique referral code
@@ -87,16 +108,27 @@ const handelUserSignup = async (req, res) => {
     // Create new user
     const newUser = await userModel.create(newUserData);
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    // Update referer after user creation (now we have the new user's ID)
+    if (referedBy) {
+      const referer = await userModel.findOne({ referralCode: referedBy });
+      if (referer) {
+        referer.totalReferrals += 1;
+        referer.referredUsers.push({
+          userId: newUser._id,
+          referredAt: new Date()
+        });
+        await referer.save();
+      }
+    }
+
+    // Generate JWT token (no expiration)
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET);
 
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "None",
       secure: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year - user stays logged in forever
     });
 
     // Remove password before sending response
@@ -157,30 +189,50 @@ const handelUserLogin = async (req, res) => {
         .json({ success: false, message: "Invalid password" });
     }
 
-    if (user.isBankAdded) {
-      user.accountNumber = maskString(user.bankAccount.accountNumber, 4);
-      delete user.bankAccount;
+    // Convert to object for manipulation
+    const userObj = user.toObject();
+    
+    // Mask sensitive banking information and keep only necessary fields
+    if (userObj.bankAccount) {
+      userObj.bankAccount = {
+        accountNumber: maskString(userObj.bankAccount.accountNumber, 4)
+      };
     }
 
-    if (user.isUpiAdded) {
-      user.upi = maskUpiId(user.upiId.upi);
-      delete user.upiId;
+    if (userObj.upiId) {
+      userObj.upiId = {
+        upi: maskUpiId(userObj.upiId.upi)
+      };
     }
-    delete user.password;
+
+    // Remove unnecessary/sensitive fields
+    delete userObj.password;
+    delete userObj.resetOtp;
+    delete userObj.otpExpiresAt;
+    delete userObj.kycDocuments;
+    delete userObj.isBankAdded;
+    delete userObj.isUpiAdded;
+    delete userObj.googleId;
+    delete userObj.authProvider;
+    delete userObj.createdAt;
+    delete userObj.updatedAt;
+    delete userObj.lastActive;
+    delete userObj.referedBy;
+    delete userObj.dateOfBirth;
+    delete userObj.mobile;
+    delete userObj.__v;
 
     const token = jwt.sign(
       { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
+      process.env.JWT_SECRET
+      // No expiration
     );
 
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "Lax",
       secure: false,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year - user stays logged in forever
     });
 
     sendLoginAlert(user.fullName).catch((err) =>
@@ -190,7 +242,7 @@ const handelUserLogin = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "user logged in successfully",
-      userData: user,
+      userData: userObj,
     });
   } catch (err) {
     console.error("Login Error:", err.message);
@@ -200,64 +252,7 @@ const handelUserLogin = async (req, res) => {
   }
 };
 
-const handelAdminLogin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "missing details" });
-    }
-
-    const user = await userModel.findOne({ email }).lean();
-    if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials" });
-    }
-
-    // Check if user is admin
-    if (user.role !== "admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied. Admin privileges required.",
-      });
-    }
-
-    const isPassMatch = await bcrypt.compare(password, user.password);
-    if (!isPassMatch) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials" });
-    }
-
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
-    );
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "Lax",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Admin logged in successfully",
-      userData: user,
-    });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Something went wrong" });
-  }
-};
+// Admin login moved to separate adminController.js
 
 const handleUserLogout = async (req, res) => {
   try {
@@ -381,15 +376,38 @@ const isloggedin = async (req, res) => {
       .findById(decoded.userId)
       .select("-password");
 
-    if (user.isBankAdded) {
-      user.accountNumber = maskString(user.bankAccount.accountNumber, 4);
-      delete user.bankAccount;
+    // Convert to object for manipulation
+    const userObj = user.toObject();
+    
+    // Mask sensitive banking information and keep only necessary fields
+    if (userObj.bankAccount) {
+      userObj.bankAccount = {
+        accountNumber: maskString(userObj.bankAccount.accountNumber, 4)
+      };
     }
 
-    if (user.isUpiAdded) {
-      user.upi = maskUpiId(user.upiId.upi);
-      delete user.upiId;
+    if (userObj.upiId) {
+      userObj.upiId = {
+        upi: maskUpiId(userObj.upiId.upi)
+      };
     }
+
+    // Remove unnecessary/sensitive fields
+    delete userObj.password;
+    delete userObj.resetOtp;
+    delete userObj.otpExpiresAt;
+    delete userObj.kycDocuments;
+    delete userObj.isBankAdded;
+    delete userObj.isUpiAdded;
+    delete userObj.googleId;
+    delete userObj.authProvider;
+    delete userObj.createdAt;
+    delete userObj.updatedAt;
+    delete userObj.lastActive;
+    delete userObj.referedBy;
+    delete userObj.dateOfBirth;
+    delete userObj.mobile;
+    delete userObj.__v;
 
     // Check if user is returning after being away (more than 1 hour)
     const now = new Date();
@@ -402,11 +420,10 @@ const isloggedin = async (req, res) => {
       );
     }
 
-    // Update last active time
+    // Update last active time (need to update on original user object)
     user.lastActive = now;
     await user.save();
 
-    const userObj = user.toObject();
     return res.status(200).json({ isLoggedIn: true, user: userObj });
   } catch (err) {
     return res
@@ -489,41 +506,23 @@ function maskString(str, visibleChars = 4) {
 // Google OAuth Handler
 const handleGoogleAuth = async (req, res) => {
   try {
-    console.log('=== GOOGLE AUTH DEBUG START ===');
-    console.log('Request body:', req.body);
-    console.log('Headers:', req.headers);
-    console.log('Environment variables:');
-    console.log('- GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'SET' : 'NOT SET');
-    console.log('- NODE_ENV:', process.env.NODE_ENV);
-    
-    const { credential } = req.body;
+   
+    const { credential, referedBy } = req.body;
 
     if (!credential) {
-      console.log('ERROR: No credential provided');
       return res.status(400).json({
         success: false,
         message: "Google credential is required"
       });
     }
 
-    console.log('Credential received (length):', credential.length);
-
     // Verify Google token
-    console.log('Attempting to verify Google token...');
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
-    console.log('Token payload:', {
-      sub: payload.sub,
-      email: payload.email,
-      name: payload.name,
-      email_verified: payload.email_verified,
-      aud: payload.aud,
-      iss: payload.iss
-    });
 
     const {
       sub: googleId,
@@ -534,14 +533,11 @@ const handleGoogleAuth = async (req, res) => {
     } = payload;
 
     if (!email_verified) {
-      console.log('ERROR: Email not verified by Google');
       return res.status(400).json({
         success: false,
         message: "Google email not verified"
       });
     }
-
-    console.log('Searching for existing user...');
     // Check if user exists
     let user = await userModel.findOne({ 
       $or: [
@@ -551,10 +547,8 @@ const handleGoogleAuth = async (req, res) => {
     });
 
     if (user) {
-      console.log('Existing user found:', user._id);
       // User exists, update Google info if needed
       if (!user.googleId) {
-        console.log('Updating user with Google info');
         user.googleId = googleId;
         user.profilePicture = profilePicture;
         user.authProvider = 'google';
@@ -562,11 +556,17 @@ const handleGoogleAuth = async (req, res) => {
         await user.save();
       }
     } else {
-      console.log('Creating new user...');
+      // Handle referral validation (don't update referer yet, do it after user creation)
+      let validReferer = null;
+      if (referedBy) {
+        validReferer = await userModel.findOne({ referralCode: referedBy });
+        // Don't block user creation for invalid referral codes
+      }
+      
       // Create new user
       const referralCode = generateReferralCode();
       
-      user = new userModel({
+      const newUserData = {
         fullName,
         email,
         googleId,
@@ -576,10 +576,25 @@ const handleGoogleAuth = async (req, res) => {
         authProvider: 'google',
         // Don't set password for Google users
         // Don't set mobile for Google users (will be null)
-      });
+      };
 
+      // Add referral data if valid referral code was provided
+      if (referedBy && validReferer) {
+        newUserData.referedBy = referedBy;
+      }
+
+      user = new userModel(newUserData);
       await user.save();
-      console.log('New user created:', user._id);
+
+      // Update referer after user creation (now we have the new user's ID)
+      if (referedBy && validReferer) {
+        validReferer.totalReferrals += 1;
+        validReferer.referredUsers.push({
+          userId: user._id,
+          referredAt: new Date()
+        });
+        await validReferer.save();
+      }
 
       // Send new user alert
       sendGoogleSignupAlert(user.fullName).catch((err) =>
@@ -587,46 +602,53 @@ const handleGoogleAuth = async (req, res) => {
       );
     }
 
-    console.log('Generating JWT token...');
-    // Generate JWT token
+    // Generate JWT token (no expiration)
     const token = jwt.sign(
       { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      process.env.JWT_SECRET
+      // No expiration
     );
 
-    console.log('Setting cookie with settings:', {
-      httpOnly: true,
-      sameSite: 'Lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-
-    // Set cookie
+    // Set cookie (no expiration)
     res.cookie('token', token, {
       httpOnly: true,
       sameSite: 'Lax',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year - user stays logged in forever
     });
 
     // Prepare user data for response
     const userObj = user.toObject();
     delete userObj.password;
 
-    // Handle banking info masking (same as regular login)
-    if (user.isBankAdded) {
-      userObj.accountNumber = maskString(user.bankAccount.accountNumber, 4);
-      delete userObj.bankAccount;
+    // Mask sensitive banking information and keep only necessary fields
+    if (userObj.bankAccount) {
+      userObj.bankAccount = {
+        accountNumber: maskString(userObj.bankAccount.accountNumber, 4)
+      };
     }
 
-    if (user.isUpiAdded) {
-      userObj.upi = maskUpiId(user.upiId.upi);
-      delete userObj.upiId;
+    if (userObj.upiId) {
+      userObj.upiId = {
+        upi: maskUpiId(userObj.upiId.upi)
+      };
     }
 
-    console.log('SUCCESS: Sending response');
-    console.log('=== GOOGLE AUTH DEBUG END ===');
+    // Remove unnecessary/sensitive fields
+    delete userObj.resetOtp;
+    delete userObj.otpExpiresAt;
+    delete userObj.kycDocuments;
+    delete userObj.isBankAdded;
+    delete userObj.isUpiAdded;
+    delete userObj.googleId;
+    delete userObj.authProvider;
+    delete userObj.createdAt;
+    delete userObj.updatedAt;
+    delete userObj.lastActive;
+    delete userObj.referedBy;
+    delete userObj.dateOfBirth;
+    delete userObj.mobile;
+    delete userObj.__v;
 
     return res.status(200).json({
       success: true,
@@ -635,20 +657,7 @@ const handleGoogleAuth = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('=== GOOGLE AUTH ERROR ===');
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
-    console.error('Error name:', error.name);
-    
-    if (error.message.includes('Token used too late')) {
-      console.error('Token timestamp issue detected');
-    }
-    if (error.message.includes('Invalid token audience')) {
-      console.error('CLIENT_ID mismatch detected');
-      console.error('Expected audience:', process.env.GOOGLE_CLIENT_ID);
-    }
-    
-    console.error('=== END GOOGLE AUTH ERROR ===');
+    console.error('Google authentication error:', error.message);
     
     return res.status(400).json({
       success: false,
@@ -680,7 +689,6 @@ const sendGoogleSignupAlert = async (userName) => {
 module.exports = {
   handelUserSignup,
   handelUserLogin,
-  handelAdminLogin,
   handleUserLogout,
   generateResetPassOTP,
   submitResetPassOTP,

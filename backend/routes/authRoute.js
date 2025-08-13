@@ -3,7 +3,6 @@ const rateLimit = require("express-rate-limit");
 const {
   handelUserSignup,
   handelUserLogin,
-  handelAdminLogin,
   handleUserLogout,
   generateResetPassOTP,
   submitResetPassOTP,
@@ -45,8 +44,7 @@ router.post("/login", authLimiter, handelUserLogin);
 router.post("/google", authLimiter, handleGoogleAuth);
 router.post("/logout", handleUserLogout);
 
-// Admin Authentication Routes
-router.post("/admin/login", authLimiter, handelAdminLogin);
+// Admin routes moved to /api/admin
 
 // Password Reset Routes
 router.post("/forgot-password", otpLimiter, generateResetPassOTP);

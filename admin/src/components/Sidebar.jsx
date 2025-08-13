@@ -1,9 +1,12 @@
-import React, { memo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Users, Shield, Trophy, Calendar, Play, CheckCircle, UserCheck, Zap, Home, Target, Award, ChevronLeft, ChevronRight, MessageCircle, CreditCard } from 'lucide-react';
+import React, { memo, useContext } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Users, Shield, Trophy, Calendar, Play, CheckCircle, UserCheck, Zap, Home, Target, Award, ChevronLeft, ChevronRight, MessageCircle, CreditCard, LogOut } from 'lucide-react';
+import { AppContext } from '../context/AppContext';
 
 const Sidebar = memo(({ collapsed, onToggle }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { adminLogout, adminUser } = useContext(AppContext);
 
   const isActive = (path) => location.pathname === path;
 
@@ -122,6 +125,40 @@ const Sidebar = memo(({ collapsed, onToggle }) => {
           </div>
         )}
       </nav>
+
+      {/* Admin Info & Logout Section */}
+      <div className='absolute bottom-20 left-0 right-0 p-6 border-t border-purple-400/30 bg-gradient-to-t from-slate-900/80 to-transparent backdrop-blur-sm'>
+        {!collapsed && adminUser && (
+          <div className="hidden lg:block mb-4">
+            <div className="text-center text-white/80 text-sm">
+              <p className="font-medium">Welcome, {adminUser.fullName}</p>
+              <p className="text-xs text-white/60 mt-1">{adminUser.email}</p>
+            </div>
+          </div>
+        )}
+        
+        {/* Logout Button */}
+        <button
+          onClick={async () => {
+            await adminLogout();
+            navigate('/login');
+          }}
+          className={`group relative flex flex-col lg:flex-row items-center ${collapsed ? 'justify-center' : 'justify-center lg:justify-start'} w-full px-4 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 bg-red-500/20 backdrop-blur-sm hover:bg-red-500/30 text-white/90 hover:text-white border border-red-400/30 hover:border-red-400/50 hover:shadow-lg hover:shadow-red-500/25`}
+          title="Logout"
+        >
+          <div className="relative group-hover:scale-110 transition-transform duration-200">
+            <LogOut className={`w-5 h-5 ${collapsed ? '' : 'mb-1 lg:mb-0 lg:mr-3'} text-white/80 group-hover:text-white`} />
+          </div>
+          
+          {!collapsed && (
+            <span className="text-xs lg:text-sm font-semibold transition-all duration-200 text-white/80 group-hover:text-white">
+              Logout
+            </span>
+          )}
+
+          <div className="absolute inset-0 bg-gradient-to-r from-white/0 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+        </button>
+      </div>
 
       {/* Footer for desktop */}
       {!collapsed && (

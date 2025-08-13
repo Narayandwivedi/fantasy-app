@@ -78,6 +78,10 @@ const GoogleLogin = () => {
         backendUrl: BACKEND_URL
       });
       
+      // Get referral code from URL params
+      const urlParams = new URLSearchParams(window.location.search);
+      const referralCode = urlParams.get('ref');
+      
       const result = await fetch(`${BACKEND_URL}/api/auth/google`, {
         method: 'POST',
         headers: {
@@ -85,7 +89,8 @@ const GoogleLogin = () => {
         },
         credentials: 'include',
         body: JSON.stringify({
-          credential: response.credential
+          credential: response.credential,
+          referedBy: referralCode // Add referral code to request
         }),
       });
 

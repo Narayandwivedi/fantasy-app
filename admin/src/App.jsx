@@ -2,6 +2,8 @@ import React, { useState, useCallback } from "react";
 import { ToastContainer } from "react-toastify";
 import Sidebar from "./components/Sidebar";
 import { Route, Routes } from "react-router-dom";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import AdminLogin from "./pages/AdminLogin";
 
 import ManagePlayers from "./pages/ManagePlayers/ManagePlayers";
 import ManageTeams from "./pages/ManageTeams/ManageTeams";
@@ -27,33 +29,39 @@ const App = () => {
   return (
     <div>
       <ToastContainer />
-
-      <div className="flex lg:flex-row flex-col">
-        <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
-        <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-0' : 'lg:ml-4'} ml-0`}>
-          <Routes>
-
-          <Route path="/" element={<ManagePlayers />} />
-          <Route path="/manage-user" element={<ManageUser />} />
-          <Route path="/demo" element={<Demo />} />
-          <Route path="/teams" element={<ManageTeams />} />
-
-          <Route path="/team-detail/:id" element={<TeamDetails />} />
-
-          {/* for matches */}
-
-          <Route path="/upcoming-matches" element={<UpcomingMatch />} />
-          <Route path="/live-matches" element={<LiveMatch />} />
-          <Route path="/completed-matches" element={<CompletedMatch />} />
-          <Route path="/matches/:matchId" element={<MatchDetail />} />
-          <Route path="/manage-contests" element={<ManageContest />} />
-          <Route path="/manage-deposits" element={<ManageDeposits />} />
-          <Route path="/chat-support" element={<ChatSupport />} />
-          <Route path="/test" element={<MatchCard />} />
-
-          </Routes>
-        </div>
-      </div>
+      
+      <Routes>
+        {/* Admin Login Route - No sidebar needed */}
+        <Route path="/login" element={<AdminLogin />} />
+        
+        {/* All other routes require admin authentication and show sidebar */}
+        <Route path="/*" element={
+          <AdminProtectedRoute>
+            <div className="flex lg:flex-row flex-col">
+              <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+              <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-0' : 'lg:ml-4'} ml-0`}>
+                <Routes>
+                  <Route path="/" element={<ManagePlayers />} />
+                  <Route path="/manage-user" element={<ManageUser />} />
+                  <Route path="/demo" element={<Demo />} />
+                  <Route path="/teams" element={<ManageTeams />} />
+                  <Route path="/team-detail/:id" element={<TeamDetails />} />
+                  
+                  {/* for matches */}
+                  <Route path="/upcoming-matches" element={<UpcomingMatch />} />
+                  <Route path="/live-matches" element={<LiveMatch />} />
+                  <Route path="/completed-matches" element={<CompletedMatch />} />
+                  <Route path="/matches/:matchId" element={<MatchDetail />} />
+                  <Route path="/manage-contests" element={<ManageContest />} />
+                  <Route path="/manage-deposits" element={<ManageDeposits />} />
+                  <Route path="/chat-support" element={<ChatSupport />} />
+                  <Route path="/test" element={<MatchCard />} />
+                </Routes>
+              </div>
+            </div>
+          </AdminProtectedRoute>
+        } />
+      </Routes>
     </div>
   );
 };

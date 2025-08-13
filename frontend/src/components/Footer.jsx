@@ -5,7 +5,7 @@ import { Trophy, Mail, Phone, MapPin, Twitter, Instagram } from 'lucide-react';
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-r from-gray-900 via-slate-900 to-black text-white">
-      <div className="px-6 py-12">
+      <div className="px-6 py-12 pb-24 md:pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           
           {/* Brand Section */}
@@ -118,11 +118,11 @@ const Footer = () => {
               © {new Date().getFullYear()} MySeries11. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm">
-              <a href="https://x.com/myseries11" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors cursor-pointer relative z-10">
+              <a href="https://x.com/myseries11" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors cursor-pointer">
                 <Twitter className="w-4 h-4" />
                 <span>Twitter</span>
               </a>
-              <a href="https://www.instagram.com/myseries11official" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors cursor-pointer relative z-10">
+              <a href="https://www.instagram.com/myseries11official" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors cursor-pointer">
                 <Instagram className="w-4 h-4" />
                 <span>Instagram</span>
               </a>

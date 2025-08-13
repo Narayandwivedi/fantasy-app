@@ -63,7 +63,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
   },
-  referredBy: {
+  referedBy: {
     type: String,
   },
 
@@ -84,10 +84,6 @@ const userSchema = new mongoose.Schema({
     accountHolderName: { type: String },
   },
 
-  isBankAdded: {
-    type: Boolean,
-    default: false,
-  },
   isVerified: {
     type: Boolean,
     default: false,
@@ -104,6 +100,16 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  referredUsers: [{
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    referredAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
 
   // Verification Status
 

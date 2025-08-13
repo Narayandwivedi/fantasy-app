@@ -46,7 +46,7 @@ const App = () => {
     return hidePaths.some(path => location.pathname.includes(path))
   }, [location.pathname, user])
 
-  // Full width for homepage, contact, and about pages, mobile-first for others
+  // Full width for homepage, contact, about pages, mobile-first for others
   const isHomePage = location.pathname === '/'
   const isContactPage = location.pathname === '/contact'
   const isAboutPage = location.pathname === '/about'
