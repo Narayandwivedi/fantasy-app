@@ -8,7 +8,7 @@ const LandingNavbar = () => {
   return (
     <>
       <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-4 md:py-4 lg:py-5 px-6 shadow-xl">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center md:grid md:grid-cols-[1fr_auto_1fr] md:items-center">
           {/* Left side - Menu toggle for mobile */}
           <div className="md:hidden">
             <button 
@@ -25,19 +25,22 @@ const LandingNavbar = () => {
           
           {/* Desktop Navigation Links - Left */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/about" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium">
+            <Link to="/about" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm">
               About Us
             </Link>
-            <Link to="/contact" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium">
+            <Link to="/contact" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm">
               Contact Us
             </Link>
-            <Link to="/terms" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium">
-              Terms
+            <Link to="/terms-and-conditions" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm">
+              Terms & Conditions
+            </Link>
+            <Link to="/privacy-policy" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm">
+              Privacy Policy
             </Link>
           </div>
         
           {/* Center - Logo/Brand */}
-          <div className="flex items-center space-x-3 md:space-x-4 md:mr-2">
+          <div className="flex items-center space-x-3 md:space-x-4 md:justify-center">
             <div className="bg-white bg-opacity-20 p-2 md:p-3 rounded-lg">
               <Trophy className="w-7 h-7 md:w-8 md:h-8 lg:w-9 lg:h-9 text-yellow-300" />
             </div>
@@ -47,7 +50,7 @@ const LandingNavbar = () => {
           </div>
         
           {/* Desktop Navigation Links - Right */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-6 md:justify-end">
             <Link 
               to="/login"
               className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-200"
@@ -73,24 +76,31 @@ const LandingNavbar = () => {
             <div className="flex flex-col space-y-4">
               <Link 
                 to="/about" 
-                className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium"
+                className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About Us
               </Link>
               <Link 
                 to="/contact" 
-                className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium"
+                className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact Us
               </Link>
               <Link 
-                to="/terms" 
-                className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium"
+                to="/terms-and-conditions" 
+                className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Terms & Conditions
+              </Link>
+              <Link 
+                to="/privacy-policy" 
+                className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Privacy Policy
               </Link>
             </div>
           </div>

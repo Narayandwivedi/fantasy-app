@@ -116,7 +116,17 @@ const MenuSidebar = ({ isOpen, onClose }) => {
               title="Terms & Conditions"
               subtitle="Read our policies"
               onClick={() => {
-                navigate('/terms')
+                navigate('/terms-and-conditions')
+                onClose()
+              }}
+            />
+            
+            <MenuItem 
+              icon={<FileText size={20} />}
+              title="Privacy Policy"
+              subtitle="Data protection & privacy"
+              onClick={() => {
+                navigate('/privacy-policy')
                 onClose()
               }}
             />

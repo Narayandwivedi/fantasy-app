@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import LandingNavbar from "../components/LandingNavbar"
+import Footer from "../components/Footer"
 import { Link, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 
@@ -32,7 +33,7 @@ const HomePage = () => {
         <div className="flex justify-center mt-6">
           <div className="relative">
             <img 
-              src="/myseries11 img.png" 
+              src="/series11desktop.png" 
               alt="MySeries11 App Preview" 
               className="w-60 h-auto drop-shadow-2xl rounded-3xl"
             />
@@ -116,7 +117,7 @@ const HomePage = () => {
         <div className="flex-1 flex justify-end">
           <div className="relative">
             <img 
-              src="/myseries11 img.png" 
+              src="/series11desktop.png" 
               alt="MySeries11 App Preview" 
               className="w-80 lg:w-96 xl:w-[420px] h-auto drop-shadow-2xl rounded-3xl"
             />
@@ -158,6 +159,9 @@ const HomePage = () => {
           </Link>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

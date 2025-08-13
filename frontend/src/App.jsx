@@ -20,7 +20,8 @@ import Login from './pages/Login'
 import AboutUs from './pages/AboutUs'
 import ContactUs from './pages/ContactUs'
 import CustomerSupport from './pages/CustomerSupport'
-import TermsConditions from './pages/TermsConditions'
+import Terms from './pages/Terms'
+import PrivacyPolicy from './pages/PrivacyPolicy'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -35,7 +36,7 @@ const App = () => {
       return true
     }
     
-    const hidePaths = ['/', '/create-team', '/login', '/my-teams', '/contest', '/chat', '/my-contests', '/my-matches', '/qr-payment', '/about', '/game-rules', '/terms', '/admin']
+    const hidePaths = ['/', '/create-team', '/login', '/my-teams', '/contest', '/chat', '/my-contests', '/my-matches', '/qr-payment', '/about', '/game-rules', '/terms-and-conditions', '/privacy-policy', '/admin']
     
     // Special case: show bottom nav for logged-in users on contact page
     if (location.pathname.includes('/contact')) {
@@ -49,7 +50,9 @@ const App = () => {
   const isHomePage = location.pathname === '/'
   const isContactPage = location.pathname === '/contact'
   const isAboutPage = location.pathname === '/about'
-  const containerClasses = (isHomePage || isContactPage || isAboutPage)
+  const isTermPage = location.pathname === '/terms-and-conditions'
+  const isPrivacyPage = location.pathname === '/privacy-policy'
+  const containerClasses = (isHomePage || isContactPage || isAboutPage || isTermPage || isPrivacyPage)
     ? 'w-full min-h-screen relative overflow-hidden' 
     : 'max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden'
 
@@ -145,7 +148,8 @@ const App = () => {
 
           <Route path='/about' element = {<AboutUs/>} />
           <Route path='/contact' element = {<ContactUs/>} />
-          <Route path='/terms' element = {<TermsConditions/>} />
+          <Route path='/terms-and-conditions' element = {<Terms/>} />
+          <Route path='/privacy-policy' element = {<PrivacyPolicy/>} />
 
         </Routes>
         {!hideBottomNav && <BottomNav/>}

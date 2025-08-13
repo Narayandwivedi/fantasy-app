@@ -24,6 +24,22 @@
     <priority>0.8</priority>
   </url>
   
+  <!-- Terms and Conditions - Legal terms -->
+  <url>
+    <loc>https://myseries11.com/terms-and-conditions</loc>
+    <lastmod>2025-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Privacy Policy - Data protection and privacy -->
+  <url>
+    <loc>https://myseries11.com/privacy-policy</loc>
+    <lastmod>2025-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
   
   <!-- Game Rules - How to play fantasy cricket -->
   <url>

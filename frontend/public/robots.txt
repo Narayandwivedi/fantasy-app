@@ -4,6 +4,8 @@ User-agent: *
 Allow: /
 Allow: /about
 Allow: /contact  
+Allow: /terms-and-conditions
+Allow: /privacy-policy
 Allow: /game-rules
 Allow: /login
 
