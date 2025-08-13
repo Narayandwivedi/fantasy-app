@@ -38,7 +38,7 @@ const corsOptions = {
     "https://myseries11.com",
     "https://www.myseries11.com",
     "https://api.myseries11.com",
-    "https://fantasy-app-73q4.vercel.app"
+    "https://series11.vercel.app"
   ],
   credentials: true
 };
