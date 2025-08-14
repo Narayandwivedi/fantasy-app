@@ -6,10 +6,6 @@ const { cleanupOldChatMessages } = require("./jobs/chatCleanup");
 
 const app = express();
 
-// Trust proxy - only in production (behind reverse proxy)
-if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
 
 const { connectToDb } = require("./config/mongodb");
 
