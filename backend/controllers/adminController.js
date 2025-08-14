@@ -9,22 +9,6 @@ function maskString(str, visibleChars = 4) {
   return "*".repeat(str.length - visibleChars) + str.slice(-visibleChars);
 }
 
-function maskUpiId(upiId) {
-  if (!upiId) return upiId;
-
-  const atIndex = upiId.indexOf("@");
-  if (atIndex === -1) return maskString(upiId, 4);
-
-  const namePart = upiId.substring(0, atIndex);
-  const domainPart = upiId.substring(atIndex);
-
-  const maskedName =
-    namePart.length > 4
-      ? "*".repeat(namePart.length - 4) + namePart.slice(-4)
-      : namePart;
-
-  return maskedName + domainPart;
-}
 
 // Admin Login Controller
 const adminLogin = async (req, res) => {

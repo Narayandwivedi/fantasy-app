@@ -18,7 +18,7 @@ const INITIAL_FORM_DATA = {
 const AddPlayerModal = ({ showModal, onClose}) => {
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { BACKEND_URL } = useContext(AppContext);
+  const { BACKEND_URL, fetchAllPlayers } = useContext(AppContext);
 
   const resetForm = () => {
     setFormData(INITIAL_FORM_DATA);
@@ -57,12 +57,16 @@ const AddPlayerModal = ({ showModal, onClose}) => {
         bowlingStyle: formData.bowlingStyle,
         country: formData.country.trim(),
         imgLink: imgLink,
+      }, {
+        withCredentials: true
       });
 
       if (data.success) {
         toast.success("Player added successfully");
         resetForm();
         onClose();
+        // Refresh the players list to show the new player
+        await fetchAllPlayers();
       }
     } catch (err) {
       console.error('Error adding player:', err);

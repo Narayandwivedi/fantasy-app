@@ -16,6 +16,8 @@ export const AppContextProvider = (props) => {
   const [isCheckingAuth, setIsCheckingAuth] = useState(false);
 
   const [allPlayers, setAllPlayers] = useState([]);
+  const [playersPagination, setPlayersPagination] = useState({});
+  const [availableCountries, setAvailableCountries] = useState([]);
 
   const fetchAllPlayers = async () => {
     try {
@@ -30,7 +32,35 @@ export const AppContextProvider = (props) => {
     }
   };
 
+  const fetchPlayersWithPagination = async (page = 1, country = 'all') => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '50'
+      });
+      
+      if (country && country !== 'all') {
+        params.append('country', country);
+      }
+
+      const { data } = await axios.get(`${BACKEND_URL}/api/players?${params}`, {
+        withCredentials: true,
+      });
+      
+      if (data.success) {
+        setAllPlayers(data.allPlayers);
+        setPlayersPagination(data.pagination);
+        setAvailableCountries(data.countries || []);
+        return data;
+      }
+    } catch (err) {
+      console.log(err.message);
+      throw err;
+    }
+  };
+
   const fetchAllPlayersCallback = useCallback(fetchAllPlayers, []);
+  const fetchPlayersWithPaginationCallback = useCallback(fetchPlayersWithPagination, []);
 
   // Admin authentication functions (improved with loading states)
   const checkAdminAuth = useCallback(async () => {
@@ -132,6 +162,9 @@ export const AppContextProvider = (props) => {
     BACKEND_URL,
     allPlayers,
     fetchAllPlayers: fetchAllPlayersCallback,
+    fetchPlayersWithPagination: fetchPlayersWithPaginationCallback,
+    playersPagination,
+    availableCountries,
     // Admin auth (following frontend pattern)
     adminUser,
     isAdminAuthenticated,
@@ -141,7 +174,7 @@ export const AppContextProvider = (props) => {
     checkAdminAuth,
     refreshAdminUser,
     updateAdminUser,
-  }), [BACKEND_URL, allPlayers, fetchAllPlayersCallback, adminUser, isAdminAuthenticated, loading, adminLogin, adminLogout, checkAdminAuth, refreshAdminUser, updateAdminUser]);
+  }), [BACKEND_URL, allPlayers, fetchAllPlayersCallback, fetchPlayersWithPaginationCallback, playersPagination, availableCountries, adminUser, isAdminAuthenticated, loading, adminLogin, adminLogout, checkAdminAuth, refreshAdminUser, updateAdminUser]);
 
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>

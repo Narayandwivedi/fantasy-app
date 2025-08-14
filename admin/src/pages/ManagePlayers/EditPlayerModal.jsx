@@ -18,7 +18,7 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
     fantasyPrice: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { BACKEND_URL, setAllPlayers } = useContext(AppContext);
+  const { BACKEND_URL, fetchAllPlayers } = useContext(AppContext);
 
   // Set form data when player changes
   useEffect(() => {
@@ -74,6 +74,7 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
         form.append("player", formData.image);
         const res = await axios.post(`${BACKEND_URL}/api/upload/player`, form, {
           headers: { "Content-Type": "multipart/form-data" },
+          withCredentials:true
         });
         
         // Store only WebP URL
@@ -93,17 +94,18 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
           country: formData.country.trim(),
           imgLink: imgLink,
           fantasyPrice: formData.fantasyPrice ? parseFloat(formData.fantasyPrice) : undefined,
+        },
+        {
+          withCredentials: true
         }
       );
 
       if (data.success) {
         toast.success("Player updated successfully");
-        // Update the player in allPlayers context
-        setAllPlayers(prev => 
-          prev.map(p => p._id === player._id ? { ...p, ...data.updatedPlayer } : p)
-        );
         resetForm();
         onClose();
+        // Refresh the players list to show the updated player
+        await fetchAllPlayers();
       }
     } catch (err) {
       console.error('Error updating player:', err);

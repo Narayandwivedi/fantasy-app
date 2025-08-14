@@ -147,8 +147,53 @@ async function updatePlayer(req, res) {
 }
 
 async function getAllPlayers(req, res) {
-  const allPlayers = await Player.find();
-  return res.json({ success: true, allPlayers });
+  try {
+    // Extract query parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50; // 50 players per page
+    const country = req.query.country;
+    const skip = (page - 1) * limit;
+
+    // Build filter object
+    let filter = {};
+    if (country && country !== 'all') {
+      filter.country = { $regex: country, $options: 'i' }; // Case-insensitive match
+    }
+
+    // Get total count for pagination
+    const totalPlayers = await Player.countDocuments(filter);
+    const totalPages = Math.ceil(totalPlayers / limit);
+
+    // Get paginated players
+    const allPlayers = await Player.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // Sort by newest first
+
+    // Get unique countries for filter dropdown
+    const countries = await Player.distinct('country');
+
+    return res.json({ 
+      success: true, 
+      allPlayers,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalPlayers,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+        limit
+      },
+      countries: countries.sort()
+    });
+
+  } catch (error) {
+    console.error("Get all players error:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Failed to fetch players" 
+    });
+  }
 }
 
 
