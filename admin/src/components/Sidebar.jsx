@@ -104,30 +104,10 @@ const Sidebar = memo(({ collapsed, onToggle }) => {
           })}
         </div>
 
-        {/* Quick Stats - Desktop Only */}
-        {!collapsed && (
-          <div className="hidden lg:block mt-8 p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-            <h3 className="text-white/80 text-sm font-semibold mb-3">Quick Stats</h3>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-white/60">Active Matches</span>
-                <span className="text-green-400 font-bold">3</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-white/60">Total Teams</span>
-                <span className="text-blue-400 font-bold">12</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-white/60">Players</span>
-                <span className="text-purple-400 font-bold">156</span>
-              </div>
-            </div>
-          </div>
-        )}
       </nav>
 
       {/* Admin Info & Logout Section */}
-      <div className='absolute bottom-20 left-0 right-0 p-6 border-t border-purple-400/30 bg-gradient-to-t from-slate-900/80 to-transparent backdrop-blur-sm'>
+      <div className='absolute bottom-0 left-0 right-0 p-6 border-t border-purple-400/30 bg-gradient-to-t from-slate-900/90 to-slate-900/70 backdrop-blur-md'>
         {!collapsed && adminUser && (
           <div className="hidden lg:block mb-4">
             <div className="text-center text-white/80 text-sm">
@@ -160,15 +140,6 @@ const Sidebar = memo(({ collapsed, onToggle }) => {
         </button>
       </div>
 
-      {/* Footer for desktop */}
-      {!collapsed && (
-        <div className='hidden lg:block absolute bottom-0 left-0 right-0 p-6 border-t border-purple-400/30 bg-gradient-to-t from-slate-900/80 to-transparent backdrop-blur-sm'>
-          <div className='text-center text-white/60 text-sm'>
-            <p className="font-medium">© 2025 Sports Manager</p>
-            <p className="text-xs text-white/40 mt-1">Admin Panel v2.0</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 });

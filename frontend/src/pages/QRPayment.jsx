@@ -50,7 +50,7 @@ const QRPayment = () => {
 
   // Generate UPI payment string
   const generateUPIString = (amount) => {
-    return `upi://pay?pa=6262330338@ybl&am=${amount}&cu=INR`
+    return `upi://pay?pa=myseries11official@oksbi&am=${amount}&cu=INR`
   }
 
   // Generate QR Code
@@ -177,7 +177,7 @@ const QRPayment = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col justify-between p-2">
-        <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md mx-auto flex-1 flex flex-col justify-between">
+        <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md mx-auto flex-1 flex flex-col justify-start">
         
         {/* QR Code Section */}
         <div className="text-center mb-5">
