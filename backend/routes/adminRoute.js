@@ -5,7 +5,7 @@ const {
   adminLogout,
   getAdminStatus,
   getAdminStats,
-  changeAdminPassword
+  deletePlayer
 } = require("../controllers/adminController.js");
 const auth = require("../middleware/auth");
 const isAdmin = require("../middleware/isAdmin");
@@ -47,7 +47,8 @@ router.get("/status", getAdminStatus);
 // Admin Dashboard Routes
 router.get("/stats", auth, isAdmin, adminOperationLimiter, getAdminStats);
 
-// Admin Profile Routes
-router.put("/change-password", auth, isAdmin, adminOperationLimiter, changeAdminPassword);
+
+// Admin Player Management Routes
+router.delete("/delete-player/:playerId", auth, isAdmin, adminOperationLimiter, deletePlayer);
 
 module.exports = router;

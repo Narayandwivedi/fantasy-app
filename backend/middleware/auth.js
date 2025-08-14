@@ -16,7 +16,9 @@ const auth = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized - User not found" });
     }
 
+    // Set req.user with both the full user object and userId for consistency
     req.user = user;
+    req.user.userId = user._id;
     next();
   } catch (error) {
     console.error("Auth middleware error:", error);

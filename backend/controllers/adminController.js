@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/User.js");
+const Player = require("../models/Player.js");
 const axios = require("axios");
 
 // Helper function to mask sensitive data
@@ -236,64 +237,64 @@ const getAdminStats = async (req, res) => {
   }
 };
 
-// Change Admin Password
-const changeAdminPassword = async (req, res) => {
+
+// Delete Player Controller (Admin Only)
+const deletePlayer = async (req, res) => {
   try {
-    const { currentPassword, newPassword } = req.body;
-    const adminId = req.user.userId;
+    const { playerId } = req.params;
+    const adminId = req.user?.userId;
 
-    if (!currentPassword || !newPassword) {
+    console.log("Delete player request:");
+    console.log("- req.user:", req.user);
+    console.log("- adminId:", adminId);
+    console.log("- playerId:", playerId);
+    console.log("- req.cookies.token:", req.cookies.token ? "Present" : "Missing");
+    
+    if (!playerId) {
       return res.status(400).json({
         success: false,
-        message: "Current password and new password are required"
+        message: "Player ID is required"
       });
     }
 
-    if (newPassword.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "New password must be at least 6 characters long"
-      });
-    }
-
-    // Find admin
-    const admin = await userModel.findById(adminId);
-    if (!admin || admin.role !== "admin") {
+    // Check if admin user is authenticated
+    if (!adminId || req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: "Admin access required"
       });
     }
 
-    // Verify current password
-    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, admin.password);
-    if (!isCurrentPasswordValid) {
-      return res.status(401).json({
+    // Check if player exists
+    const player = await Player.findById(playerId);
+    if (!player) {
+      return res.status(404).json({
         success: false,
-        message: "Current password is incorrect"
+        message: "Player not found"
       });
     }
 
-    // Hash new password
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    
-    // Update password
-    admin.password = hashedNewPassword;
-    await admin.save();
+    // Delete the player
+    await Player.findByIdAndDelete(playerId);
 
-    // Log password change
-    console.log(`Admin password changed: ${admin.fullName} (${admin.email}) at ${new Date().toISOString()}`);
+    // Log the deletion for security
+    console.log(`Admin ${req.user.userId} deleted player: ${player.firstName} ${player.lastName} (${playerId}) at ${new Date().toISOString()}`);
+
+    // Send admin deletion alert
+    sendAdminDeletionAlert(req.user.fullName || 'Unknown Admin', `${player.firstName} ${player.lastName}`, req.ip).catch(err => 
+      console.error("Admin deletion alert failed:", err.message)
+    );
 
     return res.status(200).json({
       success: true,
-      message: "Admin password changed successfully"
+      message: "Player deleted successfully"
     });
 
   } catch (error) {
-    console.error("Admin password change error:", error.message);
+    console.error("Delete player error:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to change password"
+      message: "Failed to delete player"
     });
   }
 };
@@ -321,10 +322,33 @@ const sendAdminLoginAlert = async (adminName, ipAddress) => {
   }
 };
 
+// Send admin deletion alert to Telegram
+const sendAdminDeletionAlert = async (adminName, playerName, ipAddress) => {
+  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+  const CHAT_ID = process.env.TELEGRAM_GROUP_ID;
+
+  if (!BOT_TOKEN || !CHAT_ID) {
+    console.log("Telegram credentials not configured for admin alerts");
+    return;
+  }
+
+  const message = `🗑️ PLAYER DELETION ALERT 🗑️\n\nAdmin: ${adminName}\nDeleted Player: ${playerName}\nIP: ${ipAddress}\nTime: ${new Date().toLocaleString()}\n\n⚠️ Player permanently removed from database`;
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+  try {
+    await axios.post(url, {
+      chat_id: CHAT_ID,
+      text: message,
+    });
+  } catch (err) {
+    console.error("Telegram admin deletion alert error:", err.message);
+  }
+};
+
 module.exports = {
   adminLogin,
   adminLogout,
   getAdminStatus,
   getAdminStats,
-  changeAdminPassword
+  deletePlayer
 };
