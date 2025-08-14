@@ -126,8 +126,8 @@ const handelUserSignup = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "None",
-      secure: true,
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year - user stays logged in forever
     });
 
@@ -230,8 +230,8 @@ const handelUserLogin = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "Lax",
-      secure: false,
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year - user stays logged in forever
     });
 
@@ -258,6 +258,8 @@ const handleUserLogout = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      secure: process.env.NODE_ENV === "production",
     });
     return res.status(200).json({ success: true, message: "User logged out" });
   } catch (error) {
@@ -612,8 +614,8 @@ const handleGoogleAuth = async (req, res) => {
     // Set cookie (no expiration)
     res.cookie('token', token, {
       httpOnly: true,
-      sameSite: 'Lax',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year - user stays logged in forever
     });
 

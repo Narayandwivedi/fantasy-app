@@ -67,7 +67,7 @@ const adminLogin = async (req, res) => {
     // Set secure admin cookie
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "Lax",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       secure: process.env.NODE_ENV === "production",
       maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year for admin convenience
     });
@@ -118,7 +118,7 @@ const adminLogout = async (req, res) => {
     // Clear admin cookie
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "Lax",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       secure: process.env.NODE_ENV === "production",
     });
 
