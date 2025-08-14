@@ -65,12 +65,17 @@ const adminLogin = async (req, res) => {
     );
 
     // Set secure admin cookie
-    res.cookie("token", token, {
+    const cookieOptions = {
       httpOnly: true,
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       secure: process.env.NODE_ENV === "production",
       maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year for admin convenience
-    });
+    };
+    
+    console.log("Setting admin cookie with options:", cookieOptions);
+    console.log("Environment:", process.env.NODE_ENV);
+    
+    res.cookie("token", token, cookieOptions);
 
     // Prepare admin response data
     const adminData = {
@@ -140,7 +145,13 @@ const adminLogout = async (req, res) => {
 const getAdminStatus = async (req, res) => {
   const token = req.cookies.token;
 
+  console.log("Admin status check:");
+  console.log("- Token present:", !!token);
+  console.log("- All cookies:", req.cookies);
+  console.log("- User agent:", req.get('User-Agent'));
+
   if (!token) {
+    console.log("No token found, returning unauthorized");
     return res.status(401).json({
       isLoggedIn: false,
       isAdmin: false,

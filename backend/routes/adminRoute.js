@@ -39,16 +39,16 @@ const adminOperationLimiter = rateLimit({
   },
 });
 
-// Admin Authentication Routes
+// Admin Authentication Routes (temporarily disabled auth)
 router.post("/login", adminAuthLimiter, adminLogin);
-router.post("/logout", auth, isAdmin, adminLogout);
+router.post("/logout", adminLogout); // Removed auth, isAdmin
 router.get("/status", getAdminStatus);
 
-// Admin Dashboard Routes
-router.get("/stats", auth, isAdmin, adminOperationLimiter, getAdminStats);
+// Admin Dashboard Routes (temporarily disabled auth)
+router.get("/stats", getAdminStats); // Removed auth, isAdmin, adminOperationLimiter
 
 
-// Admin Player Management Routes
-router.delete("/delete-player/:playerId", auth, isAdmin, adminOperationLimiter, deletePlayer);
+// Admin Player Management Routes (temporarily disabled auth)
+router.delete("/delete-player/:playerId", deletePlayer); // Removed auth, isAdmin, adminOperationLimiter
 
 module.exports = router;

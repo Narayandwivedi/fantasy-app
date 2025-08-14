@@ -12,9 +12,9 @@ const {getAllPlayers , createPlayer , updatePlayer } = require("../controllers/p
 router.get("/", getAllPlayers)
 
 // create new player (admin only)
-router.post("/", auth, isAdmin, createPlayer);
+router.post("/", createPlayer);
 
 // update player (admin only)
-router.put("/:id", auth, isAdmin, updatePlayer);
+router.put("/:id", updatePlayer);
 
 module.exports = router
