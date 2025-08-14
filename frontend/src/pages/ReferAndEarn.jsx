@@ -70,7 +70,7 @@ const ReferAndEarn = () => {
               </div>
               <div className="flex-1">
                 <p className="text-xs text-gray-600 mb-1">Est. Earnings</p>
-                <p className="text-2xl font-bold text-gray-800 leading-none">₹{((user?.totalReferrals || 0) * 50).toFixed(0)}</p>
+                <p className="text-2xl font-bold text-gray-800 leading-none">₹{((user?.totalReferrals || 0) * 0).toFixed(0)}</p>
               </div>
             </div>
           </div>

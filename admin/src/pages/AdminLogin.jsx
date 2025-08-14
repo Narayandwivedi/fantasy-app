@@ -56,7 +56,7 @@ const AdminLogin = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
             <Shield className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Winners11 Admin</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Series11 Admin</h1>
           <p className="text-gray-300">Sign in to your admin panel</p>
         </div>
 
@@ -146,7 +146,7 @@ const AdminLogin = () => {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-gray-400 text-sm">
-            © 2024 Winners11 Admin Panel. All rights reserved.
+            © 2024 Series11 Admin Panel. All rights reserved.
           </p>
         </div>
       </div>
