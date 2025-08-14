@@ -40,6 +40,7 @@ const AddPlayerModal = ({ showModal, onClose}) => {
         form.append("player", formData.image);
         const res = await axios.post(`${BACKEND_URL}/api/upload/player`, form, {
           headers: { "Content-Type": "multipart/form-data" },
+          withCredentials:true
         });
         
         // Store only WebP URL

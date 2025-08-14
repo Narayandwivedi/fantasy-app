@@ -83,11 +83,11 @@ const QRPayment = () => {
   // Copy UPI ID to clipboard
   const copyUPIId = async () => {
     try {
-      await navigator.clipboard.writeText('6262330338@ybl')
+      await navigator.clipboard.writeText('myseries11official@oksbi')
       setCopySuccess(true)
       setTimeout(() => setCopySuccess(false), 2000)
     } catch (err) {
-      toast.error('Failed to copy. UPI ID: 6262330338@ybl', { autoClose: 600 })
+      toast.error('Failed to copy. UPI ID: myseries11official@oksbi', { autoClose: 600 })
     }
   }
 
@@ -202,7 +202,7 @@ const QRPayment = () => {
             <div className="flex items-center justify-between">
               <div className="text-left">
                 <p className="text-xs text-gray-500">UPI ID</p>
-                <p className="font-mono font-medium text-gray-800 text-sm">6262330338@ybl</p>
+                <p className="font-mono font-medium text-gray-800 text-sm">myseries11official@oksbi</p>
               </div>
               <button
                 onClick={copyUPIId}
