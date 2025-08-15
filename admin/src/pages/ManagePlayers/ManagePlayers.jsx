@@ -155,13 +155,13 @@ const ManagePlayers = () => {
     <div className="bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex justify-between items-center mb-6">
+        <div className="max-w-7xl mx-auto px-3 lg:px-4 py-4 lg:py-6">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4 lg:mb-6 space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-xl lg:text-3xl font-bold text-gray-900">
                 Manage Players
               </h1>
-              <div className="flex items-center gap-4 mt-2">
+              <div className="flex flex-wrap items-center gap-2 lg:gap-4 mt-2">
                 <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
                   {isSearching 
                     ? `Found: ${searchResults.length} Players` 
@@ -178,15 +178,15 @@ const ManagePlayers = () => {
 
             <button
               onClick={() => setShowAddPlayerModal(true)}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2 font-medium"
+              className="bg-blue-600 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2 font-medium text-sm lg:text-base"
             >
-              <Plus size={20} />
+              <Plus size={16} className="lg:w-5 lg:h-5" />
               Add Player
             </button>
           </div>
 
           {/* Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          <div className="flex flex-col gap-4 items-start">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input

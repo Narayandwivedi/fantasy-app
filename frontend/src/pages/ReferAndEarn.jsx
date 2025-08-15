@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { toast } from 'react-toastify';
 import { Copy, Share2, Gift, Users, DollarSign } from 'lucide-react';
+import BottomNav from '../components/BottomNav';
 
 const ReferAndEarn = () => {
   const { user } = useContext(AppContext);
@@ -158,6 +159,8 @@ const ReferAndEarn = () => {
         {/* Bottom padding for navigation */}
         <div className="h-20"></div>
       </div>
+      
+      <BottomNav />
     </div>
   );
 };

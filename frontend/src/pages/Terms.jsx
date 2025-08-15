@@ -1,16 +1,48 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { ArrowLeft } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import LandingNavbar from '../components/LandingNavbar'
+import Footer from '../components/Footer'
+import { AppContext } from '../context/AppContext'
 
 const Terms = () => {
+  const navigate = useNavigate()
+  const { user } = useContext(AppContext)
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600">
-      <div className="bg-white shadow-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-16 px-8">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">Terms and Conditions</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation */}
+      {user ? (
+        // Back button for logged-in users
+        <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-3 px-6 shadow-xl">
+          <div className="flex items-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="bg-white bg-opacity-10 hover:bg-opacity-20 p-2 rounded-lg cursor-pointer transition-all duration-200 group mr-4"
+            >
+              <ArrowLeft className="w-6 h-6 text-white group-hover:text-yellow-300 transition-colors duration-200" />
+            </button>
+            <h1 className="text-white text-xl font-bold tracking-wide">
+              Terms & Conditions
+            </h1>
+          </div>
         </div>
+      ) : (
+        // Landing navbar for non-logged-in users
+        <LandingNavbar />
+      )}
+      
+      <div className="bg-white shadow-lg overflow-hidden">
+        {/* Header - Only show for non-logged-in users */}
+        {!user && (
+          <div className="bg-gradient-to-r from-gray-800 to-slate-800 text-white text-center py-6 px-6 lg:px-16">
+            <h1 className="text-2xl lg:text-3xl font-bold">Terms and Conditions</h1>
+          </div>
+        )}
         
         <div className="p-8 lg:p-12 xl:p-16">
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               1. Introduction - Who We Are and What We Do
             </h2>
             <p className="text-gray-600 leading-relaxed text-base lg:text-lg mb-4 lg:mb-6">
@@ -18,7 +50,7 @@ const Terms = () => {
             </p>
             <div className="flex flex-wrap gap-2 my-6">
               {['Cricket', 'Football', 'Basketball', 'Baseball', 'Hockey', 'Handball', 'Volleyball', 'Kabaddi'].map((sport, index) => (
-                <div key={index} className="bg-blue-500 text-white px-3 py-2 rounded-lg text-center font-medium hover:bg-blue-600 transform hover:-translate-y-1 transition-all duration-200 shadow-md text-sm flex-shrink-0">
+                <div key={index} className="bg-yellow-400 text-black px-3 py-2 rounded-lg text-center font-medium hover:bg-yellow-500 transform hover:-translate-y-1 transition-all duration-200 shadow-md text-sm flex-shrink-0">
                   {sport}
                 </div>
               ))}
@@ -29,7 +61,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               2. Acceptance of Our Terms and Conditions
             </h2>
             <p className="text-gray-600 leading-relaxed text-base lg:text-lg mb-4 lg:mb-6">
@@ -54,7 +86,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               3. User Account
             </h2>
             <p className="text-gray-600 leading-relaxed text-base lg:text-lg mb-4 lg:mb-6">
@@ -79,7 +111,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               4. Eligibility
             </h2>
             <p className="text-gray-600 leading-relaxed text-base lg:text-lg mb-4 lg:mb-6">To participate in any Paid Contest, you must meet the following eligibility criteria:</p>
@@ -104,7 +136,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               5. Contest Rules and Format
             </h2>
             <h3 className="text-xl font-medium text-gray-700 mb-3">Contest Rules</h3>
@@ -120,7 +152,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               6. Payment Terms
             </h2>
             <h3 className="text-xl font-medium text-gray-700 mb-3">Payment Accounts</h3>
@@ -135,7 +167,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               7. User Conduct
             </h2>
             <p className="text-gray-600 leading-relaxed text-base lg:text-lg mb-4 lg:mb-6">In using and accessing Our Platform, You agree to observe the following code of conduct:</p>
@@ -150,7 +182,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               8. Intellectual Property Rights
             </h2>
             <p className="text-gray-600 leading-relaxed">
@@ -159,7 +191,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               9. Privacy Policy
             </h2>
             <p className="text-gray-600 leading-relaxed">
@@ -168,7 +200,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               10. Grievance Redressal Mechanism
             </h2>
             <p className="text-gray-600 leading-relaxed text-base lg:text-lg mb-4 lg:mb-6">
@@ -180,7 +212,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               11. Legality
             </h2>
             <p className="text-gray-600 leading-relaxed text-base lg:text-lg mb-4 lg:mb-6">
@@ -192,7 +224,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               12. Limitation of Liability and Indemnification
             </h2>
             <p className="text-gray-600 leading-relaxed text-base lg:text-lg mb-4 lg:mb-6">
@@ -204,7 +236,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-12 lg:mb-16 p-6 lg:p-8 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-yellow-400 inline-block">
               13. Governing Law and Dispute Resolution
             </h2>
             <p className="text-gray-600 leading-relaxed text-base lg:text-lg mb-4 lg:mb-6">
@@ -216,7 +248,7 @@ const Terms = () => {
           </section>
 
           <section className="mb-8 p-6 hover:bg-gray-50 transition-colors duration-300">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500 inline-block">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-yellow-400 inline-block">
               14. Disclaimers
             </h2>
             <ul className="list-disc list-inside text-gray-600 leading-relaxed space-y-2 ml-4">
@@ -236,6 +268,9 @@ const Terms = () => {
           </div>
         </div>
       </div>
+
+      {/* Footer - Only show for non-logged-in users */}
+      {!user && <Footer />}
     </div>
   )
 }

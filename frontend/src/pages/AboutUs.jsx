@@ -1,9 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { ArrowLeft, Trophy, Users, Shield, Star, Target, Award } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
+import { Link, useNavigate } from 'react-router-dom';
+import LandingNavbar from '../components/LandingNavbar';
+import Footer from '../components/Footer';
+import { AppContext } from '../context/AppContext';
 
 const AboutUs = () => {
+  const navigate = useNavigate();
+  const { user } = useContext(AppContext);
+
   useEffect(() => {
     // Update meta tags for About Us page
     document.title = 'About MySeries11 - Skill Based Fantasy Cricket Platform | Company Info';
@@ -49,25 +54,46 @@ const AboutUs = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
-      {/* Header */}
-      <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-6 px-6 lg:px-16 shadow-xl">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+      {/* Navigation */}
+      {user ? (
+        // Back button for logged-in users
+        <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-3 px-6 shadow-xl">
           <div className="flex items-center">
-            <Link to="/" className="mr-4">
-              <ArrowLeft className="w-6 h-6 text-white hover:text-yellow-300 transition-colors" />
-            </Link>
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-wide">About MySeries11</h1>
-              <p className="text-gray-300 text-sm lg:text-base mt-1">Your Skill-Based Gaming Platform</p>
-            </div>
-          </div>
-          <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-            <Trophy className="w-8 h-8 lg:w-10 lg:h-10 text-yellow-300" />
+            <button
+              onClick={() => navigate(-1)}
+              className="bg-white bg-opacity-10 hover:bg-opacity-20 p-2 rounded-lg cursor-pointer transition-all duration-200 group mr-4"
+            >
+              <ArrowLeft className="w-6 h-6 text-white group-hover:text-yellow-300 transition-colors duration-200" />
+            </button>
+            <h1 className="text-white text-xl font-bold tracking-wide">
+              About MySeries11
+            </h1>
           </div>
         </div>
-      </div>
+      ) : (
+        // Landing navbar for non-logged-in users
+        <LandingNavbar />
+      )}
+      
+      {/* Header - Only show for non-logged-in users */}
+      {!user && (
+        <div className="bg-gradient-to-r from-gray-800 to-slate-800 py-6 px-6 lg:px-16 shadow-xl">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div className="flex items-center">
+              <Link to="/" className="mr-4">
+                <ArrowLeft className="w-6 h-6 text-white hover:text-yellow-300 transition-colors" />
+              </Link>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-wide">About MySeries11</h1>
+                <p className="text-gray-300 text-sm lg:text-base mt-1">Your Skill-Based Gaming Platform</p>
+              </div>
+            </div>
+            <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+              <Trophy className="w-8 h-8 lg:w-10 lg:h-10 text-yellow-300" />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div className="px-4 lg:px-16 py-6">
@@ -206,6 +232,9 @@ const AboutUs = () => {
           </div>
         </div>
       </div>
+
+      {/* Footer - Only show for non-logged-in users */}
+      {!user && <Footer />}
     </div>
   );
 };

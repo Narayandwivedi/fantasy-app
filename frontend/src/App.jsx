@@ -24,6 +24,7 @@ import CustomerSupport from './pages/CustomerSupport'
 import Terms from './pages/Terms'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import ProtectedRoute from './components/ProtectedRoute'
+import ErrorBoundary from './components/ErrorBoundary'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -58,125 +59,127 @@ const App = () => {
     : 'max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden'
 
   return (
-    <div className={containerClasses}>
-      <div>
-        <Routes>
-          
-          <Route path='/login' element = {<Login/>} />
-          
-          <Route path='/' element = {
+    <ErrorBoundary>
+      <div className={containerClasses}>
+        <div>
+          <Routes>
             
-              <HomePage/>
-          } />
+            <Route path='/login' element = {<Login/>} />
+            
+            <Route path='/' element = {
+              
+                <HomePage/>
+            } />
 
 
-          <Route path='/:matchId/contest' element = {
-            <ProtectedRoute>
-              <Contest/>
-            </ProtectedRoute>
-          } />
+            <Route path='/:matchId/contest' element = {
+              <ProtectedRoute>
+                <Contest/>
+              </ProtectedRoute>
+            } />
 
 
-          <Route path='/:matchId/create-team' element = {
-            <ProtectedRoute>
-              <CreateTeam/>
-            </ProtectedRoute>
-          } />
+            <Route path='/:matchId/create-team' element = {
+              <ProtectedRoute>
+                <CreateTeam/>
+              </ProtectedRoute>
+            } />
 
 
-          <Route path='/:matchId/my-teams' element = {
-            <ProtectedRoute>
-              <MyTeams/>
-            </ProtectedRoute>
-          } />
+            <Route path='/:matchId/my-teams' element = {
+              <ProtectedRoute>
+                <MyTeams/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/my-matches' element = {
-            <ProtectedRoute>
-              <MyMatches/>
-            </ProtectedRoute>
-          } />
+            <Route path='/my-matches' element = {
+              <ProtectedRoute>
+                <MyMatches/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/my-contests/:matchId' element = {
-            <ProtectedRoute>
-              <MyContests/>
-            </ProtectedRoute>
-          } />
+            <Route path='/my-contests/:matchId' element = {
+              <ProtectedRoute>
+                <MyContests/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/my-contests/:matchId/leaderboard/:contestId' element = {
-            <ProtectedRoute>
-              <LeaderboardPage/>
-            </ProtectedRoute>
-          } />
+            <Route path='/my-contests/:matchId/leaderboard/:contestId' element = {
+              <ProtectedRoute>
+                <LeaderboardPage/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/wallet' element = {
-            <ProtectedRoute>
-              <Wallet/>
-            </ProtectedRoute>
-          } />
+            <Route path='/wallet' element = {
+              <ProtectedRoute>
+                <Wallet/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/withdraw' element = {
-            <ProtectedRoute>
-              <Withdraw/>
-            </ProtectedRoute>
-          } />
+            <Route path='/withdraw' element = {
+              <ProtectedRoute>
+                <Withdraw/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/qr-payment' element = {
-            <ProtectedRoute>
-              <QRPayment/>
-            </ProtectedRoute>
-          } />
+            <Route path='/qr-payment' element = {
+              <ProtectedRoute>
+                <QRPayment/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/refer' element = {
-            <ProtectedRoute>
-              <ReferAndEarn/>
-            </ProtectedRoute>
-          } />
+            <Route path='/refer' element = {
+              <ProtectedRoute>
+                <ReferAndEarn/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/game-rules' element = {<GameRules/>} />
+            <Route path='/game-rules' element = {<GameRules/>} />
 
 
-          <Route path='/chat' element = {
-            <ProtectedRoute>
-              <ChatPage/>
-            </ProtectedRoute>
-          } />
+            <Route path='/chat' element = {
+              <ProtectedRoute>
+                <ChatPage/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/fantasy-sport' element = {
-            <ProtectedRoute>
-              <FantasySport/>
-            </ProtectedRoute>
-          } />
+            <Route path='/fantasy-sport' element = {
+              <ProtectedRoute>
+                <FantasySport/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/support' element = {
-            <ProtectedRoute>
-              <CustomerSupport/>
-            </ProtectedRoute>
-          } />
+            <Route path='/support' element = {
+              <ProtectedRoute>
+                <CustomerSupport/>
+              </ProtectedRoute>
+            } />
 
-          <Route path='/about' element = {<AboutUs/>} />
-          <Route path='/contact' element = {<ContactUs/>} />
-          <Route path='/terms-and-conditions' element = {<Terms/>} />
-          <Route path='/privacy-policy' element = {<PrivacyPolicy/>} />
+            <Route path='/about' element = {<AboutUs/>} />
+            <Route path='/contact' element = {<ContactUs/>} />
+            <Route path='/terms-and-conditions' element = {<Terms/>} />
+            <Route path='/privacy-policy' element = {<PrivacyPolicy/>} />
 
-        </Routes>
-        {!hideBottomNav && <BottomNav/>}
+          </Routes>
+          {!hideBottomNav && <BottomNav/>}
+        </div>
+        
+        {/* Global Toast Container - shows notifications from any component */}
+        <ToastContainer
+          position="top-center"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+        
       </div>
-      
-      {/* Global Toast Container - shows notifications from any component */}
-      <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      
-    </div>
+    </ErrorBoundary>
   )
 }
 

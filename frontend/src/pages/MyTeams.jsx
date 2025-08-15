@@ -9,17 +9,26 @@ const MyTeams = () => {
   const { BACKEND_URL, user } = useContext(AppContext);
   const [userTeams, setUserTeams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchUserTeams = async () => {
-    if (!user?._id) return;
+    if (!user?._id) {
+      setLoading(false);
+      return;
+    }
     
     try {
+      setLoading(true);
+      setError(null);
       const { data } = await axios.get(`${BACKEND_URL}/api/userteam/${matchId}?userId=${user._id}`);
       if (data.success) {
         setUserTeams(data.data);
+      } else {
+        setError('Failed to load teams');
       }
     } catch (error) {
       console.error("Error fetching user teams:", error);
+      setError('Failed to load teams. Please check your connection.');
     } finally {
       setLoading(false);
     }
@@ -219,7 +228,21 @@ const MyTeams = () => {
           </h2>
         </div>
 
-        {userTeams.length === 0 ? (
+        {error ? (
+          <div className="text-center py-12">
+            <div className="text-red-400 mb-4">
+              <Users size={48} className="mx-auto mb-2" />
+            </div>
+            <h3 className="text-lg font-medium text-red-600 mb-2">Failed to load teams</h3>
+            <p className="text-gray-500 mb-6">{error}</p>
+            <button
+              onClick={fetchUserTeams}
+              className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : userTeams.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-4">
               <Users size={48} className="mx-auto mb-2" />

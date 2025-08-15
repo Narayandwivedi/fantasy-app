@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ArrowLeft, Phone, Mail, MessageCircle, Clock, HeadphonesIcon, Send } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
+import LandingNavbar from '../components/LandingNavbar';
+import Footer from '../components/Footer';
 import { AppContext } from '../context/AppContext';
 
 const ContactUs = () => {
@@ -77,25 +78,46 @@ const ContactUs = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
-      {/* Header */}
-      <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-6 px-6 lg:px-16 shadow-xl">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+      {/* Navigation */}
+      {user ? (
+        // Back button for logged-in users
+        <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-3 px-6 shadow-xl">
           <div className="flex items-center">
-            <Link to="/" className="mr-4">
-              <ArrowLeft className="w-6 h-6 text-white hover:text-yellow-300 transition-colors" />
-            </Link>
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-wide">Contact Us</h1>
-              <p className="text-gray-300 text-sm lg:text-base mt-1">We're here to help you</p>
-            </div>
-          </div>
-          <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-            <HeadphonesIcon className="w-8 h-8 lg:w-10 lg:h-10 text-yellow-300" />
+            <button
+              onClick={() => navigate(-1)}
+              className="bg-white bg-opacity-10 hover:bg-opacity-20 p-2 rounded-lg cursor-pointer transition-all duration-200 group mr-4"
+            >
+              <ArrowLeft className="w-6 h-6 text-white group-hover:text-yellow-300 transition-colors duration-200" />
+            </button>
+            <h1 className="text-white text-xl font-bold tracking-wide">
+              Contact Us
+            </h1>
           </div>
         </div>
-      </div>
+      ) : (
+        // Landing navbar for non-logged-in users
+        <LandingNavbar />
+      )}
+      
+      {/* Header - Only show for non-logged-in users */}
+      {!user && (
+        <div className="bg-gradient-to-r from-gray-800 to-slate-800 py-6 px-6 lg:px-16 shadow-xl">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div className="flex items-center">
+              <Link to="/" className="mr-4">
+                <ArrowLeft className="w-6 h-6 text-white hover:text-yellow-300 transition-colors" />
+              </Link>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-wide">Contact Us</h1>
+                <p className="text-gray-300 text-sm lg:text-base mt-1">We're here to help you</p>
+              </div>
+            </div>
+            <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+              <HeadphonesIcon className="w-8 h-8 lg:w-10 lg:h-10 text-yellow-300" />
+            </div>
+          </div>
+        </div>
+      )}
 
 
       {/* Quick Contact Options */}
@@ -295,6 +317,8 @@ const ContactUs = () => {
         </div>
       </div>
 
+      {/* Footer - Only show for non-logged-in users */}
+      {!user && <Footer />}
     </div>
   );
 };

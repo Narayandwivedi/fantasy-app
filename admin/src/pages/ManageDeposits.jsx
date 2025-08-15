@@ -135,16 +135,16 @@ const ManageDeposits = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 lg:p-6 space-y-4 lg:space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold mb-2">Manage Deposits</h1>
-        <p className="text-blue-100">Review and approve deposit requests</p>
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 lg:p-6 rounded-lg shadow-lg">
+        <h1 className="text-xl lg:text-3xl font-bold mb-2">Manage Deposits</h1>
+        <p className="text-blue-100 text-sm lg:text-base">Review and approve deposit requests</p>
       </div>
 
       {/* Filter Buttons */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <div className="flex flex-wrap gap-2">
+      <div className="bg-white p-3 lg:p-4 rounded-lg shadow">
+        <div className="grid grid-cols-2 lg:flex lg:flex-wrap gap-2">
           <button
             onClick={() => {
               setFilter('all');
@@ -213,8 +213,85 @@ const ManageDeposits = () => {
         </div>
       </div>
 
-      {/* Deposits Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      {/* Mobile Cards View */}
+      <div className="lg:hidden space-y-3">
+        {deposits.map((deposit) => (
+          <div key={deposit._id} className="bg-white rounded-lg shadow p-4 border">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <div className="text-sm font-medium text-gray-900">
+                  {deposit.userId?.firstName} {deposit.userId?.lastName}
+                </div>
+                <div className="text-xs text-gray-500">{deposit.userId?.email}</div>
+              </div>
+              <span 
+                className="inline-flex px-2 py-1 text-xs font-semibold rounded-full text-white"
+                style={{ backgroundColor: getStatusColor(deposit.status) }}
+              >
+                {getStatusText(deposit.status)}
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+              <div>
+                <span className="text-gray-500">Amount:</span>
+                <div className="font-medium text-green-600">₹{deposit.amount}</div>
+              </div>
+              <div>
+                <span className="text-gray-500">Date:</span>
+                <div className="font-medium">
+                  {(() => {
+                    const date = new Date(deposit.createdAt);
+                    const day = date.getDate().toString().padStart(2, '0');
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    const year = date.getFullYear();
+                    return `${day}/${month}/${year}`;
+                  })()}
+                </div>
+              </div>
+            </div>
+            
+            <div className="mb-3">
+              <span className="text-gray-500 text-sm">UTR:</span>
+              <div className="font-mono text-sm bg-gray-50 p-2 rounded mt-1">{deposit.UTR}</div>
+            </div>
+            
+            {(deposit.status === 'pending' || deposit.status === 'auto-approved') ? (
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleApprove(deposit._id)}
+                  disabled={processingId === deposit._id}
+                  className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded text-sm font-medium disabled:opacity-50"
+                >
+                  {processingId === deposit._id ? 'Processing...' : 
+                   deposit.status === 'auto-approved' ? 'Final Approve' : 'Approve'}
+                </button>
+                <button
+                  onClick={() => handleReject(deposit._id)}
+                  disabled={processingId === deposit._id}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm font-medium disabled:opacity-50"
+                >
+                  Reject
+                </button>
+              </div>
+            ) : deposit.status === 'approved' ? (
+              <div className="text-center text-green-600 font-medium py-2">✓ Approved</div>
+            ) : (
+              <div>
+                <div className="text-center text-red-600 font-medium py-2">✗ Rejected</div>
+                {deposit.rejectionReason && (
+                  <div className="text-xs text-gray-500 mt-1 p-2 bg-red-50 rounded">
+                    <strong>Reason:</strong> {deposit.rejectionReason}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">

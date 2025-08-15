@@ -38,17 +38,24 @@ const CreateTeam = () => {
   const [captain, setCaptain] = useState(null)
   const [viceCaptain, setViceCaptain] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
 
   const fetchAllPlayers = async () => {
     try {
       setLoading(true)
+      setError(null)
       const { data } = await axios.get(`${BACKEND_URL}/api/matches/${matchId}/players`)
       console.log(data)
       if (data.success) {
         setMatchData(data.data)
+      } else {
+        setError('Failed to load match data')
+        toast.error('Failed to load match data', { autoClose: 3000 })
       }
     } catch (error) {
       console.error("Error fetching players:", error)
+      setError('Failed to load players. Please check your connection.')
+      toast.error('Failed to load players. Please check your connection.', { autoClose: 3000 })
     } finally {
       setLoading(false)
     }
@@ -68,12 +75,12 @@ const CreateTeam = () => {
 
     // Check if we can select this position
     if (!canSelectPosition(player.position)) {
-      alert(`Cannot select more ${player.position}s. You need to select required positions first.`)
+      toast.error(`Cannot select more ${player.position}s. You need to select required positions first.`, { autoClose: 3000 })
       return
     }
 
     if (selectedPlayers.length >= 11) {
-      alert("You can only select 11 players")
+      toast.error("You can only select 11 players", { autoClose: 2000 })
       return
     }
 
@@ -81,7 +88,7 @@ const CreateTeam = () => {
     const currentCreditsUsed = getTotalCreditsUsed()
     
     if (currentCreditsUsed + playerCredits > 100) {
-      alert(`Not enough credits! You need ${playerCredits} credits but only have ${100 - currentCreditsUsed} remaining.`)
+      toast.error(`Not enough credits! You need ${playerCredits} credits but only have ${100 - currentCreditsUsed} remaining.`, { autoClose: 4000 })
       return
     }
 
@@ -275,7 +282,8 @@ const CreateTeam = () => {
     try {
       const response = await axios.post(`${BACKEND_URL}/api/userteam`, teamData)
       console.log('Team saved:', response.data)
-      navigate(`/${matchId}/contest`)
+      // Replace history entry so back button goes to home instead of create-team page
+      navigate(`/${matchId}/contest`, { replace: true })
       // Show success toast with quick duration
       toast.success('Team created successfully! 🎉', {
         position: "top-center",
@@ -495,7 +503,7 @@ const CreateTeam = () => {
               if (validation.isValid) {
                 setShowCaptainSelection(true)
               } else {
-                alert(`Team incomplete! You need: ${validation.missing.join(', ')}`)
+                toast.error(`Team incomplete! You need: ${validation.missing.join(', ')}`, { autoClose: 4000 })
               }
             }}
           >
