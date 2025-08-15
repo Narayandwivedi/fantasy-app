@@ -159,10 +159,40 @@ const Contest = () => {
       console.error('Error joining contest:', error);
       console.error('Error details:', error.response?.data || error.message);
       
-      // Show error toast
-      toast.error('Failed to join contest. Please try again.', {
+      // Extract error message from backend response
+      const errorMessage = error.response?.data?.message || 'Failed to join contest. Please try again.';
+      
+      // Show specific error toast based on backend response
+      let displayMessage = errorMessage;
+      let autoCloseTime = 3000;
+      
+      // Check for specific error types and customize messages
+      if (errorMessage.includes('Insufficient balance')) {
+        displayMessage = errorMessage; // Use the detailed message from backend with amounts
+        autoCloseTime = 4000;
+      } else if (errorMessage.includes('only join this contest with maximum')) {
+        displayMessage = errorMessage; // Use the detailed message from backend
+        autoCloseTime = 3500;
+      } else if (errorMessage.includes('contest full')) {
+        displayMessage = 'Contest is full! Try joining another contest.';
+        autoCloseTime = 2500;
+      } else if (errorMessage.includes('match is live')) {
+        displayMessage = 'Cannot join contest. Match has already started.';
+        autoCloseTime = 2500;
+      }
+      
+      toast.error(displayMessage, {
         position: "top-center",
-        autoClose: 2000,
+        autoClose: autoCloseTime,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        style: {
+          fontSize: '14px',
+          maxWidth: '350px',
+          textAlign: 'center'
+        }
       });
     } finally {
       setJoining(false);
@@ -242,7 +272,9 @@ const Contest = () => {
 
             {/* Teams List */}
             <div className="p-4 space-y-4">
-              <p className="text-sm text-gray-600 mb-4">You can enter with only 1 team</p>
+              <p className="text-sm text-gray-600 mb-4">
+                You can enter with maximum {selectedContest?.maxTeamPerUser || 1} team{(selectedContest?.maxTeamPerUser || 1) > 1 ? 's' : ''} in this contest
+              </p>
               
               {userTeams.map((team, index) => {
                 const captain = team.captain;
