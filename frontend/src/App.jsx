@@ -10,6 +10,7 @@ import CreateTeam from './pages/CreateTeam'
 import MyTeams from './pages/MyTeams'
 import MyMatches from './pages/my matches/MyMatches'
 import MyContests from './pages/MyContests'
+import LeaderboardPage from './pages/LeaderboardPage'
 import Wallet from './pages/user profile/Wallet'
 import Withdraw from './pages/user profile/Withdraw'
 import QRPayment from './pages/QRPayment'
@@ -98,6 +99,12 @@ const App = () => {
           <Route path='/my-contests/:matchId' element = {
             <ProtectedRoute>
               <MyContests/>
+            </ProtectedRoute>
+          } />
+
+          <Route path='/my-contests/:matchId/leaderboard/:contestId' element = {
+            <ProtectedRoute>
+              <LeaderboardPage/>
             </ProtectedRoute>
           } />
 

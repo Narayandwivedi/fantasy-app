@@ -55,36 +55,6 @@ const CustomerSupport = () => {
     };
   }, []);
 
-  // Quick action buttons with better icons and colors
-  const quickActions = [
-    {
-      icon: <CreditCard className="w-6 h-6" />,
-      title: "Payment Issues",
-      description: "Deposits & withdrawals",
-      bgColor: "bg-blue-500",
-      bgLight: "bg-blue-50",
-      textColor: "text-blue-600",
-      action: () => setFormData({...formData, subject: 'payment'})
-    },
-    {
-      icon: <User className="w-6 h-6" />,
-      title: "Account Help",
-      description: "Profile & verification",
-      bgColor: "bg-purple-500",
-      bgLight: "bg-purple-50",
-      textColor: "text-purple-600",
-      action: () => setFormData({...formData, subject: 'account'})
-    },
-    {
-      icon: <AlertCircle className="w-6 h-6" />,
-      title: "Contest Issues",
-      description: "Teams & scoring",
-      bgColor: "bg-orange-500",
-      bgLight: "bg-orange-50",
-      textColor: "text-orange-600",
-      action: () => setFormData({...formData, subject: 'contest'})
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -111,7 +81,7 @@ const CustomerSupport = () => {
       <div className="px-4 py-6 space-y-6">
 
           {/* Live Chat Support - Redesigned */}
-          <div className="bg-gradient-to-br from-green-400 via-green-500 to-green-600 rounded-2xl p-6 shadow-lg relative overflow-hidden">
+          <div className="bg-gradient-to-br from-gray-900 via-black to-gray-800 rounded-2xl p-6 shadow-lg relative overflow-hidden">
             <div className="absolute top-0 right-0 w-20 h-20 bg-white bg-opacity-10 rounded-full -mr-10 -mt-10"></div>
             <div className="absolute bottom-0 left-0 w-16 h-16 bg-white bg-opacity-10 rounded-full -ml-8 -mb-8"></div>
             
@@ -135,7 +105,7 @@ const CustomerSupport = () => {
               
               <button
                 onClick={handleChatNow}
-                className="w-full bg-white text-green-600 font-bold py-4 px-6 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-lg flex items-center justify-center space-x-2"
+                className="w-full bg-white text-black font-bold py-4 px-6 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-lg flex items-center justify-center space-x-2"
               >
                 <MessageCircle className="w-5 h-5" />
                 <span>Start Live Chat</span>
@@ -143,139 +113,8 @@ const CustomerSupport = () => {
             </div>
           </div>
 
-          {/* Quick Actions - Redesigned */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <Zap className="w-5 h-5 text-yellow-500" />
-              <h2 className="text-lg font-bold text-gray-800">Quick Actions</h2>
-            </div>
-            
-            <div className="space-y-3">
-              {quickActions.map((action, index) => (
-                <button
-                  key={index}
-                  onClick={action.action}
-                  className="w-full bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:scale-[1.02] transition-all duration-200 text-left"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className={`${action.bgColor} p-3 rounded-xl shadow-sm`}>
-                      <div className="text-white">
-                        {action.icon}
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 text-base">{action.title}</h3>
-                      <p className="text-sm text-gray-500 mt-1">{action.description}</p>
-                    </div>
-                    <div className="text-gray-400">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
 
-          {/* Priority Support Form - Redesigned */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 p-3 rounded-xl shadow-sm">
-                <Send className="w-6 h-6 text-gray-900" />
-              </div>
-              <div>
-                <h2 className="font-bold text-gray-900 text-lg">Priority Support</h2>
-                <div className="flex items-center space-x-2 mt-1">
-                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                  <p className="text-gray-600 text-sm">VIP response within 2-4 hours</p>
-                </div>
-              </div>
-            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Issue Type *</label>
-                <select
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200"
-                >
-                  <option value="">Select issue type</option>
-                  <option value="account">Account Related</option>
-                  <option value="payment">Payment & Withdrawal Issues</option>
-                  <option value="technical">Technical Support</option>
-                  <option value="contest">Contest Related</option>
-                  <option value="verification">KYC & Verification</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Priority Level</label>
-                <select
-                  name="priority"
-                  value={formData.priority}
-                  onChange={handleInputChange}
-                  className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200"
-                >
-                  <option value="low">🟢 Low - General inquiry</option>
-                  <option value="medium">🟡 Medium - Account issue</option>
-                  <option value="high">🟠 High - Payment problem</option>
-                  <option value="urgent">🔴 Urgent - Cannot access account</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Describe your issue *</label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  required
-                  rows={4}
-                  className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 resize-none transition-all duration-200"
-                  placeholder="Please provide as much detail as possible to help us resolve your issue quickly..."
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-gray-900 py-4 rounded-xl font-bold hover:shadow-lg hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2 text-base"
-              >
-                <Send className="w-5 h-5" />
-                <span>Submit Priority Ticket</span>
-              </button>
-              </form>
-            </div>
-
-          {/* Emergency Contact - Redesigned */}
-          <div className="bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-200 rounded-2xl p-6">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="bg-red-500 p-3 rounded-xl shadow-sm">
-                <AlertCircle className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="font-bold text-gray-900 text-base">Emergency Support</h3>
-                <p className="text-red-600 text-sm font-medium">Urgent issues only</p>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => handleCall('6264682508')}
-              className="w-full bg-red-500 hover:bg-red-600 text-white p-4 rounded-xl transition-all duration-200 hover:shadow-lg"
-            >
-              <div className="flex items-center justify-center space-x-3">
-                <Phone className="w-5 h-5" />
-                <div className="text-left">
-                  <div className="font-bold">+91 6264682508</div>
-                  <div className="text-sm opacity-90">Tap to call now</div>
-                </div>
-              </div>
-            </button>
-          </div>
 
           {/* Other Contact Options */}
           <div className="space-y-4">
@@ -284,7 +123,7 @@ const CustomerSupport = () => {
               <h3 className="font-bold text-gray-800 text-lg">Other Ways to Reach Us</h3>
             </div>
 
-            {/* Regular Phone */}
+            {/* Phone Numbers */}
             <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
@@ -299,6 +138,26 @@ const CustomerSupport = () => {
                 <button
                   onClick={() => handleCall('9202469725')}
                   className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition-colors"
+                >
+                  Call
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-green-500 p-2 rounded-lg">
+                    <Phone className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">+91 6264682508</div>
+                    <div className="text-sm text-gray-500">Priority Support</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleCall('6264682508')}
+                  className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition-colors"
                 >
                   Call
                 </button>

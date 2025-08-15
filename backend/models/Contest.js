@@ -55,7 +55,7 @@ const ContestSchema = new mongoose.Schema(
     joinedUsers: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        team: { type: mongoose.Schema.Types.ObjectId, ref: "UserTeam" },
+        team: { type: mongoose.Schema.Types.ObjectId, ref: "Userteam" },
         joinedAt: { type: Date, default: Date.now },
       },
     ],

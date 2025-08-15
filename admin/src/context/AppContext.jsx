@@ -103,9 +103,12 @@ export const AppContextProvider = (props) => {
     }
   }, [isAdminAuthenticated, adminUser, checkAdminAuth])
 
+  // Fetch players only after successful authentication
   useEffect(() => {
-    fetchAllPlayers();
-  }, []);
+    if (isAdminAuthenticated === true) {
+      fetchAllPlayers();
+    }
+  }, [isAdminAuthenticated]);
 
   // Admin login function
   const adminLogin = useCallback(async (loginData) => {

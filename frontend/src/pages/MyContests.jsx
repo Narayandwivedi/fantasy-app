@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { AppContext } from '../context/AppContext'
-import { ArrowLeft, Trophy, Users, Shield, Clock } from 'lucide-react'
+import { ArrowLeft, Trophy, Users, Shield, Clock, Eye } from 'lucide-react'
 
 const MyContests = () => {
   const { matchId } = useParams()
@@ -68,6 +68,10 @@ const MyContests = () => {
     }
   }
 
+  const handleLeaderboardClick = (contest) => {
+    navigate(`/my-contests/${matchId}/leaderboard/${contest._id}`)
+  }
+
   const TabButton = ({ tab, label, count }) => (
     <button
       onClick={() => setActiveTab(tab)}
@@ -85,19 +89,23 @@ const MyContests = () => {
   )
 
   const ContestCard = ({ contest, userTeam, teamIndex }) => {
-    // Find the user's entry in this contest
-    const userEntry = contest.joinedUsers?.find(entry => entry.user === user._id)
-    const userTeamInContest = userTeams.find(team => team._id === userEntry?.team)
+    // Use the team passed as prop since we don't have joinedUsers data
+    const userTeamInContest = userTeam || userTeams[teamIndex] || userTeams[0]
     
     return (
-      <div className="bg-white rounded-xl mx-3 mb-5 overflow-hidden shadow-sm border border-gray-200">
+      <div 
+        className="bg-white rounded-xl mx-3 mb-5 overflow-hidden shadow-xl border border-gray-300 cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+        onClick={() => handleLeaderboardClick(contest)}
+      >
         {/* Contest Header */}
-        <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
-          <div className="flex items-center space-x-2">
-            <Shield size={16} className="text-green-600" />
-            <span className="text-sm font-medium text-gray-700">
-              {contest.contestFormat === 'guaranteed' ? 'Guaranteed' : contest.contestFormat.toUpperCase()}
-            </span>
+        <div className="px-4 py-3 bg-white border-b border-gray-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Shield size={16} className="text-green-600" />
+              <span className="text-sm font-medium text-gray-700">
+                {contest.contestFormat === 'guaranteed' ? 'Guaranteed' : contest.contestFormat.toUpperCase()}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -119,34 +127,14 @@ const MyContests = () => {
           </div>
         </div>
 
-        {/* Team Info */}
-        <div className="px-4 py-3 bg-blue-50">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="text-sm font-medium text-gray-800">
-                Team {teamIndex + 1}
-              </span>
-              <span className="text-sm font-medium text-gray-800">T1</span>
-              <span className="text-sm font-medium text-gray-800">
-                {userTeamInContest?.totalPoints || '0'}.0
-              </span>
-            </div>
-            <div className="text-right">
-              {matchData?.status === 'completed' ? (
-                <span className="text-lg font-bold text-gray-800">
-                  {getPositionText(Math.floor(Math.random() * contest.totalSpots) + 1)}
-                </span>
-              ) : (
-                <div className="text-right">
-                  <div className="text-xs text-gray-500">Rank</div>
-                  <div className="text-sm font-medium text-gray-800">
-                    {contest.currentParticipants > 0 ? `${Math.floor(Math.random() * contest.currentParticipants) + 1}/${contest.currentParticipants}` : '-'}
-                  </div>
-                </div>
-              )}
-            </div>
+        {/* Contest Stats */}
+        <div className="px-4 py-2 bg-gray-50 border-b border-gray-100">
+          <div className="flex items-center justify-between text-xs text-gray-600">
+            <span>{contest.currentParticipants || 0} Joined</span>
+            <span>{contest.totalSpots - (contest.currentParticipants || 0)} Spots Left</span>
           </div>
         </div>
+
       </div>
     )
   }
@@ -326,17 +314,16 @@ const MyContests = () => {
             ) : (
               <div>
                 {userContests.map((contest, index) => {
-                  // Find which team was used for this contest
-                  const userEntry = contest.joinedUsers?.find(entry => entry.user === user._id)
-                  const teamUsedInContest = userTeams.find(team => team._id === userEntry?.team)
-                  const teamIndex = userTeams.findIndex(team => team._id === userEntry?.team)
+                  // Since we don't have joinedUsers data, use teams in order
+                  const teamUsedInContest = userTeams[index % userTeams.length] || userTeams[0]
+                  const teamIndex = index % userTeams.length
                   
                   return (
                     <ContestCard 
                       key={contest._id} 
                       contest={contest} 
                       userTeam={teamUsedInContest}
-                      teamIndex={teamIndex >= 0 ? teamIndex : 0}
+                      teamIndex={teamIndex}
                     />
                   )
                 })}

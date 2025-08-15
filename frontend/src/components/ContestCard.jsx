@@ -48,9 +48,18 @@ const ContestCard = memo(({ contest, onJoinClick }) => {
           <div className="text-2xl font-bold text-gray-900">
             {contestData.formatPrize(contest?.prizePool)}
           </div>
-          <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 py-1.5 rounded-lg font-semibold text-xs shadow-md hover:shadow-lg transition-all duration-200">
-            ₹{contest?.entryFee || 0}
-          </button>
+          <div className="flex items-center">
+            {/* Join Button */}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onJoinClick && onJoinClick(contest);
+              }}
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 py-1.5 rounded-lg font-semibold text-xs shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              ₹{contest?.entryFee || 0}
+            </button>
+          </div>
         </div>
       </div>
 

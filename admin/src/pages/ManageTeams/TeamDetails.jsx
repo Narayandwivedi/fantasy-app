@@ -2,9 +2,10 @@ import axios from "axios";
 import React, { useContext, useEffect, useState, useCallback, memo } from "react";
 import { AppContext } from "../../context/AppContext";
 import { useParams } from "react-router-dom";
-import { Plus, Search, X, UserPlus, Crown, Shield, Star, Users, Trophy, Target } from "lucide-react";
+import { Plus, Search, X, UserPlus, Crown, Shield, Star, Users, Trophy, Target, Edit3 } from "lucide-react";
 import { toast } from "react-toastify";
 import EditPlayerModal from "../ManagePlayers/EditPlayerModal";
+import EditTeamModal from "./EditTeamModal";
 
 // Search Player Modal Component
 const SearchPlayerModal = memo(({ 
@@ -17,22 +18,77 @@ const SearchPlayerModal = memo(({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPosition, setFilterPosition] = useState("all");
+  const [filterCountry, setFilterCountry] = useState("all");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Search players using API when search term or filters change
+  useEffect(() => {
+    const searchPlayers = async () => {
+      // If no search term and no country filter, use allPlayers
+      if (!searchTerm.trim() && filterCountry === "all") {
+        setSearchResults([]);
+        setIsSearching(false);
+        return;
+      }
+
+      try {
+        setSearchLoading(true);
+        setIsSearching(true);
+        
+        let searchQuery = searchTerm.trim();
+        if (filterCountry !== "all" && !searchQuery) {
+          searchQuery = filterCountry; // Search by country if no search term
+        }
+        
+        const { data } = await axios.get(
+          `${BACKEND_URL}/api/search/players/${encodeURIComponent(searchQuery)}`
+        );
+        
+        if (data.success) {
+          let results = data.data || [];
+          
+          // Apply country filter if set and different from search term
+          if (filterCountry !== "all" && searchTerm.trim() && searchTerm.trim().toLowerCase() !== filterCountry.toLowerCase()) {
+            results = results.filter(player => 
+              player.country.toLowerCase() === filterCountry.toLowerCase()
+            );
+          }
+          
+          setSearchResults(results);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (err) {
+        console.error("Error searching players:", err);
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      searchPlayers();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm, filterCountry, BACKEND_URL]);
 
   if (!showModal) return null;
 
+  // Determine which players to display
+  const displayedPlayers = isSearching ? searchResults : allPlayers;
+  
   // Filter available players (exclude already added players)
-  const availablePlayers = allPlayers.filter(player => 
+  const availablePlayers = displayedPlayers.filter(player => 
     !currentSquadIds.includes(player._id)
   );
 
-  // Filter players based on search and filters
+  // Apply position filter
   const filteredPlayers = availablePlayers.filter(player => {
-    const matchesSearch = player.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         player.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         player.country.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPosition = filterPosition === "all" || player.position === filterPosition;
-    
-    return matchesSearch && matchesPosition;
+    return matchesPosition;
   });
 
   const handleAddPlayer = (player) => {
@@ -60,18 +116,37 @@ const SearchPlayerModal = memo(({
 
         {/* Search and Filters */}
         <div className="p-6 border-b bg-gradient-to-br from-gray-50 to-blue-50">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Search */}
             <div className="relative md:col-span-2">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type="text"
-                placeholder="Search players by name or country..."
+                placeholder="Search players by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm transition-all duration-200"
               />
+              {searchLoading && (
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                </div>
+              )}
             </div>
+
+            {/* Country Filter */}
+            <select
+              value={filterCountry}
+              onChange={(e) => setFilterCountry(e.target.value)}
+              className="border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm transition-all duration-200"
+            >
+              <option value="all">All Countries</option>
+              <option value="India">India</option>
+              <option value="Australia">Australia</option>
+              <option value="England">England</option>
+              <option value="New Zealand">New Zealand</option>
+              <option value="Pakistan">Pakistan</option>
+            </select>
 
             {/* Position Filter */}
             <select
@@ -87,11 +162,32 @@ const SearchPlayerModal = memo(({
             </select>
           </div>
           
-          <div className="mt-4 flex items-center gap-2">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <span className="text-sm text-gray-600 font-medium">
-              {filteredPlayers.length} of {availablePlayers.length} players available
-            </span>
+          <div className="mt-4 flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span className="text-sm text-gray-600 font-medium">
+                {filteredPlayers.length} of {availablePlayers.length} players available
+              </span>
+            </div>
+            {isSearching && (
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-green-600 font-medium">
+                  🔍 Search results from database
+                </span>
+              </div>
+            )}
+            {(searchTerm || filterCountry !== "all") && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterCountry("all");
+                }}
+                className="text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 px-3 py-1 rounded-lg transition-colors"
+              >
+                ✕ Clear Filters
+              </button>
+            )}
           </div>
         </div>
 
@@ -106,9 +202,16 @@ const SearchPlayerModal = memo(({
               <p className="text-gray-600">
                 {availablePlayers.length === 0 
                   ? "All available players are already in the squad" 
-                  : "Try adjusting your search or filters"
+                  : isSearching 
+                    ? "Try different search terms or adjust country/position filters"
+                    : "Try adjusting your filters or search for specific players"
                 }
               </p>
+              {isSearching && (
+                <p className="text-sm text-blue-600 mt-2">
+                  💡 Tip: Use the country dropdown to find players from specific countries like England, India, etc.
+                </p>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -178,6 +281,7 @@ const TeamDetails = memo(() => {
   const [error, setError] = useState(null);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showEditPlayerModal, setShowEditPlayerModal] = useState(false);
+  const [showEditTeamModal, setShowEditTeamModal] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null);
 
   const { BACKEND_URL, allPlayers, setAllPlayers } = useContext(AppContext);
@@ -258,6 +362,22 @@ const TeamDetails = memo(() => {
     // Refresh team details to show any updates
     fetchTeamDetails();
   }, [fetchTeamDetails]);
+
+  // Function to open edit team modal
+  const handleEditTeam = useCallback(() => {
+    setShowEditTeamModal(true);
+  }, []);
+
+  // Function to close edit team modal
+  const handleCloseEditTeamModal = useCallback(() => {
+    setShowEditTeamModal(false);
+  }, []);
+
+  // Function to handle team update callback
+  const handleTeamUpdated = useCallback((updatedTeam) => {
+    setTeamDetails(updatedTeam);
+    setShowEditTeamModal(false);
+  }, []);
 
   useEffect(() => {
     fetchTeamDetails();
@@ -357,6 +477,16 @@ const TeamDetails = memo(() => {
                   <span className="font-medium">{teamDetails.captain ? 'Captain Assigned' : 'No Captain'}</span>
                 </div>
               </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleEditTeam}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 flex items-center gap-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer"
+                title="Edit team details"
+              >
+                <Edit3 size={20} />
+                Edit Team
+              </button>
             </div>
           </div>
         </div>
@@ -555,6 +685,14 @@ const TeamDetails = memo(() => {
         showModal={showEditPlayerModal}
         onClose={handleCloseEditModal}
         player={editingPlayer}
+      />
+
+      {/* Edit Team Modal */}
+      <EditTeamModal
+        showModal={showEditTeamModal}
+        onClose={handleCloseEditTeamModal}
+        team={teamDetails}
+        onTeamUpdated={handleTeamUpdated}
       />
     </div>
   );

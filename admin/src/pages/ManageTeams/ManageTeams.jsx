@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { Plus, Search, Edit3, Trash2, Filter, Users, Crown, Star, TrendingUp, Award, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AddTeamModal from "./AddTeamModal";
+import EditTeamModal from "./EditTeamModal";
 
 const ManageTeams = () => {
   const [allTeams, setAllTeams] = useState([]);
@@ -12,6 +13,8 @@ const ManageTeams = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterSport, setFilterSport] = useState("all");
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
+  const [showEditTeamModal, setShowEditTeamModal] = useState(false);
+  const [editingTeam, setEditingTeam] = useState(null);
   const [loading, setLoading] = useState(false);
   const [playersLoading, setPlayersLoading] = useState(false);
   const { BACKEND_URL } = useContext(AppContext);
@@ -165,6 +168,29 @@ const ManageTeams = () => {
     }
   };
 
+  // Handle edit team
+  const handleEditTeam = (team) => {
+    setEditingTeam(team);
+    setShowEditTeamModal(true);
+  };
+
+  // Handle close edit team modal
+  const handleCloseEditTeamModal = () => {
+    setShowEditTeamModal(false);
+    setEditingTeam(null);
+  };
+
+  // Handle team updated callback
+  const handleTeamUpdated = (updatedTeam) => {
+    setAllTeams(prevTeams => 
+      prevTeams.map(team => 
+        team._id === updatedTeam._id ? updatedTeam : team
+      )
+    );
+    setShowEditTeamModal(false);
+    setEditingTeam(null);
+  };
+
   // Filter teams based on search and filters
   const filteredTeams = allTeams.filter((team) => {
     const matchesSearch =
@@ -303,29 +329,35 @@ const ManageTeams = () => {
             {filteredTeams.map((team) => (
               <div
                 key={team._id}
-                className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:scale-105 overflow-hidden"
+                className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:scale-105 overflow-hidden relative"
               >
                 {/* Team Header with Logo */}
                 <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 p-6">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
                   
                   {/* Action Buttons */}
-                  <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="action-buttons absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
                     <button
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
-                        // Handle edit functionality
+                        handleEditTeam(team);
                       }}
-                      className="bg-white/90 backdrop-blur-sm p-2 rounded-xl hover:bg-white transition-all duration-200 shadow-lg hover:scale-110"
+                      className="bg-white/95 backdrop-blur-sm p-2.5 rounded-xl hover:bg-white transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110 cursor-pointer relative z-30"
+                      title="Edit team"
+                      style={{ pointerEvents: 'auto' }}
                     >
                       <Edit3 size={14} className="text-slate-600" />
                     </button>
                     <button
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         handleDeleteTeam(team._id);
                       }}
-                      className="bg-white/90 backdrop-blur-sm p-2 rounded-xl hover:bg-red-50 transition-all duration-200 shadow-lg hover:scale-110"
+                      className="bg-white/95 backdrop-blur-sm p-2.5 rounded-xl hover:bg-red-50 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110 cursor-pointer relative z-30"
+                      title="Delete team"
+                      style={{ pointerEvents: 'auto' }}
                     >
                       <Trash2 size={14} className="text-red-500" />
                     </button>
@@ -364,8 +396,13 @@ const ManageTeams = () => {
 
                 {/* Team Details */}
                 <div
-                  className="p-6 cursor-pointer"
-                  onClick={() => navigate(`/team-detail/${team._id}`)}
+                  className="p-6 cursor-pointer relative z-10"
+                  onClick={(e) => {
+                    // Only navigate if the click didn't come from action buttons
+                    if (!e.target.closest('.action-buttons')) {
+                      navigate(`/team-detail/${team._id}`);
+                    }
+                  }}
                 >
                   <div className="space-y-4">
                     {/* Sport and Squad Size */}
@@ -435,6 +472,14 @@ const ManageTeams = () => {
         onSubmit={handleAddTeam}
         allPlayers={allPlayers}
         loading={loading}
+      />
+
+      {/* Edit Team Modal */}
+      <EditTeamModal
+        showModal={showEditTeamModal}
+        onClose={handleCloseEditTeamModal}
+        team={editingTeam}
+        onTeamUpdated={handleTeamUpdated}
       />
     </div>
   );

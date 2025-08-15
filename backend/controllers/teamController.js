@@ -2,6 +2,13 @@ const Team = require("../models/Team");
 const mongoose = require("mongoose");
 const Player = require("../models/Player");
 
+// Helper function to convert text to title case
+function toTitleCase(str) {
+  return str.replace(/\w\S*/g, (txt) => {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}
+
 async function createTeam(req, res) {
   try {
     const { name, shortName, logo, sport, captain, viceCaptain, squad } =
@@ -176,7 +183,7 @@ async function createTeam(req, res) {
     // Create the team
 
     const newTeam = await Team.create({
-      name: name.trim(),
+      name: toTitleCase(name.trim()),
       shortName: shortName.trim().toUpperCase(),
       logo: logo.trim(),
       sport: sport.toLowerCase(),
@@ -368,6 +375,161 @@ async function removePlayerFromTeam(req, res) {
 }
 
 
+async function updateTeam(req, res) {
+  try {
+    const { id } = req.params;
+    const { name, shortName, logo, sport, captain, viceCaptain } = req.body;
+
+    // Validate team ID
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid team ID"
+      });
+    }
+
+    // Check if team exists
+    const existingTeam = await Team.findById(id);
+    if (!existingTeam) {
+      return res.status(404).json({
+        success: false,
+        message: "Team not found"
+      });
+    }
+
+    // Basic field validation
+    if (!name || !shortName || !sport) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, short name, and sport are required"
+      });
+    }
+
+    // Validate data types and formats
+    if (typeof name !== "string" || name.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Team name must be a valid string"
+      });
+    }
+
+    if (typeof shortName !== "string" || shortName.trim().length > 4) {
+      return res.status(400).json({
+        success: false,
+        message: "Short name must be a string with maximum 4 characters"
+      });
+    }
+
+    // Validate sport enum
+    const validSports = ["cricket", "football", "basketball", "kabaddi"];
+    if (!validSports.includes(sport.toLowerCase())) {
+      return res.status(400).json({
+        success: false,
+        message: `Sport must be one of: ${validSports.join(", ")}`
+      });
+    }
+
+    // Check if name already exists (excluding current team)
+    const nameExists = await Team.findOne({
+      name: { $regex: new RegExp(`^${name.trim()}$`, "i") },
+      _id: { $ne: id }
+    });
+
+    if (nameExists) {
+      return res.status(409).json({
+        success: false,
+        message: "Team with this name already exists"
+      });
+    }
+
+    // Check if short name already exists (excluding current team)
+    const shortNameExists = await Team.findOne({
+      shortName: { $regex: new RegExp(`^${shortName.trim()}$`, "i") },
+      _id: { $ne: id }
+    });
+
+    if (shortNameExists) {
+      return res.status(409).json({
+        success: false,
+        message: "Team with this short name already exists"
+      });
+    }
+
+    // Validate captain and viceCaptain if provided
+    if (captain && viceCaptain) {
+      if (!mongoose.Types.ObjectId.isValid(captain)) {
+        return res.status(400).json({
+          success: false,
+          message: "Captain ID is not valid"
+        });
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(viceCaptain)) {
+        return res.status(400).json({
+          success: false,
+          message: "Vice Captain ID is not valid"
+        });
+      }
+
+      if (captain === viceCaptain) {
+        return res.status(400).json({
+          success: false,
+          message: "Captain and Vice Captain must be different players"
+        });
+      }
+    }
+
+    // Prepare update data
+    const updateData = {
+      name: toTitleCase(name.trim()),
+      shortName: shortName.trim().toUpperCase(),
+      sport: sport.toLowerCase()
+    };
+
+    // Add optional fields if provided
+    if (logo) updateData.logo = logo.trim();
+    if (captain) updateData.captain = captain;
+    if (viceCaptain) updateData.viceCaptain = viceCaptain;
+
+    // Update the team
+    const updatedTeam = await Team.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true
+    }).populate("squad captain viceCaptain");
+
+    return res.json({
+      success: true,
+      message: "Team updated successfully",
+      data: updatedTeam
+    });
+
+  } catch (err) {
+    console.error("Update team error:", err);
+
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern)[0];
+      return res.status(409).json({
+        success: false,
+        message: `Team with this ${field} already exists`
+      });
+    }
+
+    if (err.name === "ValidationError") {
+      const errors = Object.values(err.errors).map((e) => e.message);
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+}
+
 async function deleteTeam(req,res) {
   
 }
@@ -387,6 +549,7 @@ module.exports = {
   getTeamById,
   addNewPlayerToTeam,
   removePlayerFromTeam,
+  updateTeam,
   deleteTeam,
   getTeamSquad
 };

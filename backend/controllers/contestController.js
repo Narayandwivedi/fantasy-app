@@ -363,7 +363,7 @@ async function getUserContestsByMatch(req, res) {
         .json({ success: false, message: "invalid user id or match id" });
     }
 
-    // Find contests where user has joined for specific match
+    // Find contests where user has joined for specific match - minimal data, no joinedUsers
     const userContests = await Contest.find({
       matchId: matchId,
       "joinedUsers.user": userId
@@ -371,28 +371,27 @@ async function getUserContestsByMatch(req, res) {
     .populate({
       path: "matchId",
       populate: [
-        { path: "team1", select: "name shortName logo" },
-        { path: "team2", select: "name shortName logo" }
+        { path: "team1", select: "shortName logo" },
+        { path: "team2", select: "shortName logo" }
       ],
-      select: "team1 team2 startTime status matchType series"
+      select: "team1 team2 startTime status"
     })
+    .select("contestFormat entryFee prizePool totalSpots currentParticipants matchId")
     .sort({ createdAt: -1 });
 
-    // Get user's teams for this match
+    // Get only basic team info that user used in contests - no players details
     const userTeams = await Userteam.find({
       userId: userId,
       matchId: matchId
     })
-    .populate("players", "firstName lastName position")
-    .populate("captainId", "firstName lastName")
-    .populate("viceCaptainId", "firstName lastName");
+    .select("teamName totalPoints")
+    .sort({ createdAt: -1 });
 
     return res.json({ 
       success: true, 
       data: {
         contests: userContests,
-        teams: userTeams,
-        teamsCount: userTeams.length
+        teams: userTeams
       }
     });
   } catch (err) {
@@ -403,4 +402,74 @@ async function getUserContestsByMatch(req, res) {
   }
 }
 
-module.exports = { createContest, getContestsByMatch, joinContest, getUserJoinedContests, getUserMatches, getUserContestsByMatch };
+async function getContestLeaderboard(req, res) {
+  try {
+    const { contestId } = req.params;
+
+    if (!contestId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "contest id not provided" });
+    }
+
+    if (!mongoose.isValidObjectId(contestId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid contest id" });
+    }
+
+    // Fetch contest with populated user and team data, including match status
+    const contest = await Contest.findById(contestId)
+      .populate({
+        path: 'matchId',
+        select: 'status'
+      })
+      .populate({
+        path: 'joinedUsers.user',
+        select: 'firstName lastName email'
+      })
+      .populate({
+        path: 'joinedUsers.team',
+        select: 'teamName totalPoints players captainId viceCaptainId'
+      });
+
+    if (!contest) {
+      return res
+        .status(404)
+        .json({ success: false, message: "contest not found" });
+    }
+
+    // Sort leaderboard by team points (highest first)
+    const leaderboard = contest.joinedUsers
+      .map(entry => ({
+        _id: entry._id,
+        user: entry.user,
+        team: entry.team,
+        joinedAt: entry.joinedAt
+      }))
+      .sort((a, b) => (b.team?.totalPoints || 0) - (a.team?.totalPoints || 0));
+
+    return res.json({ 
+      success: true, 
+      data: {
+        contest: {
+          _id: contest._id,
+          contestFormat: contest.contestFormat,
+          entryFee: contest.entryFee,
+          prizePool: contest.prizePool,
+          totalSpots: contest.totalSpots,
+          currentParticipants: contest.currentParticipants,
+          matchStatus: contest.matchId?.status
+        },
+        leaderboard
+      }
+    });
+  } catch (err) {
+    console.log(err.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "internal server error" });
+  }
+}
+
+module.exports = { createContest, getContestsByMatch, joinContest, getUserJoinedContests, getUserMatches, getUserContestsByMatch, getContestLeaderboard };

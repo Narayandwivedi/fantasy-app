@@ -5,7 +5,8 @@ const {
   getUserJoinedContests,
   joinContest,
   getUserMatches,
-  getUserContestsByMatch
+  getUserContestsByMatch,
+  getContestLeaderboard
 } = require("../controllers/contestController");
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router.get("/:matchId", getContestsByMatch);
 router.get("/user/:userId", getUserJoinedContests);
 router.get("/matches/:userId", getUserMatches);
 router.get("/user/:userId/match/:matchId", getUserContestsByMatch);
+router.get("/:contestId/leaderboard", getContestLeaderboard);
 
 
 module.exports = router;

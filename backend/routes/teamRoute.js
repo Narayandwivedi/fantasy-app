@@ -7,6 +7,7 @@ const {
   addNewPlayerToTeam,
   removePlayerFromTeam,
   createTeam,
+  updateTeam,
   deleteTeam,
   getTeamSquad,
 } = require("../controllers/teamController");
@@ -16,6 +17,8 @@ router.get("/", getAllTeam);
 router.get("/:id", getTeamById);
 
 router.post("/", createTeam);
+
+router.put("/:id", updateTeam);
 
 router.post("/:id/add-player", addNewPlayerToTeam);
 

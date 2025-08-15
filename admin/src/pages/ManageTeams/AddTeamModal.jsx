@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import upload_area from "../../assets/upload_area.svg";
 import { Crown, Upload, X, User, Users, Star } from "lucide-react";
 
+// Helper function to convert text to title case
+const toTitleCase = (str) => {
+  return str.replace(/\w\S*/g, (txt) => {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+};
+
 const AddTeamModal = ({
   showModal,
   onClose,
@@ -114,6 +121,15 @@ const AddTeamModal = ({
   if (!showModal) return null;
 
   const handleInputChange = (field, value) => {
+    // Convert shortName to uppercase and limit to 4 characters
+    if (field === 'shortName') {
+      value = value.slice(0, 4).toUpperCase();
+    }
+    // Convert teamName to title case
+    else if (field === 'teamName') {
+      value = toTitleCase(value);
+    }
+    
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -279,6 +295,8 @@ const AddTeamModal = ({
                   className="w-full border border-gray-300 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
                   placeholder="Enter short name (e.g., MI, CSK)"
                   type="text"
+                  maxLength="4"
+                  style={{ textTransform: 'uppercase' }}
                 />
               </div>
 

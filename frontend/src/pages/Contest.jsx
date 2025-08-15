@@ -199,6 +199,7 @@ const Contest = () => {
     }
   };
 
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -222,7 +223,11 @@ const Contest = () => {
                 : format.replace(/([A-Z])/g, " $1").trim()}
             </h2>
             {contestList.map((contest) => (
-              <ContestCard key={contest._id} contest={contest} onJoinClick={handleJoinClick} />
+              <ContestCard 
+                key={contest._id} 
+                contest={contest} 
+                onJoinClick={handleJoinClick}
+              />
             ))}
           </div>
         ))
@@ -487,6 +492,7 @@ const Contest = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };
