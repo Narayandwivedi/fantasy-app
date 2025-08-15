@@ -123,19 +123,14 @@ const QRPayment = () => {
       const data = response.data
       
       if (data.success) {
-        // Show success message based on deposit status
-        if (data.data.status === 'auto-approved') {
-          toast.success(`Payment successful! ₹${amount} has been added to your wallet instantly.`, { autoClose: 600 })
-        } else {
-          toast.success(`UTR ${utr} submitted successfully! Your payment is under review.`, { autoClose: 600 })
-        }
+        // Show simple success message for all cases
+        toast.success(`Balance added successfully!`, { 
+          autoClose: 600
+        })
         
-        // Reset form and navigate back
+        // Reset form and navigate to fantasy sport page immediately
         setUtr('')
-        navigate('/wallet')
-        
-        // Refresh user data to show updated balance
-        window.location.reload()
+        navigate('/fantasy-sport')
         
       } else {
         toast.error(`Error: ${data.message}`, { autoClose: 600 })

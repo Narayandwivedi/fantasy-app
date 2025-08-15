@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { MessageCircle, User, Clock, Eye, EyeOff, Send, Filter, Search } from 'lucide-react';
+import { MessageCircle, User, Clock, Eye, EyeOff, Send, Filter, Search, ArrowLeft, ChevronRight } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 
 const ChatSupport = () => {
@@ -15,6 +15,7 @@ const ChatSupport = () => {
     search: ''
   });
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showChatDetail, setShowChatDetail] = useState(false);
 
   const categories = ['Deposit Related', 'Withdraw', 'KYC', 'Game Related', 'Other'];
 
@@ -197,10 +198,10 @@ const ChatSupport = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className={`${showChatDetail ? 'p-0 lg:p-6' : 'p-6'} max-w-7xl mx-auto`}>
 
         {/* Enhanced Filters */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6 backdrop-blur-sm">
+        <div className="hidden lg:block bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6 backdrop-blur-sm">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
@@ -245,13 +246,14 @@ const ChatSupport = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Enhanced User Conversations List */}
-          <div className="lg:col-span-4 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 200px)' }}>
+          <div className={`lg:col-span-4 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col ${showChatDetail ? 'hidden lg:flex' : ''}`} style={{ height: 'calc(100vh - 200px)' }}>
             <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-4 flex-shrink-0">
               <h2 className="text-xl font-bold text-white flex items-center">
                 <User className="w-6 h-6 mr-2" />
                 Conversations ({filteredConversations.length})
               </h2>
-              <p className="text-indigo-100 text-sm mt-1">Click on a conversation to view details</p>
+              <p className="text-indigo-100 text-sm mt-1 hidden lg:block">Click on a conversation to view details</p>
+              <p className="text-indigo-100 text-sm mt-1 lg:hidden">Tap on a conversation to view details</p>
             </div>
           <div className="flex-1 overflow-y-auto">
             {filteredConversations.length === 0 ? (
@@ -278,6 +280,7 @@ const ChatSupport = () => {
                     key={conversation.user._id}
                     onClick={() => {
                       setSelectedMessage(lastMessage);
+                      setShowChatDetail(true);
                       // Mark all unread messages as read
                       conversation.messages.forEach(msg => {
                         if (!msg.isRead) markAsRead(msg._id);
@@ -310,13 +313,20 @@ const ChatSupport = () => {
                             <p className="text-sm font-medium text-gray-900 truncate">
                               {conversation.user?.name || 'Unknown User'}
                             </p>
-                            <p className="text-xs text-gray-500">{conversation.user?.email}</p>
+                            <p className="text-xs text-gray-500 truncate">{conversation.user?.email}</p>
+                            <p className="text-xs text-gray-400 mt-1 truncate">
+                              {lastMessage.message.length > 50 ? `${lastMessage.message.substring(0, 50)}...` : lastMessage.message}
+                            </p>
                           </div>
                           <div className="flex items-center space-x-2 flex-shrink-0">
-                            <p className="text-xs text-gray-400">{formatShortDate(conversation.lastMessageTime)}</p>
+                            <div className="text-right">
+                              <p className="text-xs text-gray-400">{formatShortDate(conversation.lastMessageTime)}</p>
+                              <p className="text-xs text-gray-400">{formatTime(conversation.lastMessageTime)}</p>
+                            </div>
                             {conversation.hasUnread && (
                               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                             )}
+                            <ChevronRight className="w-4 h-4 text-gray-400 lg:hidden" />
                           </div>
                         </div>
                       </div>
@@ -329,9 +339,29 @@ const ChatSupport = () => {
         </div>
 
         {/* Enhanced Message Detail */}
-        <div className="lg:col-span-8 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 200px)' }}>
+        <div className={`lg:col-span-8 bg-white ${showChatDetail ? 'fixed inset-0 z-50 lg:relative lg:rounded-xl lg:shadow-lg lg:border lg:border-gray-100' : 'rounded-xl shadow-lg border border-gray-100'} overflow-hidden flex flex-col ${!showChatDetail ? 'hidden lg:flex' : ''}`} style={{ height: showChatDetail ? '100vh' : 'calc(100vh - 200px)' }}>
           {selectedMessage ? (
             <div className="h-full flex flex-col">
+              {/* Mobile Header with Back Button */}
+              <div className="lg:hidden bg-gradient-to-r from-indigo-500 to-purple-600 p-4 flex items-center space-x-3 flex-shrink-0">
+                <button
+                  onClick={() => setShowChatDetail(false)}
+                  className="text-white hover:text-indigo-200 transition-colors"
+                >
+                  <ArrowLeft className="w-6 h-6" />
+                </button>
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold">
+                      {selectedMessage.userId?.name || 'Unknown User'}
+                    </h3>
+                    <p className="text-indigo-200 text-sm">{selectedMessage.userId?.email}</p>
+                  </div>
+                </div>
+              </div>
               {/* Enhanced Messages Area */}
               <div className="flex-1 p-6 overflow-y-auto bg-gradient-to-b from-gray-50 to-white" id="admin-chat-messages">
                 <div className="space-y-6">
@@ -345,7 +375,7 @@ const ChatSupport = () => {
                         <div className="flex justify-end">
                           <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl p-4 max-w-sm shadow-lg">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white bg-opacity-20 text-blue-100">
+                              <span className="hidden lg:inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white bg-opacity-20 text-blue-100">
                                 {message.category}
                               </span>
                               <span className="text-xs text-blue-100">{formatDate(message.createdAt)}</span>

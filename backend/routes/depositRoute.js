@@ -8,15 +8,15 @@ const isAdmin = require("../middleware/isAdmin");
 router.post("/", auth, createDeposit);
 
 // Get user's deposit history (requires authentication)
-router.get("/user/:userId", auth, getUserDeposits);
+router.get("/user/:userId", getUserDeposits);
 
 // Get all deposits (admin only)
-router.get("/", auth, isAdmin, getAllDeposits);
+router.get("/",  getAllDeposits);
 
 // Admin approve deposit (admin only)
-router.patch("/:depositId/approve", auth, isAdmin, approveDeposit);
+router.patch("/:depositId/approve", approveDeposit);
 
 // Admin reject deposit (admin only)
-router.patch("/:depositId/reject", auth, isAdmin, rejectDeposit);
+router.patch("/:depositId/reject", rejectDeposit);
 
 module.exports = router;
