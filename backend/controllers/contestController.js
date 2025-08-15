@@ -262,6 +262,18 @@ async function joinContest(req, res) {
       return res.status(400).json({ success: false, message: "contest full" });
     }
 
+    // Check maxTeamPerUser limit
+    const userTeamsInContest = getContest.joinedUsers.filter(
+      (entry) => entry.user.toString() === userId
+    );
+    
+    if (userTeamsInContest.length >= getContest.maxTeamPerUser) {
+      return res.status(400).json({ 
+        success: false, 
+        message: `You can only join this contest with maximum ${getContest.maxTeamPerUser} team(s). You have already joined ${userTeamsInContest.length} time(s).`
+      });
+    }
+
     // Check if user has sufficient balance (allow negative balance)
     if (getUser.balance < getContest.entryFee) {
       return res.status(400).json({ 

@@ -17,7 +17,6 @@ const Sidebar = memo(({ collapsed, onToggle }) => {
     { path: '/upcoming-matches', label: 'Upcoming Matches', icon: Calendar },
     { path: '/live-matches', label: 'Live Matches', icon: Zap },
     { path: '/completed-matches', label: 'Completed Matches', icon: CheckCircle },
-    { path: '/manage-contests', label: 'Manage Contests', icon: Award },
     { path: '/manage-deposits', label: 'Manage Deposits', icon: CreditCard },
     { path: '/chat-support', label: 'Chat Support', icon: MessageCircle }
   ];

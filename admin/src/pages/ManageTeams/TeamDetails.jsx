@@ -37,8 +37,6 @@ const SearchPlayerModal = memo(({
 
   const handleAddPlayer = (player) => {
     onAddPlayer(player);
-    setSearchTerm("");
-    setFilterPosition("all");
   };
 
   return (
@@ -210,6 +208,11 @@ const TeamDetails = memo(() => {
       
       if (data.success) {
         toast.success(`${player.firstName} ${player.lastName} added to squad successfully`);
+        // Update the teamDetails state to include the new player
+        setTeamDetails(prevDetails => ({
+          ...prevDetails,
+          squad: [...(prevDetails.squad || []), player]
+        }));
       } else {
         toast.error(data.message || "Failed to add player to squad");
       }
