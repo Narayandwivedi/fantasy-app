@@ -7,6 +7,7 @@ import { Routes , Route, useLocation } from 'react-router-dom'
 import { AppContext } from './context/AppContext'
 import Contest from './pages/Contest'
 import CreateTeam from './pages/CreateTeam'
+import PreviewGround from './pages/createteam/PreviewGround'
 import MyTeams from './pages/MyTeams'
 import MyMatches from './pages/my matches/MyMatches'
 import MyContests from './pages/MyContests'
@@ -54,7 +55,8 @@ const App = () => {
   const isAboutPage = location.pathname === '/about'
   const isTermPage = location.pathname === '/terms-and-conditions'
   const isPrivacyPage = location.pathname === '/privacy-policy'
-  const containerClasses = (isHomePage || isContactPage || isAboutPage || isTermPage || isPrivacyPage)
+  const isPreviewGroundPage = location.pathname === '/preview-ground'
+  const containerClasses = (isHomePage || isContactPage || isAboutPage || isTermPage || isPrivacyPage || isPreviewGroundPage)
     ? 'w-full min-h-screen relative overflow-hidden' 
     : 'max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden'
 
@@ -159,6 +161,7 @@ const App = () => {
             <Route path='/contact' element = {<ContactUs/>} />
             <Route path='/terms-and-conditions' element = {<Terms/>} />
             <Route path='/privacy-policy' element = {<PrivacyPolicy/>} />
+            <Route path='/preview-ground' element = {<PreviewGround/>} />
 
           </Routes>
           {!hideBottomNav && <BottomNav/>}
