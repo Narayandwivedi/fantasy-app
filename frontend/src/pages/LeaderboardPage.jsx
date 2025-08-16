@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Trophy, ArrowLeft, Users } from 'lucide-react'
+import { Trophy, ArrowLeft, Users, X } from 'lucide-react'
 import axios from 'axios'
 import { AppContext } from '../context/AppContext'
 
@@ -11,6 +11,8 @@ const LeaderboardPage = () => {
   const [leaderboardData, setLeaderboardData] = useState([])
   const [loading, setLoading] = useState(false)
   const [contest, setContest] = useState(null)
+  const [selectedTeam, setSelectedTeam] = useState(null)
+  const [showTeamModal, setShowTeamModal] = useState(false)
 
   useEffect(() => {
     if (contestId) {
@@ -46,6 +48,229 @@ const LeaderboardPage = () => {
 
   const getTeamDisplayName = (teamData, userIndex) => {
     return teamData?.teamName || `Team ${userIndex + 1}`
+  }
+
+  const handleUserClick = (entry) => {
+    if (entry.team) {
+      setSelectedTeam(entry.team)
+      setShowTeamModal(true)
+    }
+  }
+
+  const closeTeamModal = () => {
+    setShowTeamModal(false)
+    setSelectedTeam(null)
+  }
+
+  // Team Preview Modal Component
+  const TeamPreviewModal = ({ team, onClose }) => {
+    if (!team) return null
+
+    const getPlayerStats = (player) => {
+      return {
+        wk: player.playerType === 'wicket-keeper' ? 1 : 0,
+        bat: player.playerType === 'batsman' ? 1 : 0,
+        ar: player.playerType === 'all-rounder' ? 1 : 0,
+        bowl: player.playerType === 'bowler' ? 1 : 0
+      }
+    }
+
+    const teamStats = team.players?.reduce((acc, playerObj) => {
+      const player = playerObj.player
+      if (player) {
+        const stats = getPlayerStats(player)
+        acc.wk += stats.wk
+        acc.bat += stats.bat
+        acc.ar += stats.ar
+        acc.bowl += stats.bowl
+      }
+      return acc
+    }, { wk: 0, bat: 0, ar: 0, bowl: 0 })
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center p-4 border-b">
+            <h2 className="text-xl font-bold">Team Preview</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Team Content */}
+          <div className="p-4">
+            <div className="bg-gradient-to-b from-green-600 to-green-800 rounded-xl p-4 text-white mb-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold">
+                  {team.teamName || 'Team'}
+                </h3>
+                <div className="flex items-center text-white">
+                  <Users size={16} className="mr-1" />
+                  <span className="text-sm">{team.players?.length || 0}</span>
+                </div>
+              </div>
+
+              {/* Captain and Vice Captain */}
+              <div className="flex justify-center mb-4">
+                <div className="flex space-x-6">
+                  {team.captain && (
+                    <div className="flex flex-col items-center">
+                      <div className="relative mb-2">
+                        <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
+                          {team.captain.imgLink ? (
+                            <img 
+                              src={`${BACKEND_URL}${team.captain.imgLink}`} 
+                              alt={`${team.captain.firstName} ${team.captain.lastName}`}
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">
+                                {team.captain.firstName?.charAt(0)}{team.captain.lastName?.charAt(0)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">C</span>
+                        </div>
+                      </div>
+                      <div className="bg-white border border-gray-800 rounded-full px-2 py-1">
+                        <span className="text-xs font-medium text-gray-800">
+                          {team.captain.firstName && team.captain.lastName 
+                            ? `${team.captain.firstName} ${team.captain.lastName}`.length > 10 
+                              ? `${team.captain.firstName} ${team.captain.lastName}`.substring(0, 10) + '...' 
+                              : `${team.captain.firstName} ${team.captain.lastName}`
+                            : 'Captain'
+                          }
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {team.viceCaptain && (
+                    <div className="flex flex-col items-center">
+                      <div className="relative mb-2">
+                        <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
+                          {team.viceCaptain.imgLink ? (
+                            <img 
+                              src={`${BACKEND_URL}${team.viceCaptain.imgLink}`} 
+                              alt={`${team.viceCaptain.firstName} ${team.viceCaptain.lastName}`}
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-orange-400 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">
+                                {team.viceCaptain.firstName?.charAt(0)}{team.viceCaptain.lastName?.charAt(0)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">VC</span>
+                        </div>
+                      </div>
+                      <div className="bg-gray-700 rounded-full px-2 py-1">
+                        <span className="text-xs font-medium text-white">
+                          {team.viceCaptain.firstName && team.viceCaptain.lastName 
+                            ? `${team.viceCaptain.firstName} ${team.viceCaptain.lastName}`.length > 10 
+                              ? `${team.viceCaptain.firstName} ${team.viceCaptain.lastName}`.substring(0, 10) + '...' 
+                              : `${team.viceCaptain.firstName} ${team.viceCaptain.lastName}`
+                            : 'Vice Captain'
+                          }
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Team Composition Stats */}
+              <div className="flex justify-center items-center space-x-8">
+                <div className="flex items-center space-x-1">
+                  <span className="text-xs text-white">WK</span>
+                  <span className="text-xs text-white font-medium">{teamStats?.wk || 0}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="text-xs text-white">BAT</span>
+                  <span className="text-xs text-white font-medium">{teamStats?.bat || 0}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="text-xs text-white">AR</span>
+                  <span className="text-xs text-white font-medium">{teamStats?.ar || 0}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="text-xs text-white">BOWL</span>
+                  <span className="text-xs text-white font-medium">{teamStats?.bowl || 0}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Players List */}
+            <div className="space-y-2">
+              <h4 className="font-semibold text-gray-800 mb-3">Players ({team.players?.length || 0})</h4>
+              {team.players?.map((playerObj, index) => {
+                const player = playerObj.player
+                if (!player) return null
+                
+                const isCaptain = team.captain?._id === player._id
+                const isViceCaptain = team.viceCaptain?._id === player._id
+                
+                return (
+                  <div key={player._id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
+                    <div className="relative">
+                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                        {player.imgLink ? (
+                          <img 
+                            src={`${BACKEND_URL}${player.imgLink}`} 
+                            alt={`${player.firstName} ${player.lastName}`}
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        ) : (
+                          <span className="text-gray-600 text-xs font-bold">
+                            {player.firstName?.charAt(0)}{player.lastName?.charAt(0)}
+                          </span>
+                        )}
+                      </div>
+                      {(isCaptain || isViceCaptain) && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gray-700 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">
+                            {isCaptain ? 'C' : 'VC'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">
+                        {player.firstName} {player.lastName}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {player.playerType?.replace('-', ' ').toUpperCase() || player.position}
+                      </div>
+                    </div>
+                    <div className="text-sm font-medium text-green-600">
+                      {playerObj.fantasyPoints || 0} pts
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Team Total Points */}
+            <div className="mt-4 p-3 bg-green-50 rounded-lg">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-green-800">Total Points</span>
+                <span className="font-bold text-green-800 text-lg">{team.totalPoints || 0}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
 
@@ -173,7 +398,8 @@ const LeaderboardPage = () => {
               return (
                 <div 
                   key={entry._id}
-                  className={`px-4 py-3 border-b border-gray-100 ${
+                  onClick={() => handleUserClick(entry)}
+                  className={`px-4 py-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
                     isCurrentUser ? 'bg-blue-50' : 'bg-white'
                   }`}
                 >
@@ -246,6 +472,14 @@ const LeaderboardPage = () => {
 
       {/* Bottom padding for mobile */}
       <div className="h-20"></div>
+
+      {/* Team Preview Modal */}
+      {showTeamModal && (
+        <TeamPreviewModal 
+          team={selectedTeam} 
+          onClose={closeTeamModal}
+        />
+      )}
     </div>
   )
 }

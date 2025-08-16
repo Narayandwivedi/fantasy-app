@@ -430,7 +430,21 @@ async function getContestLeaderboard(req, res) {
       })
       .populate({
         path: 'joinedUsers.team',
-        select: 'teamName totalPoints players captainId viceCaptainId'
+        select: 'teamName totalPoints players captain viceCaptain',
+        populate: [
+          {
+            path: 'players.player',
+            select: 'firstName lastName position imgLink playerType'
+          },
+          {
+            path: 'captain',
+            select: 'firstName lastName position imgLink playerType'
+          },
+          {
+            path: 'viceCaptain', 
+            select: 'firstName lastName position imgLink playerType'
+          }
+        ]
       });
 
     if (!contest) {
