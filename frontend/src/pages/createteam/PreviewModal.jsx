@@ -10,7 +10,7 @@ const PreviewModal = ({
   if (!showPreview) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50" style={{paddingTop: '35px'}}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
       <div className="w-full md:max-w-md h-full overflow-y-auto relative">
         {/* Realistic Cricket Ground Background */}
         <div className="absolute inset-0">
@@ -41,10 +41,10 @@ const PreviewModal = ({
               </div>
               
               {/* Boundary rope indication - More visible */}
-              <div className="absolute inset-2 border-2 border-white border-opacity-60 rounded-full"></div>
+              <div className="absolute inset-y-8 inset-x-0.5 border-2 border-white border-opacity-60 rounded-full"></div>
               
-              {/* MYSERIES11 Text with Embedded Grass Effect - Top */}
-              <div className="absolute top-12 left-1/2 transform -translate-x-1/2">
+              {/* MYSERIES11 Text with Embedded Grass Effect - Top Outside Circle */}
+              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
                 <div className="text-lg font-black tracking-wider" style={{
                   color: 'rgba(255, 255, 255, 0.25)',
                   textShadow: `
@@ -61,9 +61,10 @@ const PreviewModal = ({
                   MYSERIES11
                 </div>
               </div>
+              
 
-              {/* MYSERIES11 Text with Embedded Grass Effect - Bottom */}
-              <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
+              {/* MYSERIES11 Text with Embedded Grass Effect - Bottom Outside Circle */}
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
                 <div className="text-lg font-black tracking-wider" style={{
                   color: 'rgba(255, 255, 255, 0.25)',
                   textShadow: `
@@ -80,6 +81,7 @@ const PreviewModal = ({
                   MYSERIES11
                 </div>
               </div>
+              
             </div>
           </div>
         </div>
@@ -94,12 +96,12 @@ const PreviewModal = ({
         </button>
 
         {/* Ground View - Full Height */}
-        <div className="h-full flex flex-col justify-center space-y-6 py-4 relative z-10">
+        <div className="h-full flex flex-col justify-center space-y-4 py-4 relative z-10">
           {/* Wicket Keepers - Always at Top */}
           <div>
             <div>
             <h3 className="text-white text-xs mb-2 text-center">WICKET-KEEPERS</h3>
-            <div className="space-y-4">
+            <div className="space-y-2">
               {Array.from({ length: Math.ceil(getSelectedPlayersByPosition()['wicket-keeper'].length / 3) }, (_, rowIndex) => (
                 <div key={rowIndex} className="flex justify-around">
                   {getSelectedPlayersByPosition()['wicket-keeper'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
@@ -133,7 +135,7 @@ const PreviewModal = ({
           <div>
             <div>
             <h3 className="text-white text-xs mb-2 text-center">BATTERS</h3>
-            <div className="space-y-4">
+            <div className="space-y-2">
               {Array.from({ length: Math.ceil(getSelectedPlayersByPosition()['batsman'].length / 3) }, (_, rowIndex) => (
                 <div key={rowIndex} className="flex justify-around">
                   {getSelectedPlayersByPosition()['batsman'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
@@ -167,7 +169,7 @@ const PreviewModal = ({
           <div>
             <div>
             <h3 className="text-white text-xs mb-2 text-center">ALL-ROUNDERS</h3>
-            <div className="space-y-4">
+            <div className="space-y-2">
               {Array.from({ length: Math.ceil(getSelectedPlayersByPosition()['all-rounder'].length / 3) }, (_, rowIndex) => (
                 <div key={rowIndex} className="flex justify-around">
                   {getSelectedPlayersByPosition()['all-rounder'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
@@ -201,7 +203,7 @@ const PreviewModal = ({
           <div>
             <div>
             <h3 className="text-white text-xs mb-2 text-center">BOWLERS</h3>
-            <div className="space-y-4">
+            <div className="space-y-2">
               {Array.from({ length: Math.ceil(getSelectedPlayersByPosition()['bowler'].length / 3) }, (_, rowIndex) => (
                 <div key={rowIndex} className="flex justify-around">
                   {getSelectedPlayersByPosition()['bowler'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (

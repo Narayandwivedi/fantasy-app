@@ -41,10 +41,10 @@ const CricketGroundPreview = () => {
             </div>
             
             {/* Boundary rope indication - More visible */}
-            <div className="absolute inset-8 border-2 border-white border-opacity-30 rounded-full"></div>
+            <div className="absolute inset-y-20 inset-x-2 border-2 border-white border-opacity-30 rounded-full"></div>
             
-            {/* MYSERIES11 Text with Embedded Grass Effect - Top */}
-            <div className="absolute top-16 left-1/2 transform -translate-x-1/2">
+            {/* MYSERIES11 Text with Embedded Grass Effect - Top Outside Circle */}
+            <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
               <div className="text-3xl font-black tracking-wider" style={{
                 color: 'rgba(255, 255, 255, 0.25)',
                 textShadow: `
@@ -61,6 +61,26 @@ const CricketGroundPreview = () => {
                 MYSERIES11
               </div>
             </div>
+            
+            {/* MYSERIES11 Text with Embedded Grass Effect - Bottom Outside Circle */}
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+              <div className="text-3xl font-black tracking-wider" style={{
+                color: 'rgba(255, 255, 255, 0.25)',
+                textShadow: `
+                  0 1px 0 rgba(255,255,255,0.3),
+                  0 -1px 0 rgba(0,0,0,0.4),
+                  0 2px 4px rgba(0,0,0,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.2),
+                  inset 0 -1px 0 rgba(0,0,0,0.2)
+                `,
+                WebkitTextStroke: '1px rgba(34, 197, 94, 0.3)',
+                letterSpacing: '4px',
+                fontWeight: '900'
+              }}>
+                MYSERIES11
+              </div>
+            </div>
+            
             
 
           </div>
