@@ -24,6 +24,7 @@ const LeaderboardPage = () => {
       // Fetch contest details with populated joinedUsers
       const { data } = await axios.get(`${BACKEND_URL}/api/contests/${contestId}/leaderboard`)
       
+      
       if (data.success) {
         setContest(data.data.contest)
         setLeaderboardData(data.data.leaderboard)
@@ -130,7 +131,10 @@ const LeaderboardPage = () => {
             </div>
           </div>
           <div className="w-20 text-center">
-            <span className="text-sm font-medium text-gray-600">Points</span>
+            <span className="text-sm font-medium text-gray-600">Team Pts</span>
+          </div>
+          <div className="w-20 text-center">
+            <span className="text-sm font-medium text-gray-600">Total Pts</span>
           </div>
           <div className="w-16 text-center">
             <span className="text-sm font-medium text-gray-600">Rank</span>
@@ -156,7 +160,8 @@ const LeaderboardPage = () => {
               const isCurrentUser = entry.user?._id === user?._id
               const userName = getUserDisplayName(entry.user)
               const teamName = getTeamDisplayName(entry.team, index)
-              const points = entry.team?.totalPoints || 0
+              const teamPoints = entry.team?.totalPoints || 0
+              const totalFantasyPoints = entry.totalFantasyPoints || 0
               
               // Generate diverse avatar backgrounds
               const avatarColors = [
@@ -211,10 +216,17 @@ const LeaderboardPage = () => {
                       </div>
                     </div>
 
-                    {/* Points - Aligned with header */}
+                    {/* Team Points - Aligned with header */}
                     <div className="w-20 text-center">
                       <div className="font-medium text-gray-900 text-sm">
-                        {points}
+                        {teamPoints}
+                      </div>
+                    </div>
+
+                    {/* Total Fantasy Points - Aligned with header */}
+                    <div className="w-20 text-center">
+                      <div className="font-medium text-blue-600 text-sm">
+                        {totalFantasyPoints}
                       </div>
                     </div>
 

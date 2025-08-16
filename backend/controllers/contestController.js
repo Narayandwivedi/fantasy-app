@@ -439,14 +439,30 @@ async function getContestLeaderboard(req, res) {
         .json({ success: false, message: "contest not found" });
     }
 
+    // Calculate total fantasy points for each user
+    const Userteam = require('../models/Userteam');
+    const leaderboardWithTotalPoints = await Promise.all(
+      contest.joinedUsers.map(async (entry) => {
+        // Calculate user's total fantasy points across all teams
+        const userTotalPoints = await Userteam.aggregate([
+          { $match: { user: entry.user._id } },
+          { $group: { _id: null, totalFantasyPoints: { $sum: "$totalFantasyPoints" } } }
+        ]);
+        
+        const totalFantasyPoints = userTotalPoints.length > 0 ? userTotalPoints[0].totalFantasyPoints : 0;
+
+        return {
+          _id: entry._id,
+          user: entry.user,
+          team: entry.team,
+          totalFantasyPoints: totalFantasyPoints,
+          joinedAt: entry.joinedAt
+        };
+      })
+    );
+
     // Sort leaderboard by team points (highest first)
-    const leaderboard = contest.joinedUsers
-      .map(entry => ({
-        _id: entry._id,
-        user: entry.user,
-        team: entry.team,
-        joinedAt: entry.joinedAt
-      }))
+    const leaderboard = leaderboardWithTotalPoints
       .sort((a, b) => (b.team?.totalPoints || 0) - (a.team?.totalPoints || 0));
 
     return res.json({ 

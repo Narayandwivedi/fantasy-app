@@ -115,9 +115,9 @@ const ImprovedScoreCard = memo(({ matchId }) => {
   }, []);
 
   const initializeQuickUpdate = () => {
-    const battingPlayers = getBattingTeamPlayers();
-    const bowlingPlayers = getBowlingTeamPlayers();
-    const fieldingPlayers = getFieldingTeamPlayers();
+    const battingPlayers = getBattingTeamPlayers;
+    const bowlingPlayers = getBowlingTeamPlayers;
+    const fieldingPlayers = getFieldingTeamPlayers;
     
     const initialData = {};
     
@@ -269,8 +269,8 @@ const ImprovedScoreCard = memo(({ matchId }) => {
 
   // Keyboard navigation for quick update fields
   const handleKeyDown = (e, playerId, fieldName) => {
-    const battingPlayers = getBattingTeamPlayers();
-    const bowlingPlayers = getBowlingTeamPlayers();
+    const battingPlayers = getBattingTeamPlayers;
+    const bowlingPlayers = getBowlingTeamPlayers;
     const allPlayers = [...battingPlayers, ...bowlingPlayers];
     
     const currentPlayerIndex = allPlayers.findIndex(p => p._id === playerId);
@@ -370,14 +370,14 @@ const ImprovedScoreCard = memo(({ matchId }) => {
     return <div className="text-center p-8">No match data available</div>;
   }
 
-  const battingTeamTotals = getTeamTotals(getBattingTeamPlayers());
+  const battingTeamTotals = getTeamTotals(getBattingTeamPlayers);
 
   return (
     <div className="max-w-full mx-auto p-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold text-gray-800">{getMatchTitle()}</h1>
+          <h1 className="text-3xl font-bold text-gray-800">{getMatchTitle}</h1>
           <div className="flex gap-4 items-center">
             <button
               onClick={initializeQuickUpdate}
@@ -477,7 +477,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
                     {battingTeam} - Batting
                   </h3>
                   <div className="space-y-4">
-                    {getBattingTeamPlayers()
+                    {getBattingTeamPlayers
                       .sort((a, b) => {
                         // Sort by out status first (not out players first), then by batting order
                         if (a.batting.isOut !== b.batting.isOut) {
@@ -592,10 +592,10 @@ const ImprovedScoreCard = memo(({ matchId }) => {
                 <div className="bg-red-50 rounded-lg p-4">
                   <h3 className="text-xl font-bold text-red-800 mb-4 flex items-center gap-2">
                     <Activity size={20} />
-                    {getBowlingTeamName()} - Bowling
+                    {getBowlingTeamName} - Bowling
                   </h3>
                   <div className="space-y-4">
-                    {getBowlingTeamPlayers()
+                    {getBowlingTeamPlayers
                       .sort((a, b) => {
                         // Sort bowlers - active bowlers (with overs > 0) first, then by batting order descending
                         const aHasBowled = (a.bowling.oversBowled || 0) > 0;
@@ -684,10 +684,10 @@ const ImprovedScoreCard = memo(({ matchId }) => {
               <div className="mt-6 bg-green-50 rounded-lg p-4">
                 <h3 className="text-xl font-bold text-green-800 mb-4 flex items-center gap-2">
                   <Users size={20} />
-                  {getBowlingTeamName()} - Fielding
+                  {getBowlingTeamName} - Fielding
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {getFieldingTeamPlayers()
+                  {getFieldingTeamPlayers
                     .sort((a, b) => {
                       // Sort fielders - those with fielding stats first, then by batting order descending
                       const aHasFielded = (a.fielding.catches || 0) + (a.fielding.stumpings || 0) + (a.fielding.runOuts || 0) > 0;
@@ -812,7 +812,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
                 </tr>
               </thead>
               <tbody>
-                {getBattingTeamPlayers().map((player) => {
+                {getBattingTeamPlayers.map((player) => {
                   const battingStats = player.batting;
                   
                   return (
@@ -859,7 +859,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
         {/* Bowling Team Scorecard */}
         <div className="bg-white rounded-lg shadow-md">
           <div className="bg-red-600 text-white p-4 rounded-t-lg">
-            <h2 className="text-xl font-bold">{getBowlingTeamName()} Bowling</h2>
+            <h2 className="text-xl font-bold">{getBowlingTeamName} Bowling</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -874,7 +874,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
                 </tr>
               </thead>
               <tbody>
-                {getBowlingTeamPlayers().map((player) => {
+                {getBowlingTeamPlayers.map((player) => {
                   const bowlingStats = player.bowling;
                   
                   return (
@@ -909,7 +909,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
       {/* Fielding Stats */}
       <div className="bg-white rounded-lg shadow-md mt-6">
         <div className="bg-green-600 text-white p-4 rounded-t-lg">
-          <h2 className="text-xl font-bold">{getBowlingTeamName()} Fielding</h2>
+          <h2 className="text-xl font-bold">{getBowlingTeamName} Fielding</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -923,7 +923,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
               </tr>
             </thead>
             <tbody>
-              {getFieldingTeamPlayers().map((player) => {
+              {getFieldingTeamPlayers.map((player) => {
                 const fieldingStats = player.fielding;
                 
                 return (
