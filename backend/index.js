@@ -24,6 +24,7 @@ const contestRoute = require("./routes/contestRoute")
 const userTeamRoute = require("./routes/userTeamRoute")
 const chatRoute = require("./routes/chatRoute")
 const depositRoute = require("./routes/depositRoute")
+const blogRoute = require("./routes/blogRoute")
 
 
 
@@ -85,6 +86,8 @@ app.use("/api/userteam",userTeamRoute)
 app.use("/api/chat",chatRoute)
 
 app.use("/api/deposits",depositRoute)
+
+app.use("/api/blogs",blogRoute)
 
 
 

@@ -13,7 +13,7 @@ const MatchSchema = new mongoose.Schema({
   matchType: {
     type: String,
     // required: true,
-    enum: ["T20", "ODI", "Test", "T10", "League", "Cup"],
+    enum: ["T20", "ODI", "Test", "T10"],
   },
   series: {
     type: String,
