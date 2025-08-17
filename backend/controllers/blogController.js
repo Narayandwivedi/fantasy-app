@@ -66,9 +66,30 @@ const createBlog = async (req, res) => {
       });
     }
 
+    // Generate slug from title
+    const generateSlug = (title) => {
+      return title
+        .toLowerCase()
+        .replace(/[^a-z0-9 -]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim('-');
+    };
+
+    const baseSlug = generateSlug(title.trim());
+    
+    // Ensure slug is unique
+    let slug = baseSlug;
+    let counter = 1;
+    while (await Blog.findOne({ slug })) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
     // Create new blog
     const newBlog = new Blog({
       title: title.trim(),
+      slug: slug,
       content: content.trim(),
       excerpt: excerpt.trim(),
       author: author || "Admin",
@@ -366,6 +387,28 @@ const updateBlog = async (req, res) => {
           message: "A blog with this title already exists",
         });
       }
+
+      // Generate new slug if title is being updated
+      const generateSlug = (title) => {
+        return title
+          .toLowerCase()
+          .replace(/[^a-z0-9 -]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .trim('-');
+      };
+
+      const baseSlug = generateSlug(updateData.title.trim());
+      
+      // Ensure slug is unique (excluding current blog)
+      let slug = baseSlug;
+      let counter = 1;
+      while (await Blog.findOne({ slug, _id: { $ne: id } })) {
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+      
+      updateData.slug = slug;
     }
 
     // Update blog
