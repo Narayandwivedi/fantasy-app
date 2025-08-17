@@ -37,6 +37,22 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
   const [colorPickerMode, setColorPickerMode] = useState('palette'); // 'palette' or 'advanced'
   const [bgColorPickerMode, setBgColorPickerMode] = useState('palette');
   
+  // Track active formatting states
+  const [activeFormats, setActiveFormats] = useState({
+    bold: false,
+    italic: false,
+    underline: false,
+    strikethrough: false,
+    justifyLeft: false,
+    justifyCenter: false,
+    justifyRight: false,
+    justifyFull: false,
+    insertUnorderedList: false,
+    insertOrderedList: false,
+    superscript: false,
+    subscript: false
+  });
+  
   // Undo/Redo state management
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -95,14 +111,42 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
     }, 500); // Wait 500ms after user stops typing
   }, [historyIndex, isUpdatingFromHistory]);
 
+  // Check active formatting states
+  const checkActiveFormats = useCallback(() => {
+    if (!editorRef.current || disabled) return;
+    
+    try {
+      const newActiveFormats = {
+        bold: document.queryCommandState('bold'),
+        italic: document.queryCommandState('italic'),
+        underline: document.queryCommandState('underline'),
+        strikethrough: document.queryCommandState('strikethrough'),
+        justifyLeft: document.queryCommandState('justifyLeft'),
+        justifyCenter: document.queryCommandState('justifyCenter'),
+        justifyRight: document.queryCommandState('justifyRight'),
+        justifyFull: document.queryCommandState('justifyFull'),
+        insertUnorderedList: document.queryCommandState('insertUnorderedList'),
+        insertOrderedList: document.queryCommandState('insertOrderedList'),
+        superscript: document.queryCommandState('superscript'),
+        subscript: document.queryCommandState('subscript')
+      };
+      
+      setActiveFormats(newActiveFormats);
+    } catch (error) {
+      // queryCommandState can sometimes throw errors, ignore them
+      console.warn('Error checking format states:', error);
+    }
+  }, [disabled]);
+
   // Handle content change
   const handleInput = useCallback(() => {
     if (editorRef.current && onChange) {
       const content = editorRef.current.innerHTML;
       onChange(content);
       saveToHistory(content);
+      checkActiveFormats();
     }
-  }, [onChange, saveToHistory]);
+  }, [onChange, saveToHistory, checkActiveFormats]);
 
   // Initialize history with initial value
   useEffect(() => {
@@ -154,6 +198,9 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
     document.execCommand(command, false, value);
     editorRef.current?.focus();
     
+    // Check active formats after command execution
+    setTimeout(checkActiveFormats, 10);
+    
     // Save current state for undo/redo after formatting commands
     if (editorRef.current) {
       const content = editorRef.current.innerHTML;
@@ -176,7 +223,21 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
         });
       }
     }
-  }, [disabled, onChange, historyIndex, isUpdatingFromHistory]);
+  }, [disabled, onChange, historyIndex, isUpdatingFromHistory, checkActiveFormats]);
+
+  // Handle selection changes to update active format states
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      if (isEditorFocused) {
+        checkActiveFormats();
+      }
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, [isEditorFocused, checkActiveFormats]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -833,24 +894,28 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
       icon: Bold,
       title: 'Bold',
       command: () => executeCommand('bold'),
-      shortcut: 'Ctrl+B'
+      shortcut: 'Ctrl+B',
+      commandName: 'bold'
     },
     {
       icon: Italic,
       title: 'Italic',
       command: () => executeCommand('italic'),
-      shortcut: 'Ctrl+I'
+      shortcut: 'Ctrl+I',
+      commandName: 'italic'
     },
     {
       icon: Underline,
       title: 'Underline',
       command: () => executeCommand('underline'),
-      shortcut: 'Ctrl+U'
+      shortcut: 'Ctrl+U',
+      commandName: 'underline'
     },
     {
       icon: Strikethrough,
       title: 'Strikethrough',
-      command: () => executeCommand('strikethrough')
+      command: () => executeCommand('strikethrough'),
+      commandName: 'strikethrough'
     }
   ];
 
@@ -858,22 +923,26 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
     {
       icon: AlignLeft,
       title: 'Align Left',
-      command: () => executeCommand('justifyLeft')
+      command: () => executeCommand('justifyLeft'),
+      commandName: 'justifyLeft'
     },
     {
       icon: AlignCenter,
       title: 'Align Center',
-      command: () => executeCommand('justifyCenter')
+      command: () => executeCommand('justifyCenter'),
+      commandName: 'justifyCenter'
     },
     {
       icon: AlignRight,
       title: 'Align Right',
-      command: () => executeCommand('justifyRight')
+      command: () => executeCommand('justifyRight'),
+      commandName: 'justifyRight'
     },
     {
       icon: AlignJustify,
       title: 'Justify',
-      command: () => executeCommand('justifyFull')
+      command: () => executeCommand('justifyFull'),
+      commandName: 'justifyFull'
     }
   ];
 
@@ -881,12 +950,14 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
     {
       icon: List,
       title: 'Bullet List',
-      command: () => executeCommand('insertUnorderedList')
+      command: () => executeCommand('insertUnorderedList'),
+      commandName: 'insertUnorderedList'
     },
     {
       icon: ListOrdered,
       title: 'Numbered List',
-      command: () => executeCommand('insertOrderedList')
+      command: () => executeCommand('insertOrderedList'),
+      commandName: 'insertOrderedList'
     }
   ];
 
@@ -922,12 +993,14 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
     {
       icon: Superscript,
       title: 'Superscript',
-      command: () => executeCommand('superscript')
+      command: () => executeCommand('superscript'),
+      commandName: 'superscript'
     },
     {
       icon: Subscript,
       title: 'Subscript',
-      command: () => executeCommand('subscript')
+      command: () => executeCommand('subscript'),
+      commandName: 'subscript'
     }
   ];
 
@@ -1005,13 +1078,18 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
           {/* Format Buttons */}
           {formatButtons.map((button, index) => {
             const IconComponent = button.icon;
+            const isActive = activeFormats[button.commandName];
             return (
               <button
                 key={index}
                 type="button"
                 onClick={button.command}
                 title={button.shortcut ? `${button.title} (${button.shortcut})` : button.title}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded border border-transparent hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className={`p-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                  isActive 
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-md' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-white border-transparent hover:border-gray-300'
+                }`}
                 disabled={disabled}
               >
                 <IconComponent size={16} />
@@ -1228,13 +1306,18 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
           {/* Alignment Buttons */}
           {alignButtons.map((button, index) => {
             const IconComponent = button.icon;
+            const isActive = activeFormats[button.commandName];
             return (
               <button
                 key={index}
                 type="button"
                 onClick={button.command}
                 title={button.title}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded border border-transparent hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className={`p-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                  isActive 
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-md' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-white border-transparent hover:border-gray-300'
+                }`}
                 disabled={disabled}
               >
                 <IconComponent size={16} />
@@ -1248,13 +1331,18 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
           {/* List Buttons */}
           {listButtons.map((button, index) => {
             const IconComponent = button.icon;
+            const isActive = activeFormats[button.commandName];
             return (
               <button
                 key={index}
                 type="button"
                 onClick={button.command}
                 title={button.title}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded border border-transparent hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className={`p-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                  isActive 
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-md' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-white border-transparent hover:border-gray-300'
+                }`}
                 disabled={disabled}
               >
                 <IconComponent size={16} />
@@ -1295,13 +1383,18 @@ const RichTextEditor = ({ value, onChange, placeholder = "Start writing...", dis
           {/* Script Buttons */}
           {scriptButtons.map((button, index) => {
             const IconComponent = button.icon;
+            const isActive = activeFormats[button.commandName];
             return (
               <button
                 key={index}
                 type="button"
                 onClick={button.command}
                 title={button.title}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded border border-transparent hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className={`p-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                  isActive 
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-md' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-white border-transparent hover:border-gray-300'
+                }`}
                 disabled={disabled}
               >
                 <IconComponent size={16} />

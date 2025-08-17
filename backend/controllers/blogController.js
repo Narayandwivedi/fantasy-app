@@ -591,8 +591,9 @@ const autoSaveBlog = async (req, res) => {
       });
     } else {
       // Create new draft blog
+      const blogTitle = title || 'Untitled Draft';
       const newBlog = new Blog({
-        title: title || 'Untitled Draft',
+        title: blogTitle,
         content: content || '',
         excerpt: excerpt || '',
         author: author || 'Admin',
@@ -602,6 +603,12 @@ const autoSaveBlog = async (req, res) => {
         featuredImageAlt: featuredImageAlt || '',
         metaTitle: metaTitle || '',
         metaDescription: metaDescription || '',
+        slug: blogTitle
+          .toLowerCase()
+          .replace(/[^a-z0-9 -]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .trim('-') + '-' + Date.now(),
         status: 'draft',
         autoSaved: true,
         lastSaved: new Date(),

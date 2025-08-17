@@ -5,7 +5,6 @@ import { AppContext } from '../../context/AppContext';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import upload_area from '../../assets/upload_area.svg';
-import useAutoSave from '../../hooks/useAutoSave';
 
 const BLOG_CATEGORIES = [
   { value: 'general', label: 'General' },
@@ -34,34 +33,6 @@ const BlogForm = ({
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isDeletingImage, setIsDeletingImage] = useState(false);
 
-  // Auto-save functionality
-  const {
-    lastSaved,
-    isSaving,
-    autoSaveEnabled,
-    saveCount,
-    blogId,
-    autoSave,
-    toggleAutoSave,
-    formatTimeAgo,
-    hasUnsavedChanges,
-    clearAllDraftBackups,
-    cleanupExpiredBackups,
-    getDraftBackupCount,
-  } = useAutoSave(formData, {
-    interval: 30000, // 30 seconds
-    enabled: true,
-    onSaveSuccess: (data) => {
-      // Update formData with the returned blogId if it's a new blog
-      if (!formData.id && data.blogId) {
-        setFormData(prev => ({ ...prev, id: data.blogId }));
-      }
-    },
-    onSaveError: (error) => {
-      console.error('Auto-save error:', error);
-      // Don't show toast for auto-save errors to avoid annoying the user
-    },
-  });
 
   const handleInputChange = useCallback((field, value) => {
     setFormData((prev) => ({
@@ -119,14 +90,42 @@ const BlogForm = ({
   };
 
   // Handle image deletion
-  const handleDeleteImage = () => {
+  const handleDeleteImage = async () => {
     if (!window.confirm('Are you sure you want to remove this featured image?')) {
       return;
     }
 
-    setImagePreview(null);
-    handleInputChange('featuredImage', '');
-    toast.success('Image removed successfully');
+    setIsDeletingImage(true);
+    
+    try {
+      // If there's an existing featured image URL (not a preview), delete it from server
+      if (formData.featuredImage && !imagePreview && !formData.featuredImage.startsWith('http')) {
+        const response = await axios.delete(
+          `${BACKEND_URL}/api/upload/blog-image`,
+          {
+            data: { imagePath: formData.featuredImage },
+            withCredentials: true
+          }
+        );
+
+        if (response.data.success) {
+          console.log('Image deleted from server successfully');
+        }
+      }
+
+      // Clear the form data and preview
+      setImagePreview(null);
+      handleInputChange('featuredImage', '');
+      toast.success('Image removed successfully');
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      // Still remove from form even if server deletion fails
+      setImagePreview(null);
+      handleInputChange('featuredImage', '');
+      toast.warning('Image removed from form, but may still exist on server');
+    } finally {
+      setIsDeletingImage(false);
+    }
   };
 
   // Get image source for display
@@ -145,216 +144,145 @@ const BlogForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Auto-save Header */}
+      {/* Header */}
       <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-lg border">
-        <div className="flex items-center space-x-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            {mode === 'add' ? 'Create New Blog Post' : 'Edit Blog Post'}
-          </h2>
-          
-          {/* Auto-save Status */}
-          <div className="flex items-center space-x-2 text-sm">
-            {isSaving ? (
-              <div className="flex items-center text-blue-600">
-                <div className="animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full mr-2"></div>
-                <span>Saving...</span>
-              </div>
-            ) : lastSaved ? (
-              <span className="text-green-600">
-                ✓ Saved {formatTimeAgo(lastSaved)}
-              </span>
-            ) : hasUnsavedChanges ? (
-              <span className="text-orange-600">
-                ● Unsaved changes
-              </span>
-            ) : (
-              <span className="text-gray-500">No changes</span>
-            )}
-          </div>
-        </div>
+        <h2 className="text-lg font-semibold text-gray-900">
+          {mode === 'add' ? 'Create New Blog Post' : 'Edit Blog Post'}
+        </h2>
+      </div>
 
-        <div className="flex items-center space-x-3">
-          {/* Save Count */}
-          {saveCount > 0 && (
-            <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
-              {saveCount} auto-saves
-            </span>
-          )}
-
-          {/* Manual Save Button */}
-          <button
-            type="button"
-            onClick={autoSave}
-            disabled={isSaving || !hasUnsavedChanges}
-            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Save Now
-          </button>
-
-          {/* Auto-save Toggle */}
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-700">Auto-save:</span>
-            <button
-              type="button"
-              onClick={toggleAutoSave}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                autoSaveEnabled ? 'bg-blue-600' : 'bg-gray-300'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  autoSaveEnabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-            <span className="text-xs text-gray-500">
-              {autoSaveEnabled ? 'ON (30s)' : 'OFF'}
-            </span>
+      {/* Main Layout: 80% Left, 20% Right */}
+      <div className="flex gap-6">
+        {/* Left Side - 80% - Title and Content */}
+        <div className="w-4/5 space-y-6">
+          {/* Title */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Title *
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter blog title"
+              required
+              disabled={isSubmitting}
+            />
           </div>
 
-          {/* Cleanup Options */}
-          {getDraftBackupCount() > 0 && (
-            <div className="flex items-center space-x-2">
-              <span className="text-xs text-gray-500">
-                {getDraftBackupCount()} local backup(s)
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  const count = clearAllDraftBackups();
-                  toast.success(`Cleared ${count} local backups`);
-                }}
-                className="text-xs text-red-600 hover:text-red-800 underline"
-              >
-                Clear All
-              </button>
+          {/* Content */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Content * (Min 50 characters)
+            </label>
+            <RichTextEditor
+              value={formData.content}
+              onChange={(content) => handleInputChange('content', content)}
+              placeholder="Write your blog content here..."
+              disabled={isSubmitting}
+            />
+            <div className="text-xs text-gray-500 mt-1">
+              Content length: {formData.content.replace(/<[^>]*>/g, '').length} characters (minimum 50 required)
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Title */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Title *
-        </label>
-        <input
-          type="text"
-          value={formData.title}
-          onChange={(e) => handleInputChange('title', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Enter blog title"
-          required
-          disabled={isSubmitting}
-        />
-      </div>
-
-      {/* Excerpt */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Excerpt * (Max 200 characters)
-        </label>
-        <textarea
-          value={formData.excerpt}
-          onChange={(e) => handleInputChange('excerpt', e.target.value)}
-          rows={3}
-          maxLength={200}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Brief description of the blog post"
-          required
-          disabled={isSubmitting}
-        />
-        <div className="text-xs text-gray-500 mt-1">
-          {formData.excerpt.length}/200 characters
-        </div>
-      </div>
-
-      {/* Content */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Content * (Min 50 characters)
-        </label>
-        <RichTextEditor
-          value={formData.content}
-          onChange={(content) => handleInputChange('content', content)}
-          placeholder="Write your blog content here..."
-          disabled={isSubmitting}
-        />
-        <div className="text-xs text-gray-500 mt-1">
-          Content length: {formData.content.replace(/<[^>]*>/g, '').length} characters (minimum 50 required)
-        </div>
-        
-        {/* Content Preview */}
-        <BlogContentPreview content={formData.content} title={formData.title} />
-      </div>
-
-      {/* Row 1: Author and Category */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Author
-          </label>
-          <input
-            type="text"
-            value={formData.author}
-            onChange={(e) => handleInputChange('author', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Author name"
-            disabled={isSubmitting}
-          />
+            
+            {/* Content Preview */}
+            <BlogContentPreview content={formData.content} title={formData.title} />
+          </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Category
-          </label>
-          <select
-            value={formData.category}
-            onChange={(e) => handleInputChange('category', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            disabled={isSubmitting}
-          >
-            {BLOG_CATEGORIES.map((category) => (
-              <option key={category.value} value={category.value}>
-                {category.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+        {/* Right Side - 20% - Metadata */}
+        <div className="w-1/5 space-y-6">
+          {/* Excerpt */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Excerpt * (Max 200 characters)
+            </label>
+            <textarea
+              value={formData.excerpt}
+              onChange={(e) => handleInputChange('excerpt', e.target.value)}
+              rows={4}
+              maxLength={200}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              placeholder="Brief description of the blog post"
+              required
+              disabled={isSubmitting}
+            />
+            <div className="text-xs text-gray-500 mt-1">
+              {formData.excerpt.length}/200
+            </div>
+          </div>
 
-      {/* Row 2: Tags and Status */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tags (comma separated)
-          </label>
-          <input
-            type="text"
-            value={formData.tags}
-            onChange={(e) => handleInputChange('tags', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g. cricket, fantasy, tips"
-            disabled={isSubmitting}
-          />
-        </div>
+          {/* Author */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Author
+            </label>
+            <input
+              type="text"
+              value={formData.author}
+              onChange={(e) => handleInputChange('author', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              placeholder="Author name"
+              disabled={isSubmitting}
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Status
-          </label>
-          <select
-            value={formData.status}
-            onChange={(e) => handleInputChange('status', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            disabled={isSubmitting}
-          >
-            {BLOG_STATUSES.map((status) => (
-              <option key={status.value} value={status.value}>
-                {status.label}
-              </option>
-            ))}
-          </select>
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Category
+            </label>
+            <select
+              value={formData.category}
+              onChange={(e) => handleInputChange('category', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              disabled={isSubmitting}
+            >
+              {BLOG_CATEGORIES.map((category) => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tags
+            </label>
+            <textarea
+              value={formData.tags}
+              onChange={(e) => handleInputChange('tags', e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              placeholder="cricket, fantasy, tips"
+              disabled={isSubmitting}
+            />
+            <div className="text-xs text-gray-500 mt-1">
+              Comma separated
+            </div>
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Status
+            </label>
+            <select
+              value={formData.status}
+              onChange={(e) => handleInputChange('status', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              disabled={isSubmitting}
+            >
+              {BLOG_STATUSES.map((status) => (
+                <option key={status.value} value={status.value}>
+                  {status.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -371,8 +299,14 @@ const BlogForm = ({
                 <img
                   src={getImageSource()}
                   alt="Featured image preview"
-                  className="max-w-full h-48 object-cover rounded-lg border border-gray-200"
+                  className="max-w-full h-56 object-cover rounded-lg border border-gray-200"
+                  style={{ aspectRatio: '16/9' }}
                 />
+                {mode === 'edit' && formData.featuredImage && !imagePreview && (
+                  <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                    Current Image
+                  </div>
+                )}
                 <div className="mt-3 flex gap-2 justify-center">
                   <label className="cursor-pointer inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
                     {isUploadingImage ? 'Uploading...' : 'Change Image'}
@@ -390,9 +324,21 @@ const BlogForm = ({
                     disabled={isSubmitting || isDeletingImage}
                     className="px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
                   >
-                    Remove Image
+                    {isDeletingImage ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block"></div>
+                        Deleting...
+                      </>
+                    ) : (
+                      'Remove Image'
+                    )}
                   </button>
                 </div>
+                {mode === 'edit' && formData.featuredImage && !imagePreview && (
+                  <p className="text-xs text-red-600 mt-2">
+                    ⚠️ Clicking "Remove Image" will permanently delete this image from the server
+                  </p>
+                )}
               </div>
             ) : (
               <div className="py-8">
@@ -421,7 +367,7 @@ const BlogForm = ({
                   </label>
                 </div>
                 <p className="mt-2 text-sm text-gray-500">
-                  PNG, JPG, WebP up to 5MB (Recommended: 800x450px)
+                  PNG, JPG, WebP up to 5MB (Recommended: 1200x675px for SEO)
                 </p>
               </div>
             )}

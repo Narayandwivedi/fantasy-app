@@ -145,26 +145,26 @@ const EditBlogModal = ({ showModal, blog, onClose, onSuccess }) => {
   if (!showModal) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Edit Blog</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700 p-1"
-            disabled={isSubmitting || loading}
-          >
-            ✕
-          </button>
-        </div>
+    <div className="fixed inset-0 bg-white z-50 flex flex-col">
+      <div className="flex justify-between items-center p-6 border-b border-gray-200 bg-white shadow-sm">
+        <h2 className="text-xl font-bold text-gray-900">Edit Blog</h2>
+        <button
+          onClick={handleClose}
+          className="text-gray-500 hover:text-gray-700 p-2 rounded-md hover:bg-gray-100 transition-colors"
+          disabled={isSubmitting || loading}
+        >
+          ✕
+        </button>
+      </div>
 
-        <div className="p-6">
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-2 text-gray-600">Loading blog details...</span>
-            </div>
-          ) : (
+      <div className="flex-1 overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading blog details...</span>
+          </div>
+        ) : (
+          <div className="h-full overflow-y-auto p-6">
             <BlogForm
               formData={formData}
               setFormData={setFormData}
@@ -173,8 +173,8 @@ const EditBlogModal = ({ showModal, blog, onClose, onSuccess }) => {
               mode="edit"
               isSubmitting={isSubmitting}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

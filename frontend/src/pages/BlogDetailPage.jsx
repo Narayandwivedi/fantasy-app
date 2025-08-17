@@ -38,6 +38,111 @@ const BlogDetailPage = () => {
     }
   }, [slug, BACKEND_URL]);
 
+  useEffect(() => {
+    if (blog) {
+      const title = blog.metaTitle || blog.title;
+      const description = blog.metaDescription || blog.excerpt;
+      const imageUrl = blog.featuredImage ? getImageUrl(blog.featuredImage) : null;
+      
+      document.title = `${title} | MySeries11 Blog`;
+      
+      const setMetaTag = (name, content, property = false) => {
+        const attribute = property ? 'property' : 'name';
+        let meta = document.querySelector(`meta[${attribute}="${name}"]`);
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute(attribute, name);
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', content);
+      };
+
+      setMetaTag('description', description);
+      setMetaTag('keywords', blog.tags ? blog.tags.join(', ') : 'cricket, fantasy cricket, MySeries11');
+      
+      setMetaTag('og:title', title, true);
+      setMetaTag('og:description', description, true);
+      setMetaTag('og:type', 'article', true);
+      setMetaTag('og:url', window.location.href, true);
+      if (imageUrl) {
+        setMetaTag('og:image', imageUrl, true);
+        setMetaTag('og:image:width', '1200', true);
+        setMetaTag('og:image:height', '675', true);
+        setMetaTag('og:image:alt', blog.featuredImageAlt || blog.title, true);
+      }
+      
+      setMetaTag('twitter:card', 'summary_large_image', true);
+      setMetaTag('twitter:title', title, true);
+      setMetaTag('twitter:description', description, true);
+      if (imageUrl) {
+        setMetaTag('twitter:image', imageUrl, true);
+      }
+      
+      setMetaTag('article:published_time', blog.publishedAt || blog.createdAt, true);
+      setMetaTag('article:author', blog.author, true);
+      setMetaTag('article:section', blog.category, true);
+      if (blog.tags) {
+        blog.tags.forEach(tag => {
+          const tagMeta = document.createElement('meta');
+          tagMeta.setAttribute('property', 'article:tag');
+          tagMeta.setAttribute('content', tag);
+          document.head.appendChild(tagMeta);
+        });
+      }
+
+      const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": title,
+        "description": description,
+        "image": imageUrl ? {
+          "@type": "ImageObject",
+          "url": imageUrl,
+          "width": 1200,
+          "height": 675
+        } : undefined,
+        "author": {
+          "@type": "Person",
+          "name": blog.author
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "MySeries11",
+          "logo": {
+            "@type": "ImageObject",
+            "url": `${window.location.origin}/logo.png`
+          }
+        },
+        "datePublished": blog.publishedAt || blog.createdAt,
+        "dateModified": blog.updatedAt || blog.createdAt,
+        "articleSection": blog.category,
+        "keywords": blog.tags ? blog.tags.join(', ') : 'cricket, fantasy cricket',
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": window.location.href
+        }
+      };
+
+      let jsonLd = document.querySelector('#blog-structured-data');
+      if (!jsonLd) {
+        jsonLd = document.createElement('script');
+        jsonLd.id = 'blog-structured-data';
+        jsonLd.type = 'application/ld+json';
+        document.head.appendChild(jsonLd);
+      }
+      jsonLd.textContent = JSON.stringify(structuredData);
+    }
+
+    return () => {
+      document.title = 'MySeries11 - Skill Based Fantasy Cricket Gaming Platform | Play & Win Cash';
+      
+      const jsonLd = document.querySelector('#blog-structured-data');
+      if (jsonLd) {
+        jsonLd.remove();
+      }
+    };
+  }, [blog]);
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -164,11 +269,13 @@ const BlogDetailPage = () => {
       {/* Featured Image or Alt Text */}
       {blog.featuredImage ? (
         <div className="relative">
-          <div className="w-full h-64 md:h-96 lg:h-[32rem] bg-gray-200 overflow-hidden">
+          <div className="w-full h-64 md:h-96 lg:h-[32rem] bg-gray-200 overflow-hidden" style={{ aspectRatio: '16/9' }}>
             <img
               src={getImageUrl(blog.featuredImage)}
               alt={blog.featuredImageAlt || blog.title}
               className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+              width="1200"
+              height="675"
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>

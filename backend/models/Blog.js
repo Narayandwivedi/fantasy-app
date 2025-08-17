@@ -111,11 +111,6 @@ blogSchema.pre('save', function(next) {
   next();
 });
 
-// Index for better performance
-blogSchema.index({ status: 1, publishedAt: -1 });
-blogSchema.index({ category: 1 });
-blogSchema.index({ slug: 1 });
-blogSchema.index({ tags: 1 });
 
 const Blog = mongoose.model("Blog", blogSchema);
 

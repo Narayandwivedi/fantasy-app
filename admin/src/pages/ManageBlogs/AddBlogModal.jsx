@@ -99,20 +99,20 @@ const AddBlogModal = ({ showModal, onClose, onSuccess }) => {
   if (!showModal) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white w-full h-full overflow-y-auto">
-        <div className="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
-          <h2 className="text-xl font-bold text-gray-900">Create New Blog</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700 p-1 text-2xl"
-            disabled={isSubmitting}
-          >
-            ✕
-          </button>
-        </div>
+    <div className="fixed inset-0 bg-white z-50 flex flex-col">
+      <div className="flex justify-between items-center p-6 border-b border-gray-200 bg-white shadow-sm">
+        <h2 className="text-xl font-bold text-gray-900">Create New Blog</h2>
+        <button
+          onClick={handleClose}
+          className="text-gray-500 hover:text-gray-700 p-2 rounded-md hover:bg-gray-100 transition-colors"
+          disabled={isSubmitting}
+        >
+          ✕
+        </button>
+      </div>
 
-        <div className="p-6">
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto p-6">
           <BlogForm
             formData={formData}
             setFormData={setFormData}

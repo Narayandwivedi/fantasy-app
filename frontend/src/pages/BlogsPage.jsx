@@ -126,12 +126,14 @@ const BlogsPage = () => {
             {blogs.map((blog) => (
               <article key={blog._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 {/* Blog Image or Alt Text */}
-                <div className="aspect-w-16 aspect-h-9 h-56 lg:h-64 bg-gray-200">
+                <div className="h-56 lg:h-64 bg-gray-200" style={{ aspectRatio: '16/9' }}>
                   {blog.featuredImage ? (
                     <img
                       src={getImageUrl(blog.featuredImage)}
                       alt={blog.featuredImageAlt || blog.title}
                       className="w-full h-full object-cover"
+                      width="1200"
+                      height="675"
                     />
                   ) : blog.featuredImageAlt ? (
                     <div className="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 flex items-center justify-center p-4">

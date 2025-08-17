@@ -279,7 +279,12 @@ const ManageBlogs = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {blogs.map((blog) => (
-                    <tr key={blog._id} className="hover:bg-gray-50">
+                    <tr 
+                      key={blog._id} 
+                      className="hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => handleEditBlog(blog)}
+                      title="Click to edit blog"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div>
@@ -304,6 +309,7 @@ const ManageBlogs = () => {
                         <select
                           value={blog.status}
                           onChange={(e) => handleStatusChange(blog._id, e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
                           className={`text-xs font-semibold rounded-full px-2 py-1 border-0 ${getStatusColor(blog.status)}`}
                         >
                           <option value="draft">Draft</option>
@@ -318,7 +324,7 @@ const ManageBlogs = () => {
                         {new Date(blog.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
                           <button
                             onClick={() => handleEditBlog(blog)}
                             className="text-indigo-600 hover:text-indigo-900"

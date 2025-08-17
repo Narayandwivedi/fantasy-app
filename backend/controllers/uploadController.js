@@ -196,9 +196,9 @@ async function handleBlogImgUpload(req, res) {
       console.warn("Directory might already exist:", mkdirError.message);
     }
 
-    // Generate WebP with high compression for blog featured images
+    // Generate WebP with high compression for blog featured images (optimized for SEO)
     await sharp(originalPath)
-      .resize(800, 450, {
+      .resize(1200, 675, {
         fit: "cover",
         position: "center",
       })
@@ -224,7 +224,7 @@ async function handleBlogImgUpload(req, res) {
       success: true,
       image_url: `/images/blogs/${compressedFilename}`,
       file_size_kb: parseFloat(fileSizeKB.toFixed(2)),
-      dimensions: "800x450",
+      dimensions: "1200x675",
       format: "webp"
     });
   } catch (err) {
@@ -291,4 +291,59 @@ async function handleBlogContentImgUpload(req, res) {
   }
 }
 
-module.exports = { handlePlayerImgUpload, handleTeamImgUpload, handleChatFileUpload, handleBlogImgUpload, handleBlogContentImgUpload};
+// Delete blog image function
+async function deleteBlogImage(req, res) {
+  try {
+    const { imagePath } = req.body;
+
+    if (!imagePath) {
+      return res.status(400).json({
+        success: false,
+        message: "Image path is required"
+      });
+    }
+
+    // Sanitize the path to prevent directory traversal
+    const sanitizedPath = path.normalize(imagePath).replace(/^(\.\.[\/\\])+/, '');
+    
+    // Construct full file path
+    let fullPath;
+    if (sanitizedPath.startsWith('/images/blogs/')) {
+      fullPath = path.join('upload', sanitizedPath);
+    } else if (sanitizedPath.startsWith('/images/blog-content/')) {
+      fullPath = path.join('upload', sanitizedPath);
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid image path"
+      });
+    }
+
+    // Check if file exists before attempting to delete
+    try {
+      await fs.access(fullPath);
+    } catch (accessError) {
+      return res.status(404).json({
+        success: false,
+        message: "Image file not found"
+      });
+    }
+
+    // Delete the file
+    await fs.unlink(fullPath);
+
+    res.json({
+      success: true,
+      message: "Image deleted successfully"
+    });
+
+  } catch (error) {
+    console.error("Error deleting blog image:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete image"
+    });
+  }
+}
+
+module.exports = { handlePlayerImgUpload, handleTeamImgUpload, handleChatFileUpload, handleBlogImgUpload, handleBlogContentImgUpload, deleteBlogImage};
