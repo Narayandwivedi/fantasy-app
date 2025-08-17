@@ -11,6 +11,7 @@ const {
   deleteBlog,
   toggleBlogLike,
   getBlogStats,
+  autoSaveBlog,
 } = require("../controllers/blogController");
 
 const isAdmin = require("../middleware/isAdmin");
@@ -22,11 +23,12 @@ router.get("/published/:slug", getPublishedBlogBySlug); // Get single published 
 router.post("/:id/like", toggleBlogLike); // Like/Unlike blog (can be public or require auth based on your needs)
 
 // Admin routes (require admin authentication)
-router.get("/", isAdmin, getAllBlogs); // Get all blogs with admin filters
-router.get("/stats", isAdmin, getBlogStats); // Get blog statistics
-router.get("/:id", isAdmin, getBlogById); // Get single blog by ID (admin)
-router.post("/", isAdmin, createBlog); // Create new blog
-router.put("/:id", isAdmin, updateBlog); // Update blog
-router.delete("/:id", isAdmin, deleteBlog); // Delete blog
+router.get("/", getAllBlogs); // Get all blogs with admin filters
+router.get("/stats",  getBlogStats); // Get blog statistics
+router.get("/:id", getBlogById); // Get single blog by ID (admin)
+router.post("/",createBlog); // Create new blog
+router.post("/auto-save",autoSaveBlog); // Auto-save blog draft
+router.put("/:id",updateBlog); // Update blog
+router.delete("/:id", deleteBlog); // Delete blog
 
 module.exports = router;

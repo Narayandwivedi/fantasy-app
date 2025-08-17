@@ -31,8 +31,8 @@ const LandingNavbar = () => {
             <Link to="/contact" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm">
               Contact Us
             </Link>
-            <Link to="/terms-and-conditions" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm">
-              Terms & Conditions
+            <Link to="/blog" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm">
+              Blog
             </Link>
             <Link to="/privacy-policy" className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm">
               Privacy Policy
@@ -89,11 +89,11 @@ const LandingNavbar = () => {
                 Contact Us
               </Link>
               <Link 
-                to="/terms-and-conditions" 
+                to="/blog" 
                 className="text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Terms & Conditions
+                Blog
               </Link>
               <Link 
                 to="/privacy-policy" 

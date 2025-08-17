@@ -120,6 +120,11 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
     onClose();
   };
 
+  const handleImageDeleted = () => {
+    // Update the form data to reflect that image has been deleted
+    setFormData(prev => ({ ...prev, imgLink: "", image: null }));
+  };
+
   if (!showModal) return null;
 
   return (
@@ -145,6 +150,8 @@ const EditPlayerModal = ({ showModal, onClose, player}) => {
           existingImageUrl={player?.imgLink || ""}
           backendUrl={BACKEND_URL}
           isSubmitting={isSubmitting}
+          playerId={player?._id}
+          onImageDeleted={handleImageDeleted}
         />
       </div>
     </div>

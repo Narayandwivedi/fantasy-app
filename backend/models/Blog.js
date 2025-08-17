@@ -33,6 +33,11 @@ const blogSchema = new mongoose.Schema({
   featuredImage: {
     type: String, // URL to the featured image
   },
+  featuredImageAlt: {
+    type: String,
+    default: '',
+    maxlength: 125, // Standard alt text length limit
+  },
   slug: {
     type: String,
     required: true,
@@ -63,9 +68,18 @@ const blogSchema = new mongoose.Schema({
   publishedAt: {
     type: Date,
   },
-  readTime: {
-    type: Number, // Reading time in minutes
-    default: 5,
+  // Auto-save fields
+  autoSaved: {
+    type: Boolean,
+    default: false,
+  },
+  lastSaved: {
+    type: Date,
+    default: Date.now,
+  },
+  isDraft: {
+    type: Boolean,
+    default: true,
   },
 }, {
   timestamps: true,

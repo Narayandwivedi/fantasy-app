@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Player = require("../models/Player");
+const fs = require('fs');
+const path = require('path');
 
 
 
@@ -197,4 +199,71 @@ async function getAllPlayers(req, res) {
 }
 
 
-module.exports = {createPlayer , updatePlayer , getAllPlayers}
+// Delete player image
+async function deletePlayerImage(req, res) {
+  try {
+    const playerId = req.params.id;
+    
+    if (!playerId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Player ID is required" 
+      });
+    }
+
+    if (!mongoose.isValidObjectId(playerId)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid player ID" 
+      });
+    }
+
+    // Find the player
+    const player = await Player.findById(playerId);
+    if (!player) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Player not found" 
+      });
+    }
+
+    // Check if player has an image
+    if (!player.imgLink) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Player has no image to delete" 
+      });
+    }
+
+    // Delete the physical file
+    try {
+      const imagePath = path.join(__dirname, '..', player.imgLink);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+        console.log(`Deleted image file: ${imagePath}`);
+      }
+    } catch (fileError) {
+      console.error('Error deleting image file:', fileError);
+      // Continue execution even if file deletion fails
+    }
+
+    // Update player record to remove imgLink
+    await Player.findByIdAndUpdate(playerId, { 
+      $unset: { imgLink: 1 } 
+    });
+
+    return res.json({ 
+      success: true, 
+      message: "Player image deleted successfully" 
+    });
+
+  } catch (error) {
+    console.error("Delete player image error:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Failed to delete player image" 
+    });
+  }
+}
+
+module.exports = {createPlayer , updatePlayer , getAllPlayers, deletePlayerImage}

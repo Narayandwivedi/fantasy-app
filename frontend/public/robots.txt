@@ -8,6 +8,8 @@ Allow: /terms-and-conditions
 Allow: /privacy-policy
 Allow: /game-rules
 Allow: /login
+Allow: /blog
+Allow: /blog/
 
 # Block protected/private pages
 Disallow: /wallet

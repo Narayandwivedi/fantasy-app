@@ -1,6 +1,6 @@
 import React, { memo, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Users, Shield, Trophy, Calendar, Play, CheckCircle, UserCheck, Zap, Home, Target, Award, ChevronLeft, ChevronRight, MessageCircle, CreditCard, LogOut } from 'lucide-react';
+import { Users, Shield, Trophy, Calendar, Play, CheckCircle, UserCheck, Zap, Home, Target, Award, ChevronLeft, ChevronRight, MessageCircle, CreditCard, LogOut, FileText } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 
 const Sidebar = memo(({ collapsed, onToggle }) => {
@@ -18,6 +18,7 @@ const Sidebar = memo(({ collapsed, onToggle }) => {
     { path: '/live-matches', label: 'Live Matches', icon: Zap },
     { path: '/completed-matches', label: 'Completed Matches', icon: CheckCircle },
     { path: '/manage-deposits', label: 'Manage Deposits', icon: CreditCard },
+    { path: '/manage-blogs', label: 'Manage Blogs', icon: FileText },
     { path: '/chat-support', label: 'Chat Support', icon: MessageCircle }
   ];
 

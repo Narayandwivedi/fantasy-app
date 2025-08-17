@@ -20,7 +20,8 @@ const {
   getMatchPlaying11,
   updateMatchScore,
   getMatchScore,
-  updateUserTeamPoints
+  updateUserTeamPoints,
+  resetMatchPointsToZero
 } = require("../controllers/scoreController");
 
 
@@ -43,6 +44,7 @@ router.get("/:matchId/playing11", getMatchPlaying11);
 router.get("/:matchId/scores",getMatchScore)
 router.put("/:matchId/players/scores", updateMatchScore);
 router.put("/:matchId/update-user-team-points", updateUserTeamPoints);
+router.delete("/:matchId/reset-points", resetMatchPointsToZero);
 
 router.post("/", createMatch);
 

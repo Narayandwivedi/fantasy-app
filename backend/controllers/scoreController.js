@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const PlayerScore = require("../models/PlayerScore");
 const { calculateFantasyPoints, calculateStrikeRate, calculateEconomyRate } = require("../utils/cricketCalculations");
 const { updateAllContestTeamPointsForMatch } = require("../utils/userTeamPointsCalculator");
+const { resetMatchPoints } = require("../utils/resetMatchPoints");
 
 // set playing 11 and create player scores
 async function setMatchPlaying11AndCreateScores(req, res) {
@@ -574,10 +575,62 @@ async function updateUserTeamPoints(req, res) {
   }
 }
 
+// Reset all points for a match to zero
+async function resetMatchPointsToZero(req, res) {
+  try {
+    const { matchId } = req.params;
+
+    if (!matchId) {
+      return res.status(400).json({
+        success: false,
+        message: "Match ID is required"
+      });
+    }
+
+    if (!mongoose.isValidObjectId(matchId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid match ID"
+      });
+    }
+
+    // Check if match exists
+    const match = await Match.findById(matchId);
+    if (!match) {
+      return res.status(404).json({
+        success: false,
+        message: "Match not found"
+      });
+    }
+
+    // Reset all points for this match
+    const resetResult = await resetMatchPoints(matchId);
+
+    if (!resetResult.success) {
+      return res.status(400).json(resetResult);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Match points reset successfully",
+      data: resetResult.data
+    });
+
+  } catch (error) {
+    console.error("Error resetting match points:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error resetting match points",
+      error: error.message
+    });
+  }
+}
+
 module.exports = {
   setMatchPlaying11AndCreateScores,
   getMatchPlaying11,
   updateMatchScore,
   getMatchScore,
   updateUserTeamPoints,
+  resetMatchPointsToZero,
 };

@@ -19,6 +19,7 @@ const createBlog = async (req, res) => {
       category,
       tags,
       featuredImage,
+      featuredImageAlt,
       status,
       metaTitle,
       metaDescription,
@@ -74,6 +75,7 @@ const createBlog = async (req, res) => {
       category: category || "general",
       tags: tags || [],
       featuredImage: featuredImage || "",
+      featuredImageAlt: featuredImageAlt || "",
       status: status || "draft",
       metaTitle: metaTitle || title.trim(),
       metaDescription: metaDescription || excerpt.trim(),
@@ -534,6 +536,97 @@ const getBlogStats = async (req, res) => {
   }
 };
 
+// Auto-save blog draft
+const autoSaveBlog = async (req, res) => {
+  try {
+    const {
+      blogId,
+      title,
+      content,
+      excerpt,
+      author,
+      category,
+      tags,
+      featuredImage,
+      featuredImageAlt,
+      metaTitle,
+      metaDescription,
+    } = req.body;
+
+    // If blogId exists, update existing draft
+    if (blogId && mongoose.isValidObjectId(blogId)) {
+      const updatedBlog = await Blog.findByIdAndUpdate(
+        blogId,
+        {
+          title: title || 'Untitled Draft',
+          content: content || '',
+          excerpt: excerpt || '',
+          author: author || 'Admin',
+          category: category || 'general',
+          tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(tag => tag.trim()) : []),
+          featuredImage: featuredImage || '',
+          featuredImageAlt: featuredImageAlt || '',
+          metaTitle: metaTitle || '',
+          metaDescription: metaDescription || '',
+          status: 'draft', // Always save as draft for auto-save
+          autoSaved: true,
+          lastSaved: new Date(),
+          isDraft: true,
+        },
+        { new: true, runValidators: false } // Skip validation for auto-save
+      );
+
+      if (!updatedBlog) {
+        return res.status(404).json({
+          success: false,
+          message: "Blog not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Blog auto-saved successfully",
+        blogId: updatedBlog._id,
+        lastSaved: updatedBlog.lastSaved,
+      });
+    } else {
+      // Create new draft blog
+      const newBlog = new Blog({
+        title: title || 'Untitled Draft',
+        content: content || '',
+        excerpt: excerpt || '',
+        author: author || 'Admin',
+        category: category || 'general',
+        tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(tag => tag.trim()) : []),
+        featuredImage: featuredImage || '',
+        featuredImageAlt: featuredImageAlt || '',
+        metaTitle: metaTitle || '',
+        metaDescription: metaDescription || '',
+        status: 'draft',
+        autoSaved: true,
+        lastSaved: new Date(),
+        isDraft: true,
+      });
+
+      const savedBlog = await newBlog.save();
+
+      return res.status(201).json({
+        success: true,
+        message: "New blog draft created and auto-saved",
+        blogId: savedBlog._id,
+        lastSaved: savedBlog.lastSaved,
+      });
+    }
+  } catch (error) {
+    console.error("Error auto-saving blog:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error auto-saving blog",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createBlog,
   getAllBlogs,
@@ -544,4 +637,5 @@ module.exports = {
   deleteBlog,
   toggleBlogLike,
   getBlogStats,
+  autoSaveBlog,
 };

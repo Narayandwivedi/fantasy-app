@@ -174,4 +174,121 @@ async function handleChatFileUpload(req, res) {
   }
 }
 
-module.exports = { handlePlayerImgUpload, handleTeamImgUpload, handleChatFileUpload};
+async function handleBlogImgUpload(req, res) {
+  try {
+    console.log(req.file);
+    
+    // Get the original uploaded file path
+    const originalPath = req.file.path;
+    const filename = req.file.filename;
+    const fileExtension = path.extname(filename);
+    const baseFilename = path.basename(filename, fileExtension);
+
+    // Create compressed WebP filename and path
+    const compressedFilename = `${baseFilename}_compressed.webp`;
+    const compressedPath = path.join("upload/images/blogs", compressedFilename);
+
+    // Ensure the blogs directory exists
+    const blogsDir = path.dirname(compressedPath);
+    try {
+      await fs.mkdir(blogsDir, { recursive: true });
+    } catch (mkdirError) {
+      console.warn("Directory might already exist:", mkdirError.message);
+    }
+
+    // Generate WebP with high compression for blog featured images
+    await sharp(originalPath)
+      .resize(800, 450, {
+        fit: "cover",
+        position: "center",
+      })
+      .webp({
+        quality: 80,
+      })
+      .toFile(compressedPath);
+
+    // Check file size
+    const stats = await fs.stat(compressedPath);
+    const fileSizeKB = stats.size / 1024;
+    
+    console.log(`Blog image size: ${fileSizeKB.toFixed(2)} KB`);
+
+    // Try to delete original file
+    try {
+      await fs.unlink(originalPath);
+    } catch (unlinkError) {
+      console.warn("Could not delete original file:", unlinkError.message);
+    }
+
+    res.json({
+      success: true,
+      image_url: `/images/blogs/${compressedFilename}`,
+      file_size_kb: parseFloat(fileSizeKB.toFixed(2)),
+      dimensions: "800x450",
+      format: "webp"
+    });
+  } catch (err) {
+    console.error("Error processing blog image:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+async function handleBlogContentImgUpload(req, res) {
+  try {
+    console.log(req.file);
+    
+    // Get the original uploaded file path
+    const originalPath = req.file.path;
+    const filename = req.file.filename;
+    const fileExtension = path.extname(filename);
+    const baseFilename = path.basename(filename, fileExtension);
+
+    // Create compressed WebP filename and path for blog content images
+    const compressedFilename = `${baseFilename}_compressed.webp`;
+    const compressedPath = path.join("upload/images/blog-content", compressedFilename);
+
+    // Ensure the blog-content directory exists
+    const blogContentDir = path.dirname(compressedPath);
+    try {
+      await fs.mkdir(blogContentDir, { recursive: true });
+    } catch (mkdirError) {
+      console.warn("Directory might already exist:", mkdirError.message);
+    }
+
+    // Generate WebP with good quality for blog content images
+    await sharp(originalPath)
+      .resize(1200, 800, {
+        fit: "inside", // Maintain aspect ratio
+        withoutEnlargement: true, // Don't upscale small images
+      })
+      .webp({
+        quality: 85, // Higher quality for content images
+      })
+      .toFile(compressedPath);
+
+    // Check file size
+    const stats = await fs.stat(compressedPath);
+    const fileSizeKB = stats.size / 1024;
+    
+    console.log(`Blog content image size: ${fileSizeKB.toFixed(2)} KB`);
+
+    // Try to delete original file
+    try {
+      await fs.unlink(originalPath);
+    } catch (unlinkError) {
+      console.warn("Could not delete original file:", unlinkError.message);
+    }
+
+    res.json({
+      success: true,
+      image_url: `/images/blog-content/${compressedFilename}`,
+      file_size_kb: parseFloat(fileSizeKB.toFixed(2)),
+      format: "webp"
+    });
+  } catch (err) {
+    console.error("Error processing blog content image:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+module.exports = { handlePlayerImgUpload, handleTeamImgUpload, handleChatFileUpload, handleBlogImgUpload, handleBlogContentImgUpload};

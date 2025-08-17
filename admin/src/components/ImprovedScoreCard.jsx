@@ -267,6 +267,38 @@ const ImprovedScoreCard = memo(({ matchId }) => {
     setFocusedField(null);
   };
 
+  // Helper function to handle cricket overs increment
+  const incrementOvers = (currentOvers) => {
+    const overs = Math.floor(currentOvers);
+    const balls = Math.round((currentOvers - overs) * 10);
+    
+    if (balls >= 5) {
+      // After 0.5, go to next over
+      return overs + 1.0;
+    } else {
+      // Increment by 0.1 (one ball)
+      return parseFloat((overs + (balls + 1) / 10).toFixed(1));
+    }
+  }
+
+  // Helper function to handle cricket overs decrement
+  const decrementOvers = (currentOvers) => {
+    if (currentOvers <= 0) return 0;
+    
+    const overs = Math.floor(currentOvers);
+    const balls = Math.round((currentOvers - overs) * 10);
+    
+    if (balls <= 0 && overs > 0) {
+      // From 1.0 go to 0.5
+      return parseFloat((overs - 1 + 0.5).toFixed(1));
+    } else if (balls > 0) {
+      // Decrement by 0.1 (one ball)
+      return parseFloat((overs + (balls - 1) / 10).toFixed(1));
+    }
+    
+    return 0;
+  }
+
   // Keyboard navigation for quick update fields
   const handleKeyDown = (e, playerId, fieldName) => {
     const battingPlayers = getBattingTeamPlayers;
@@ -324,7 +356,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
       const currentValue = currentData[fieldName] || 0;
       
       if (fieldName === 'oversBowled') {
-        updateQuickDataFloat(playerId, fieldName, (currentValue + 0.1).toFixed(1));
+        updateQuickDataFloat(playerId, fieldName, incrementOvers(currentValue));
       } else if (fieldName !== 'isOut') {
         updateQuickData(playerId, fieldName, currentValue + 1);
       }
@@ -335,7 +367,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
       const currentValue = currentData[fieldName] || 0;
       
       if (fieldName === 'oversBowled') {
-        updateQuickDataFloat(playerId, fieldName, Math.max(0, currentValue - 0.1).toFixed(1));
+        updateQuickDataFloat(playerId, fieldName, decrementOvers(currentValue));
       } else if (fieldName !== 'isOut') {
         updateQuickData(playerId, fieldName, Math.max(0, currentValue - 1));
       }

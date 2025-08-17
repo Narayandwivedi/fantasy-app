@@ -62,211 +62,300 @@ const LeaderboardPage = () => {
     setSelectedTeam(null)
   }
 
-  // Team Preview Modal Component
+  // Team Preview Modal Component - Ground View
   const TeamPreviewModal = ({ team, onClose }) => {
     if (!team) return null
 
-    const getPlayerStats = (player) => {
-      return {
-        wk: player.playerType === 'wicket-keeper' ? 1 : 0,
-        bat: player.playerType === 'batsman' ? 1 : 0,
-        ar: player.playerType === 'all-rounder' ? 1 : 0,
-        bowl: player.playerType === 'bowler' ? 1 : 0
+    // Group players by position
+    const getPlayersByPosition = () => {
+      const positions = {
+        'wicket-keeper': [],
+        'batsman': [],
+        'all-rounder': [],
+        'bowler': []
       }
+
+      team.players?.forEach((playerObj) => {
+        const player = playerObj.player
+        if (player && player.playerType) {
+          if (positions[player.playerType]) {
+            positions[player.playerType].push({
+              ...player,
+              fantasyPoints: playerObj.fantasyPoints || 0,
+              isCaptain: team.captain?._id === player._id,
+              isViceCaptain: team.viceCaptain?._id === player._id
+            })
+          }
+        }
+      })
+
+      return positions
     }
 
-    const teamStats = team.players?.reduce((acc, playerObj) => {
-      const player = playerObj.player
-      if (player) {
-        const stats = getPlayerStats(player)
-        acc.wk += stats.wk
-        acc.bat += stats.bat
-        acc.ar += stats.ar
-        acc.bowl += stats.bowl
-      }
-      return acc
-    }, { wk: 0, bat: 0, ar: 0, bowl: 0 })
+    const playersByPosition = getPlayersByPosition()
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-          {/* Header */}
-          <div className="flex justify-between items-center p-4 border-b">
-            <h2 className="text-xl font-bold">Team Preview</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full"
-            >
-              <X size={20} />
-            </button>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
+        <div className="w-full md:max-w-md h-full overflow-y-auto relative">
+          {/* Realistic Cricket Ground Background */}
+          <div className="absolute inset-0">
+            {/* Base green background */}
+            <div className="absolute inset-0 bg-green-600"></div>
+            
+            {/* Vertical grass stripes */}
+            <div 
+              className="absolute inset-0"
+              style={{
+                background: `repeating-linear-gradient(
+                  90deg,
+                  #16a34a 0px,
+                  #16a34a 40px,
+                  #15803d 40px,
+                  #15803d 80px
+                )`
+              }}
+            ></div>
+            
+            {/* Ground Area */}
+            <div className="absolute inset-8 md:inset-16">
+              <div className="w-full h-full relative">
+                {/* Pitch */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                  <div className="w-8 h-24 bg-gradient-to-b from-amber-100 via-amber-200 to-amber-100 rounded shadow-lg opacity-60">
+                  </div>
+                </div>
+                
+                {/* Boundary rope indication */}
+                <div className="absolute inset-y-8 inset-x-0.5 border-2 border-white border-opacity-60 rounded-full"></div>
+                
+                {/* Team Name - Top */}
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                  <div className="text-lg font-black tracking-wider" style={{
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    textShadow: `
+                      0 1px 0 rgba(255,255,255,0.3),
+                      0 -1px 0 rgba(0,0,0,0.4),
+                      0 2px 4px rgba(0,0,0,0.3)
+                    `,
+                    letterSpacing: '2px',
+                    fontWeight: '900'
+                  }}>
+                    {team.teamName || 'TEAM'}
+                  </div>
+                </div>
+                
+                {/* Total Points - Bottom */}
+                <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
+                  <div className="text-lg font-black tracking-wider" style={{
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    textShadow: `
+                      0 1px 0 rgba(255,255,255,0.3),
+                      0 -1px 0 rgba(0,0,0,0.4),
+                      0 2px 4px rgba(0,0,0,0.3)
+                    `,
+                    letterSpacing: '2px',
+                    fontWeight: '900'
+                  }}>
+                    {team.totalPoints || 0} PTS
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Team Content */}
-          <div className="p-4">
-            <div className="bg-gradient-to-b from-green-600 to-green-800 rounded-xl p-4 text-white mb-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold">
-                  {team.teamName || 'Team'}
-                </h3>
-                <div className="flex items-center text-white">
-                  <Users size={16} className="mr-1" />
-                  <span className="text-sm">{team.players?.length || 0}</span>
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 p-2 z-20"
+          >
+            <X size={24} />
+          </button>
+
+          {/* Ground View - Players positioned by role */}
+          <div className="h-full flex flex-col justify-center space-y-4 py-4 relative z-10">
+            {/* Wicket Keepers - Top */}
+            {playersByPosition['wicket-keeper'].length > 0 && (
+              <div>
+                <h3 className="text-white text-xs mb-2 text-center font-bold">WICKET-KEEPERS</h3>
+                <div className="space-y-2">
+                  {Array.from({ length: Math.ceil(playersByPosition['wicket-keeper'].length / 3) }, (_, rowIndex) => (
+                    <div key={rowIndex} className="flex justify-around">
+                      {playersByPosition['wicket-keeper'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
+                        <div key={player._id} className="flex flex-col items-center">
+                          <div className="relative">
+                            {player.imgLink ? (
+                              <img 
+                                src={`${BACKEND_URL}${player.imgLink}`} 
+                                alt={`${player.firstName} ${player.lastName}`}
+                                className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-lg"
+                              />
+                            ) : (
+                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                                <span className="text-xs font-bold text-white">
+                                  {player.firstName?.charAt(0)}{player.lastName?.charAt(0)}
+                                </span>
+                              </div>
+                            )}
+                            {/* Captain/Vice-Captain Badge */}
+                            {(player.isCaptain || player.isViceCaptain) && (
+                              <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border border-white">
+                                <span className="text-white text-xs font-bold">
+                                  {player.isCaptain ? 'C' : 'VC'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="bg-black bg-opacity-80 text-white px-2 py-1 rounded mt-1">
+                            <div className="text-xs font-medium text-center">{player.firstName?.charAt(0)} {player.lastName}</div>
+                          </div>
+                          <div className="text-white text-xs font-bold mt-1 bg-green-600 px-2 py-1 rounded">
+                            {player.fantasyPoints} pts
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
                 </div>
               </div>
+            )}
 
-              {/* Captain and Vice Captain */}
-              <div className="flex justify-center mb-4">
-                <div className="flex space-x-6">
-                  {team.captain && (
-                    <div className="flex flex-col items-center">
-                      <div className="relative mb-2">
-                        <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
-                          {team.captain.imgLink ? (
-                            <img 
-                              src={`${BACKEND_URL}${team.captain.imgLink}`} 
-                              alt={`${team.captain.firstName} ${team.captain.lastName}`}
-                              className="w-full h-full object-cover rounded-full"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">
-                                {team.captain.firstName?.charAt(0)}{team.captain.lastName?.charAt(0)}
-                              </span>
-                            </div>
-                          )}
+            {/* Batsmen */}
+            {playersByPosition['batsman'].length > 0 && (
+              <div>
+                <h3 className="text-white text-xs mb-2 text-center font-bold">BATTERS</h3>
+                <div className="space-y-2">
+                  {Array.from({ length: Math.ceil(playersByPosition['batsman'].length / 3) }, (_, rowIndex) => (
+                    <div key={rowIndex} className="flex justify-around">
+                      {playersByPosition['batsman'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
+                        <div key={player._id} className="flex flex-col items-center">
+                          <div className="relative">
+                            {player.imgLink ? (
+                              <img 
+                                src={`${BACKEND_URL}${player.imgLink}`} 
+                                alt={`${player.firstName} ${player.lastName}`}
+                                className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-lg"
+                              />
+                            ) : (
+                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                                <span className="text-xs font-bold text-white">
+                                  {player.firstName?.charAt(0)}{player.lastName?.charAt(0)}
+                                </span>
+                              </div>
+                            )}
+                            {/* Captain/Vice-Captain Badge */}
+                            {(player.isCaptain || player.isViceCaptain) && (
+                              <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border border-white">
+                                <span className="text-white text-xs font-bold">
+                                  {player.isCaptain ? 'C' : 'VC'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="bg-black bg-opacity-80 text-white px-2 py-1 rounded mt-1">
+                            <div className="text-xs font-medium text-center">{player.firstName?.charAt(0)} {player.lastName}</div>
+                          </div>
+                          <div className="text-white text-xs font-bold mt-1 bg-green-600 px-2 py-1 rounded">
+                            {player.fantasyPoints} pts
+                          </div>
                         </div>
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">C</span>
-                        </div>
-                      </div>
-                      <div className="bg-white border border-gray-800 rounded-full px-2 py-1">
-                        <span className="text-xs font-medium text-gray-800">
-                          {team.captain.firstName && team.captain.lastName 
-                            ? `${team.captain.firstName} ${team.captain.lastName}`.length > 10 
-                              ? `${team.captain.firstName} ${team.captain.lastName}`.substring(0, 10) + '...' 
-                              : `${team.captain.firstName} ${team.captain.lastName}`
-                            : 'Captain'
-                          }
-                        </span>
-                      </div>
+                      ))}
                     </div>
-                  )}
-
-                  {team.viceCaptain && (
-                    <div className="flex flex-col items-center">
-                      <div className="relative mb-2">
-                        <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
-                          {team.viceCaptain.imgLink ? (
-                            <img 
-                              src={`${BACKEND_URL}${team.viceCaptain.imgLink}`} 
-                              alt={`${team.viceCaptain.firstName} ${team.viceCaptain.lastName}`}
-                              className="w-full h-full object-cover rounded-full"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 bg-orange-400 rounded-full flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">
-                                {team.viceCaptain.firstName?.charAt(0)}{team.viceCaptain.lastName?.charAt(0)}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">VC</span>
-                        </div>
-                      </div>
-                      <div className="bg-gray-700 rounded-full px-2 py-1">
-                        <span className="text-xs font-medium text-white">
-                          {team.viceCaptain.firstName && team.viceCaptain.lastName 
-                            ? `${team.viceCaptain.firstName} ${team.viceCaptain.lastName}`.length > 10 
-                              ? `${team.viceCaptain.firstName} ${team.viceCaptain.lastName}`.substring(0, 10) + '...' 
-                              : `${team.viceCaptain.firstName} ${team.viceCaptain.lastName}`
-                            : 'Vice Captain'
-                          }
-                        </span>
-                      </div>
-                    </div>
-                  )}
+                  ))}
                 </div>
               </div>
+            )}
 
-              {/* Team Composition Stats */}
-              <div className="flex justify-center items-center space-x-8">
-                <div className="flex items-center space-x-1">
-                  <span className="text-xs text-white">WK</span>
-                  <span className="text-xs text-white font-medium">{teamStats?.wk || 0}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <span className="text-xs text-white">BAT</span>
-                  <span className="text-xs text-white font-medium">{teamStats?.bat || 0}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <span className="text-xs text-white">AR</span>
-                  <span className="text-xs text-white font-medium">{teamStats?.ar || 0}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <span className="text-xs text-white">BOWL</span>
-                  <span className="text-xs text-white font-medium">{teamStats?.bowl || 0}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Players List */}
-            <div className="space-y-2">
-              <h4 className="font-semibold text-gray-800 mb-3">Players ({team.players?.length || 0})</h4>
-              {team.players?.map((playerObj, index) => {
-                const player = playerObj.player
-                if (!player) return null
-                
-                const isCaptain = team.captain?._id === player._id
-                const isViceCaptain = team.viceCaptain?._id === player._id
-                
-                return (
-                  <div key={player._id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
-                    <div className="relative">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                        {player.imgLink ? (
-                          <img 
-                            src={`${BACKEND_URL}${player.imgLink}`} 
-                            alt={`${player.firstName} ${player.lastName}`}
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          <span className="text-gray-600 text-xs font-bold">
-                            {player.firstName?.charAt(0)}{player.lastName?.charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                      {(isCaptain || isViceCaptain) && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gray-700 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">
-                            {isCaptain ? 'C' : 'VC'}
-                          </span>
+            {/* All Rounders */}
+            {playersByPosition['all-rounder'].length > 0 && (
+              <div>
+                <h3 className="text-white text-xs mb-2 text-center font-bold">ALL-ROUNDERS</h3>
+                <div className="space-y-2">
+                  {Array.from({ length: Math.ceil(playersByPosition['all-rounder'].length / 3) }, (_, rowIndex) => (
+                    <div key={rowIndex} className="flex justify-around">
+                      {playersByPosition['all-rounder'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
+                        <div key={player._id} className="flex flex-col items-center">
+                          <div className="relative">
+                            {player.imgLink ? (
+                              <img 
+                                src={`${BACKEND_URL}${player.imgLink}`} 
+                                alt={`${player.firstName} ${player.lastName}`}
+                                className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-lg"
+                              />
+                            ) : (
+                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                                <span className="text-xs font-bold text-white">
+                                  {player.firstName?.charAt(0)}{player.lastName?.charAt(0)}
+                                </span>
+                              </div>
+                            )}
+                            {/* Captain/Vice-Captain Badge */}
+                            {(player.isCaptain || player.isViceCaptain) && (
+                              <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border border-white">
+                                <span className="text-white text-xs font-bold">
+                                  {player.isCaptain ? 'C' : 'VC'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="bg-black bg-opacity-80 text-white px-2 py-1 rounded mt-1">
+                            <div className="text-xs font-medium text-center">{player.firstName?.charAt(0)} {player.lastName}</div>
+                          </div>
+                          <div className="text-white text-xs font-bold mt-1 bg-green-600 px-2 py-1 rounded">
+                            {player.fantasyPoints} pts
+                          </div>
                         </div>
-                      )}
+                      ))}
                     </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-sm">
-                        {player.firstName} {player.lastName}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {player.playerType?.replace('-', ' ').toUpperCase() || player.position}
-                      </div>
-                    </div>
-                    <div className="text-sm font-medium text-green-600">
-                      {playerObj.fantasyPoints || 0} pts
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Team Total Points */}
-            <div className="mt-4 p-3 bg-green-50 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="font-semibold text-green-800">Total Points</span>
-                <span className="font-bold text-green-800 text-lg">{team.totalPoints || 0}</span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Bowlers - Bottom */}
+            {playersByPosition['bowler'].length > 0 && (
+              <div>
+                <h3 className="text-white text-xs mb-2 text-center font-bold">BOWLERS</h3>
+                <div className="space-y-2">
+                  {Array.from({ length: Math.ceil(playersByPosition['bowler'].length / 3) }, (_, rowIndex) => (
+                    <div key={rowIndex} className="flex justify-around">
+                      {playersByPosition['bowler'].slice(rowIndex * 3, (rowIndex + 1) * 3).map((player) => (
+                        <div key={player._id} className="flex flex-col items-center">
+                          <div className="relative">
+                            {player.imgLink ? (
+                              <img 
+                                src={`${BACKEND_URL}${player.imgLink}`} 
+                                alt={`${player.firstName} ${player.lastName}`}
+                                className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-lg"
+                              />
+                            ) : (
+                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                                <span className="text-xs font-bold text-white">
+                                  {player.firstName?.charAt(0)}{player.lastName?.charAt(0)}
+                                </span>
+                              </div>
+                            )}
+                            {/* Captain/Vice-Captain Badge */}
+                            {(player.isCaptain || player.isViceCaptain) && (
+                              <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border border-white">
+                                <span className="text-white text-xs font-bold">
+                                  {player.isCaptain ? 'C' : 'VC'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="bg-black bg-opacity-80 text-white px-2 py-1 rounded mt-1">
+                            <div className="text-xs font-medium text-center">{player.firstName?.charAt(0)} {player.lastName}</div>
+                          </div>
+                          <div className="text-white text-xs font-bold mt-1 bg-green-600 px-2 py-1 rounded">
+                            {player.fantasyPoints} pts
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

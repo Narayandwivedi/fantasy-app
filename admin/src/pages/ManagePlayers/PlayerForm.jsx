@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import upload_area from "../../assets/upload_area.svg";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 // Constants
 const PLAYER_POSITIONS = [
@@ -36,8 +37,11 @@ const PlayerForm = ({
   existingImageUrl = "",
   backendUrl = "",
   isSubmitting = false,
+  playerId = null,
+  onImageDeleted = null,
 }) => {
   const [imagePreview, setImagePreview] = useState(null);
+  const [isDeletingImage, setIsDeletingImage] = useState(false);
 
   const handleInputChange = useCallback((field, value) => {
     setFormData((prev) => ({
@@ -79,6 +83,43 @@ const PlayerForm = ({
       return;
     }
     onSubmit();
+  };
+
+  const handleDeleteImage = async () => {
+    if (!playerId || !existingImageUrl) {
+      toast.error("No image to delete");
+      return;
+    }
+
+    if (!window.confirm("Are you sure you want to delete this player's image?")) {
+      return;
+    }
+
+    setIsDeletingImage(true);
+    try {
+      const response = await axios.delete(
+        `${backendUrl}/api/players/${playerId}/image`,
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        toast.success("Player image deleted successfully");
+        
+        // Clear the image preview and reset imgLink in form data
+        setImagePreview(null);
+        setFormData(prev => ({ ...prev, imgLink: "", image: null }));
+        
+        // Call callback if provided
+        if (onImageDeleted) {
+          onImageDeleted();
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast.error(error.response?.data?.message || "Failed to delete image");
+    } finally {
+      setIsDeletingImage(false);
+    }
   };
 
   return (
@@ -185,18 +226,33 @@ const PlayerForm = ({
         <p className="mb-2 text-sm font-medium">
           {mode === "edit" ? "Current Image / Upload New Image" : "Upload Player Image"}
         </p>
-        <label className="cursor-pointer block" htmlFor="file-input">
-          <img
-            className="h-[80px] w-[80px] object-cover rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors mx-auto"
-            src={getImageSource()}
-            alt="Player preview"
-          />
-          <p className="text-xs text-gray-500 mt-1 text-center">
-            {mode === "edit" && existingImageUrl && !imagePreview
-              ? "Click to change image"
-              : "Click to upload image"}
-          </p>
-        </label>
+        <div className="flex flex-col items-center">
+          <label className="cursor-pointer block" htmlFor="file-input">
+            <img
+              className="h-[80px] w-[80px] object-cover rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors mx-auto"
+              src={getImageSource()}
+              alt="Player preview"
+            />
+            <p className="text-xs text-gray-500 mt-1 text-center">
+              {mode === "edit" && existingImageUrl && !imagePreview
+                ? "Click to change image"
+                : "Click to upload image"}
+            </p>
+          </label>
+          
+          {/* Delete Image Button - Only show in edit mode if image exists */}
+          {mode === "edit" && existingImageUrl && !imagePreview && (
+            <button
+              type="button"
+              onClick={handleDeleteImage}
+              disabled={isDeletingImage || isSubmitting}
+              className="mt-2 px-4 py-2 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isDeletingImage ? "Deleting..." : "Delete Image"}
+            </button>
+          )}
+        </div>
+        
         <input
           onChange={imageHandler}
           className="hidden"

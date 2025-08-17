@@ -3,7 +3,7 @@ import MatchCard from './components/MatchCard'
 import HomePage from './pages/HomePage'
 import FantasySport from './pages/FantasySport'
 import BottomNav from './components/BottomNav'
-import { Routes , Route, useLocation } from 'react-router-dom'
+import { Routes , Route, useLocation, Navigate } from 'react-router-dom'
 import { AppContext } from './context/AppContext'
 import Contest from './pages/Contest'
 import CreateTeam from './pages/createteam'
@@ -24,6 +24,8 @@ import ContactUs from './pages/ContactUs'
 import CustomerSupport from './pages/CustomerSupport'
 import Terms from './pages/Terms'
 import PrivacyPolicy from './pages/PrivacyPolicy'
+import BlogsPage from './pages/BlogsPage'
+import BlogDetailPage from './pages/BlogDetailPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import { ToastContainer } from 'react-toastify'
@@ -56,7 +58,8 @@ const App = () => {
   const isTermPage = location.pathname === '/terms-and-conditions'
   const isPrivacyPage = location.pathname === '/privacy-policy'
   const isPreviewGroundPage = location.pathname === '/preview-ground'
-  const containerClasses = (isHomePage || isContactPage || isAboutPage || isTermPage || isPrivacyPage || isPreviewGroundPage)
+  const isBlogsPage = location.pathname === '/blog' || location.pathname.startsWith('/blog/')
+  const containerClasses = (isHomePage || isContactPage || isAboutPage || isTermPage || isPrivacyPage || isPreviewGroundPage || isBlogsPage)
     ? 'w-full min-h-screen relative overflow-hidden' 
     : 'max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden'
 
@@ -66,7 +69,9 @@ const App = () => {
         <div>
           <Routes>
             
-            <Route path='/login' element = {<Login/>} />
+            <Route path='/login' element = {
+              user ? <Navigate to="/fantasy-sport" replace /> : <Login/>
+            } />
             
             <Route path='/' element = {
               
@@ -161,6 +166,8 @@ const App = () => {
             <Route path='/contact' element = {<ContactUs/>} />
             <Route path='/terms-and-conditions' element = {<Terms/>} />
             <Route path='/privacy-policy' element = {<PrivacyPolicy/>} />
+            <Route path='/blog' element = {<BlogsPage/>} />
+            <Route path='/blog/:slug' element = {<BlogDetailPage/>} />
             <Route path='/preview-ground' element = {<PreviewGround/>} />
 
           </Routes>
