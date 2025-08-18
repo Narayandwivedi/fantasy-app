@@ -7,6 +7,7 @@ import { Routes , Route, useLocation, Navigate } from 'react-router-dom'
 import { AppContext } from './context/AppContext'
 import Contest from './pages/Contest'
 import CreateTeam from './pages/createteam'
+import EditTeam from './pages/EditTeam'
 import PreviewGround from './pages/createteam/PreviewGround'
 import MyTeams from './pages/MyTeams'
 import MyMatches from './pages/my matches/MyMatches'
@@ -96,6 +97,12 @@ const App = () => {
             <Route path='/:matchId/my-teams' element = {
               <ProtectedRoute>
                 <MyTeams/>
+              </ProtectedRoute>
+            } />
+
+            <Route path='/:matchId/edit-team/:teamId' element = {
+              <ProtectedRoute>
+                <EditTeam/>
               </ProtectedRoute>
             } />
 

@@ -53,6 +53,23 @@ const Contest = () => {
     fetchUserTeams();
   }, [matchId, user]);
 
+  // Handle browser back button behavior
+  useEffect(() => {
+    // Push the fantasy sports page to history so back button goes there
+    window.history.pushState(null, '', window.location.href);
+    
+    const handlePopState = () => {
+      // When back button is pressed, navigate to fantasy sports
+      navigate('/fantasy-sport', { replace: true });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate]);
+
   const groupContestsByFormat = (contests) => {
     return contests.reduce((acc, contest) => {
       if (!acc[contest.contestFormat]) {
@@ -202,14 +219,41 @@ const Contest = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-lg">Loading contests...</div>
+      <div className="bg-gray-50 min-h-screen">
+        {/* Header */}
+        <div className="bg-gray-800 text-white p-4">
+          <div className="flex items-center">
+            <button onClick={() => navigate('/fantasy-sport', { replace: true })} className="mr-3">
+              <ArrowLeft size={24} />
+            </button>
+            <div>
+              <h1 className="text-xl font-semibold">Contests</h1>
+              <p className="text-sm text-gray-300">Loading...</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-center items-center min-h-96">
+          <div className="text-lg">Loading contests...</div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="bg-gray-800 text-white p-4">
+        <div className="flex items-center">
+          <button onClick={() => navigate('/fantasy-sport', { replace: true })} className="mr-3">
+            <ArrowLeft size={24} />
+          </button>
+          <div>
+            <h1 className="text-xl font-semibold">Contests</h1>
+            <p className="text-sm text-gray-300">Join contests and win prizes</p>
+          </div>
+        </div>
+      </div>
+
       {Object.keys(groupedContests).length === 0 ? (
         <div className="flex justify-center items-center min-h-screen">
           <div className="text-lg text-gray-500">No contests available</div>
@@ -236,11 +280,12 @@ const Contest = () => {
       {/* Fixed Team Buttons - always visible at bottom */}
       <div className="fixed left-1/2 transform -translate-x-1/2 w-full max-w-[440px] bg-white border-t border-gray-100 px-4 py-3 z-40 bottom-0">
         <div className="flex space-x-3">
-          <Link to={`/${matchId}/my-teams`} className="flex-1">
-            <button className="w-full bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold text-center hover:bg-gray-700 transition-colors shadow-lg">
-              My Teams {userTeams.length > 0 && `(${userTeams.length})`}
-            </button>
-          </Link>
+          <button 
+            onClick={() => navigate(`/${matchId}/my-teams?from=contest`, { replace: true })}
+            className="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold text-center hover:bg-gray-700 transition-colors shadow-lg"
+          >
+            My Teams {userTeams.length > 0 && `(${userTeams.length})`}
+          </button>
           <Link to={`/${matchId}/create-team`} className="flex-1">
             <button className="w-full bg-black text-white py-3 px-4 rounded-lg font-semibold text-center hover:bg-gray-800 transition-colors shadow-lg">
               Create Team
@@ -287,19 +332,22 @@ const Contest = () => {
                 
                 const getPlayerStats = (player) => {
                   return {
-                    wk: player.playerType === 'wicket-keeper' ? 1 : 0,
-                    bat: player.playerType === 'batsman' ? 1 : 0,
-                    ar: player.playerType === 'all-rounder' ? 1 : 0,
-                    bowl: player.playerType === 'bowler' ? 1 : 0
+                    wk: player.position === 'wicket-keeper' ? 1 : 0,
+                    bat: player.position === 'batsman' ? 1 : 0,
+                    ar: player.position === 'all-rounder' ? 1 : 0,
+                    bowl: player.position === 'bowler' ? 1 : 0
                   };
                 };
 
-                const teamStats = team.players?.reduce((acc, player) => {
-                  const stats = getPlayerStats(player);
-                  acc.wk += stats.wk;
-                  acc.bat += stats.bat;
-                  acc.ar += stats.ar;
-                  acc.bowl += stats.bowl;
+                const teamStats = team.players?.reduce((acc, playerObj) => {
+                  const player = playerObj.player; // Access the populated player data
+                  if (player) {
+                    const stats = getPlayerStats(player);
+                    acc.wk += stats.wk;
+                    acc.bat += stats.bat;
+                    acc.ar += stats.ar;
+                    acc.bowl += stats.bowl;
+                  }
                   return acc;
                 }, { wk: 0, bat: 0, ar: 0, bowl: 0 });
 
