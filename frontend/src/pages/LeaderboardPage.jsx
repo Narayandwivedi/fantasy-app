@@ -77,9 +77,9 @@ const LeaderboardPage = () => {
 
       team.players?.forEach((playerObj) => {
         const player = playerObj.player
-        if (player && player.playerType) {
-          if (positions[player.playerType]) {
-            positions[player.playerType].push({
+        if (player && player.position) {
+          if (positions[player.position]) {
+            positions[player.position].push({
               ...player,
               fantasyPoints: playerObj.fantasyPoints || 0,
               isCaptain: team.captain?._id === player._id,
