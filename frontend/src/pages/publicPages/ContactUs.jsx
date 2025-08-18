@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ArrowLeft, Phone, Mail, MessageCircle, Clock, HeadphonesIcon, Send } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import LandingNavbar from '../components/LandingNavbar';
-import Footer from '../components/Footer';
-import { AppContext } from '../context/AppContext';
+import LandingNavbar from '../../components/LandingNavbar';
+import Footer from '../../components/Footer';
+import { AppContext } from '../../context/AppContext';
 
 const ContactUs = () => {
   const navigate = useNavigate();

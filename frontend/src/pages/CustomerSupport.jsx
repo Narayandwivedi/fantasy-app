@@ -173,7 +173,7 @@ const CustomerSupport = () => {
                   </div>
                   <div>
                     <div className="font-semibold text-gray-900">Email Support</div>
-                    <div className="text-sm text-gray-500">myseries11assist@gmail.com</div>
+                    <div className="text-xs text-gray-500">myseries11assist@gmail.com</div>
                   </div>
                 </div>
                 <button

@@ -1,16 +1,56 @@
 import React, { useContext } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import LandingNavbar from '../components/LandingNavbar'
-import Footer from '../components/Footer'
-import { AppContext } from '../context/AppContext'
+import LandingNavbar from '../../components/LandingNavbar'
+import Footer from '../../components/Footer'
+import { AppContext } from '../../context/AppContext'
 
 const Terms = () => {
   const navigate = useNavigate()
   const { user } = useContext(AppContext)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      {/* Schema markup for Terms page */}
+      <script 
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Terms and Conditions - MySeries11",
+            "description": "Terms and conditions for using MySeries11 fantasy cricket platform. Read our complete terms of service, user agreements, and legal policies.",
+            "url": "https://myseries11.com/terms-and-conditions",
+            "mainEntity": {
+              "@type": "TermsOfService",
+              "name": "MySeries11 Terms and Conditions",
+              "provider": {
+                "@type": "Organization",
+                "name": "MySeries11"
+              }
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://myseries11.com/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Terms & Conditions",
+                  "item": "https://myseries11.com/terms-and-conditions"
+                }
+              ]
+            }
+          })
+        }}
+      />
+      
+      <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       {user ? (
         // Back button for logged-in users
@@ -272,6 +312,7 @@ const Terms = () => {
       {/* Footer - Only show for non-logged-in users */}
       {!user && <Footer />}
     </div>
+    </>
   )
 }
 

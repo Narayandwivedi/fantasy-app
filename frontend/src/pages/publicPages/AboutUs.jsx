@@ -1,9 +1,9 @@
 import React, { useEffect, useContext } from 'react';
 import { ArrowLeft, Trophy, Users, Shield, Star, Target, Award } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import LandingNavbar from '../components/LandingNavbar';
-import Footer from '../components/Footer';
-import { AppContext } from '../context/AppContext';
+import LandingNavbar from '../../components/LandingNavbar';
+import Footer from '../../components/Footer';
+import { AppContext } from '../../context/AppContext';
 
 const AboutUs = () => {
   const navigate = useNavigate();

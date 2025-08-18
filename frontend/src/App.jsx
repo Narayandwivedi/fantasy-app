@@ -8,7 +8,6 @@ import { AppContext } from './context/AppContext'
 import Contest from './pages/Contest'
 import CreateTeam from './pages/createteam'
 import EditTeam from './pages/EditTeam'
-import PreviewGround from './pages/createteam/PreviewGround'
 import MyTeams from './pages/MyTeams'
 import MyMatches from './pages/my matches/MyMatches'
 import MyContests from './pages/MyContests'
@@ -20,11 +19,11 @@ import ReferAndEarn from './pages/ReferAndEarn'
 import GameRules from './pages/user profile/GameRules'
 import ChatPage from './pages/ChatPage'
 import Login from './pages/Login'
-import AboutUs from './pages/AboutUs'
-import ContactUs from './pages/ContactUs'
+import AboutUs from './pages/publicPages/AboutUs'
+import ContactUs from './pages/publicPages/ContactUs'
 import CustomerSupport from './pages/CustomerSupport'
-import Terms from './pages/Terms'
-import PrivacyPolicy from './pages/PrivacyPolicy'
+import Terms from './pages/publicPages/Terms'
+import PrivacyPolicy from './pages/publicPages/PrivacyPolicy'
 import BlogsPage from './pages/blog/BlogsPage'
 import BlogDetailPage from './pages/blog/BlogDetailPage'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -58,9 +57,8 @@ const App = () => {
   const isAboutPage = location.pathname === '/about'
   const isTermPage = location.pathname === '/terms-and-conditions'
   const isPrivacyPage = location.pathname === '/privacy-policy'
-  const isPreviewGroundPage = location.pathname === '/preview-ground'
   const isBlogsPage = location.pathname === '/blog' || location.pathname.startsWith('/blog/')
-  const containerClasses = (isHomePage || isContactPage || isAboutPage || isTermPage || isPrivacyPage || isPreviewGroundPage || isBlogsPage)
+  const containerClasses = (isHomePage || isContactPage || isAboutPage || isTermPage || isPrivacyPage || isBlogsPage)
     ? 'w-full min-h-screen relative overflow-hidden' 
     : 'max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden'
 
@@ -174,7 +172,6 @@ const App = () => {
             <Route path='/privacy-policy' element = {<PrivacyPolicy/>} />
             <Route path='/blog' element = {<BlogsPage/>} />
             <Route path='/blog/:slug' element = {<BlogDetailPage/>} />
-            <Route path='/preview-ground' element = {<PreviewGround/>} />
 
           </Routes>
           {!hideBottomNav && <BottomNav/>}

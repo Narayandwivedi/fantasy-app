@@ -1,3 +1,113 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Rich Text Editor Heading Styles */
+.rich-text-editor-content h1 {
+  font-size: 2rem !important;
+  font-weight: bold !important;
+  margin: 0.67rem 0 !important;
+  line-height: 1.2 !important;
+}
+
+.rich-text-editor-content h2 {
+  font-size: 1.5rem !important;
+  font-weight: bold !important;
+  margin: 0.75rem 0 !important;
+  line-height: 1.3 !important;
+}
+
+.rich-text-editor-content h3 {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  margin: 0.83rem 0 !important;
+  line-height: 1.4 !important;
+}
+
+.rich-text-editor-content h4 {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  margin: 0.83rem 0 !important;
+  line-height: 1.4 !important;
+}
+
+.rich-text-editor-content h5 {
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  margin: 0.83rem 0 !important;
+  line-height: 1.4 !important;
+}
+
+.rich-text-editor-content h6 {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  margin: 0.83rem 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* Remove focus outline and borders from content area */
+.rich-text-editor-content:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* List Styles */
+.rich-text-editor-content ul {
+  margin: 1rem 0 !important;
+  padding-left: 2rem !important;
+  list-style-type: disc !important;
+}
+
+.rich-text-editor-content ol {
+  margin: 1rem 0 !important;
+  padding-left: 2rem !important;
+  list-style-type: decimal !important;
+}
+
+.rich-text-editor-content ul.plain-list {
+  list-style-type: none !important;
+  padding-left: 1rem !important;
+}
+
+.rich-text-editor-content li {
+  margin: 0.5rem 0 !important;
+  line-height: 1.6 !important;
+}
+
+/* Table Styles */
+.rich-text-editor-content table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin: 20px 0 !important;
+  font-size: 14px !important;
+}
+
+.rich-text-editor-content td, 
+.rich-text-editor-content th {
+  border: 1px solid #d1d5db !important;
+  padding: 12px !important;
+  text-align: left !important;
+  vertical-align: top !important;
+}
+
+.rich-text-editor-content th {
+  background-color: #f9fafb !important;
+  font-weight: 600 !important;
+}
+
+/* Blockquote Styles */
+.rich-text-editor-content blockquote {
+  border-left: 4px solid #3b82f6 !important;
+  margin: 20px 0 !important;
+  padding: 15px 20px !important;
+  background-color: #f8fafc !important;
+  font-style: italic !important;
+  color: #4b5563 !important;
+}
+
+/* Video/Iframe responsive container */
+.rich-text-editor-content iframe {
+  max-width: 100% !important;
+  height: auto !important;
+}

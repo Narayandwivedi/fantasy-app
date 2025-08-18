@@ -150,7 +150,7 @@ const QRPayment = () => {
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex flex-col overflow-hidden">
       {/* Timer Header */}
       <div className="bg-white shadow-sm border-b px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -171,39 +171,46 @@ const QRPayment = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col justify-between p-2">
-        <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md mx-auto flex-1 flex flex-col justify-start">
+      <div className="flex-1 p-2">
+        <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-sm mx-auto h-fit">
         
         {/* QR Code Section */}
-        <div className="text-center mb-5">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Scan to Pay ₹{amount}</h2>
+        <div className="text-center mb-3">
+          <h2 className="text-base font-semibold text-gray-800 mb-3">Scan to Pay ₹{amount}</h2>
           
-          {/* QR Code Display */}
-          <div className="bg-gray-50 p-4 rounded-xl mb-4">
+          {/* Beautiful QR Code Display */}
+          <div className="bg-gradient-to-br from-gray-100 to-gray-200 p-4 rounded-2xl mb-4 border shadow-inner">
             {qrCodeSVG ? (
-              <div 
-                className="flex justify-center"
-                dangerouslySetInnerHTML={{ __html: qrCodeSVG }} 
-              />
-            ) : (
-              <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center mx-auto">
-                <span className="text-gray-400 text-sm">Loading QR Code...</span>
+              <div className="bg-white p-3 border rounded-xl shadow-sm inline-block">
+                <div 
+                  className="flex justify-center"
+                  dangerouslySetInnerHTML={{ __html: qrCodeSVG }} 
+                />
               </div>
+            ) : (
+              <div className="w-32 h-32 bg-gray-100 rounded-xl flex items-center justify-center mx-auto">
+                <span className="text-gray-400 text-xs">Loading QR Code...</span>
+              </div>
+            )}
+            {amount && (
+              <p className="mt-2 text-xs text-gray-700 font-medium">
+                Amount: ₹{amount}
+              </p>
             )}
           </div>
 
           {/* UPI ID Display */}
-          <div className="bg-gray-50 rounded-lg p-3 mb-4">
+          <div className="bg-gray-50 rounded-lg p-2 mb-3">
             <div className="flex items-center justify-between">
               <div className="text-left">
                 <p className="text-xs text-gray-500">UPI ID</p>
-                <p className="font-mono font-medium text-gray-800 text-sm">myseries11official@oksbi</p>
+                <p className="font-mono font-medium text-gray-800 text-xs">myseries11official@oksbi</p>
               </div>
               <button
                 onClick={copyUPIId}
-                className="flex items-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-md text-xs font-medium hover:bg-blue-200 transition-colors"
+                className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs font-medium hover:bg-blue-200 transition-colors"
               >
-                {copySuccess ? <CheckCircle size={14} /> : <Copy size={14} />}
+                {copySuccess ? <CheckCircle size={12} /> : <Copy size={12} />}
                 {copySuccess ? 'Copied!' : 'Copy'}
               </button>
             </div>
@@ -211,14 +218,14 @@ const QRPayment = () => {
         </div>
 
         {/* UTR Input Section */}
-        <div className="border-t pt-4">
-          <h3 className="text-sm font-semibold text-gray-800 mb-3">Enter UTR after payment</h3>
+        <div className="border-t pt-3">
+          <h3 className="text-xs font-semibold text-gray-800 mb-2">Enter UTR after payment</h3>
           
           {/* Warning Message */}
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-2 mb-3">
             <div className="flex items-start gap-2">
-              <div className="w-4 h-4 rounded-full bg-red-500 flex-shrink-0 mt-0.5">
-                <span className="block w-full h-full text-white text-xs text-center leading-4">!</span>
+              <div className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0 mt-0.5">
+                <span className="block w-full h-full text-white text-xs text-center leading-3">!</span>
               </div>
               <p className="text-xs text-red-700">
                 <strong>Important:</strong> Invalid UTR leads to account suspension. Only submit genuine payment references.
@@ -226,17 +233,17 @@ const QRPayment = () => {
             </div>
           </div>
           
-          <form onSubmit={handleSubmitUTR} className="space-y-4">
+          <form onSubmit={handleSubmitUTR} className="space-y-3">
             <div>
               <input
                 type="text"
                 value={utr}
                 onChange={(e) => setUtr(e.target.value)}
                 placeholder="Enter 12-digit UTR number"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-xs"
                 disabled={isSubmitting}
               />
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 mt-1">
                 Find UTR in payment confirmation message
               </p>
             </div>
@@ -244,7 +251,7 @@ const QRPayment = () => {
             <button
               type="submit"
               disabled={isSubmitting || !utr.trim()}
-              className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="w-full py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? 'Submitting...' : 'Confirm Payment'}
             </button>

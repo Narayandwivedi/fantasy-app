@@ -1,16 +1,56 @@
 import React, { useContext } from 'react';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
-import LandingNavbar from '../components/LandingNavbar';
-import Footer from '../components/Footer';
-import { AppContext } from '../context/AppContext';
+import LandingNavbar from '../../components/LandingNavbar';
+import Footer from '../../components/Footer';
+import { AppContext } from '../../context/AppContext';
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
   const { user } = useContext(AppContext);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      {/* Schema markup for Privacy Policy page */}
+      <script 
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Privacy Policy - MySeries11",
+            "description": "Privacy policy for MySeries11 fantasy cricket platform. Learn how we collect, use, and protect your personal information and data.",
+            "url": "https://myseries11.com/privacy-policy",
+            "mainEntity": {
+              "@type": "PrivacyPolicy",
+              "name": "MySeries11 Privacy Policy",
+              "provider": {
+                "@type": "Organization",
+                "name": "MySeries11"
+              }
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://myseries11.com/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Privacy Policy",
+                  "item": "https://myseries11.com/privacy-policy"
+                }
+              ]
+            }
+          })
+        }}
+      />
+      
+      <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       {user ? (
         // Back button for logged-in users
@@ -330,6 +370,7 @@ const PrivacyPolicy = () => {
       {/* Footer - Only show for non-logged-in users */}
       {!user && <Footer />}
     </div>
+    </>
   );
 };
 
