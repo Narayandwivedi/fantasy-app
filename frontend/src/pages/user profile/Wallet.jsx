@@ -36,95 +36,110 @@ const Wallet = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col overflow-x-hidden">
       <Navbar />
 
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4">
-        <div className="flex items-center">
-          <div>
-            <h1 className="text-xl font-bold text-gray-800">Add Money</h1>
-            <p className="text-gray-500 text-sm">Add funds to your wallet</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Balance Section */}
-      <div className="bg-white p-4 shadow-sm border-b">
+      {/* Enhanced Header with Balance */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 sm:p-6">
         <div className="flex items-center justify-between">
-          <span className="text-gray-600 text-sm">Total Balance Available</span>
-          <span className="text-xl font-bold text-gray-900">₹{user?.balance || 0}</span>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold truncate">Add Money</h1>
+            <p className="text-blue-100 text-sm mt-1">Add funds to your wallet</p>
+          </div>
+          <div className="text-right ml-4 flex-shrink-0">
+            <p className="text-blue-100 text-xs">Current Balance</p>
+            <p className="text-xl sm:text-2xl font-bold">₹{user?.balance || 0}</p>
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="p-4 space-y-6">
-
-        {/* Amount Selection */}
-        <div className="bg-white rounded-xl p-4 shadow-sm">
-          <h3 className="text-gray-600 text-sm mb-4">Amount to add</h3>
+      {/* Main Content with Better Mobile Layout */}
+      <div className="flex-1 p-3 sm:p-4 pb-24 overflow-y-auto overflow-x-hidden">
+        {/* Amount Input Card */}
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg mb-4 sm:mb-6 w-full max-w-full">
+          <h3 className="text-gray-800 font-semibold text-base sm:text-lg mb-4 sm:mb-6">Choose Amount</h3>
           
-          {/* Custom Amount Input */}
-          <div className="relative mb-4">
-            <input
-              type="number"
-              value={customAmount}
-              onChange={handleCustomAmountChange}
-              placeholder="Enter amount"
-              className="w-full text-2xl font-bold border-b-2 border-gray-300 focus:border-blue-500 outline-none pb-2"
-            />
-            {customAmount && (
-              <button
-                onClick={clearAmount}
-                className="absolute right-2 top-2 bg-gray-200 rounded-full p-1"
-              >
-                <X size={16} />
-              </button>
-            )}
+          {/* Enhanced Custom Amount Input */}
+          <div className="relative mb-6 sm:mb-8">
+            <div className="flex items-center bg-gray-50 rounded-xl p-3 sm:p-4 border-2 border-gray-200 focus-within:border-blue-500 transition-colors w-full">
+              <span className="text-xl sm:text-2xl font-bold text-gray-600 mr-2 flex-shrink-0">₹</span>
+              <input
+                type="number"
+                value={customAmount}
+                onChange={handleCustomAmountChange}
+                placeholder="0"
+                className="flex-1 text-xl sm:text-2xl font-bold bg-transparent outline-none min-w-0"
+              />
+              {customAmount && (
+                <button
+                  onClick={clearAmount}
+                  className="ml-2 bg-gray-300 hover:bg-gray-400 rounded-full p-1.5 sm:p-2 transition-colors flex-shrink-0"
+                >
+                  <X size={14} className="sm:w-4 sm:h-4" />
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Predefined Amount Options */}
-          <div className="grid grid-cols-3 gap-3">
-            {predefinedAmounts.map((amount) => (
-              <button
-                key={amount}
-                onClick={() => handleAmountSelect(amount)}
-                className={`py-3 px-4 rounded-lg border-2 text-center font-medium transition-colors ${
-                  selectedAmount === amount
-                    ? 'border-blue-500 bg-blue-50 text-blue-600'
-                    : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                ₹{amount}
-              </button>
-            ))}
+          {/* Quick Amount Selection with Better Mobile Layout */}
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-gray-600 font-medium text-sm sm:text-base">Quick Select</p>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              {predefinedAmounts.map((amount) => (
+                <button
+                  key={amount}
+                  onClick={() => handleAmountSelect(amount)}
+                  className={`py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-medium text-sm sm:text-base transition-all duration-200 ${
+                    selectedAmount === amount
+                      ? 'bg-blue-500 text-white shadow-lg transform scale-105'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:scale-95'
+                  }`}
+                >
+                  ₹{amount}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Info Card */}
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg w-full max-w-full">
+          <h4 className="font-semibold text-gray-800 mb-3 sm:mb-4 text-sm sm:text-base">Payment Information</h4>
+          <div className="space-y-2 sm:space-y-3">
+            <div className="flex items-center text-xs sm:text-sm text-gray-600">
+              <div className="w-2 h-2 bg-green-500 rounded-full mr-3 flex-shrink-0"></div>
+              <span>100% Safe & Secure</span>
+            </div>
+            <div className="flex items-center text-xs sm:text-sm text-gray-600">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 flex-shrink-0"></div>
+              <span>Instant Deposit via UPI</span>
+            </div>
+            <div className="flex items-center text-xs sm:text-sm text-gray-600">
+              <div className="w-2 h-2 bg-purple-500 rounded-full mr-3 flex-shrink-0"></div>
+              <span>Multiple Payment Options</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Proceed to Payment Button */}
-      {selectedAmount && (
-        <div className="fixed bottom-20 left-0 right-0 p-4 bg-white shadow-lg border-t">
+      {/* Enhanced Fixed Bottom Button */}
+      <div className="bg-white border-t border-gray-200 p-4 shadow-2xl">
+        {selectedAmount ? (
           <button
             onClick={handleProceedToPayment}
-            className="w-full py-4 bg-green-600 text-white font-bold text-lg rounded-lg hover:bg-green-700 transition-colors"
+            className="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold text-lg rounded-xl shadow-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 transform active:scale-98"
           >
             PROCEED TO PAYMENT - ₹{selectedAmount}
           </button>
-        </div>
-      )}
-
-      {/* Add Cash Button (when no amount selected) */}
-      {!selectedAmount && (
-        <div className="fixed bottom-20 left-0 right-0 p-4 bg-white shadow-lg">
+        ) : (
           <button
             disabled
-            className="w-full py-4 rounded-lg font-bold text-lg bg-gray-300 text-gray-500 cursor-not-allowed"
+            className="w-full py-4 rounded-xl font-bold text-lg bg-gray-200 text-gray-500 cursor-not-allowed"
           >
             SELECT AMOUNT TO PROCEED
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
