@@ -128,37 +128,7 @@ const LeaderboardPage = () => {
                 {/* Boundary rope indication */}
                 <div className="absolute inset-y-8 inset-x-0.5 border-2 border-white border-opacity-60 rounded-full"></div>
                 
-                {/* Team Name - Top */}
-                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                  <div className="text-lg font-black tracking-wider" style={{
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    textShadow: `
-                      0 1px 0 rgba(255,255,255,0.3),
-                      0 -1px 0 rgba(0,0,0,0.4),
-                      0 2px 4px rgba(0,0,0,0.3)
-                    `,
-                    letterSpacing: '2px',
-                    fontWeight: '900'
-                  }}>
-                    {team.teamName || 'TEAM'}
-                  </div>
-                </div>
                 
-                {/* Total Points - Bottom */}
-                <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
-                  <div className="text-lg font-black tracking-wider" style={{
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    textShadow: `
-                      0 1px 0 rgba(255,255,255,0.3),
-                      0 -1px 0 rgba(0,0,0,0.4),
-                      0 2px 4px rgba(0,0,0,0.3)
-                    `,
-                    letterSpacing: '2px',
-                    fontWeight: '900'
-                  }}>
-                    {team.totalPoints || 0} PTS
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -187,10 +157,10 @@ const LeaderboardPage = () => {
                               <img 
                                 src={`${BACKEND_URL}${player.imgLink}`} 
                                 alt={`${player.firstName} ${player.lastName}`}
-                                className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-lg"
+                                className="w-14 h-14 object-cover rounded-full"
                               />
                             ) : (
-                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg">
                                 <span className="text-xs font-bold text-white">
                                   {player.firstName?.charAt(0)}{player.lastName?.charAt(0)}
                                 </span>
@@ -208,7 +178,7 @@ const LeaderboardPage = () => {
                           <div className="bg-black bg-opacity-80 text-white px-2 py-1 rounded mt-1">
                             <div className="text-xs font-medium text-center">{player.firstName?.charAt(0)} {player.lastName}</div>
                           </div>
-                          <div className="text-white text-xs font-bold mt-1 bg-green-600 px-2 py-1 rounded">
+                          <div className="text-white text-xs font-medium mt-1">
                             {player.fantasyPoints} pts
                           </div>
                         </div>
@@ -233,10 +203,10 @@ const LeaderboardPage = () => {
                               <img 
                                 src={`${BACKEND_URL}${player.imgLink}`} 
                                 alt={`${player.firstName} ${player.lastName}`}
-                                className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-lg"
+                                className="w-14 h-14 object-cover rounded-full"
                               />
                             ) : (
-                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg">
                                 <span className="text-xs font-bold text-white">
                                   {player.firstName?.charAt(0)}{player.lastName?.charAt(0)}
                                 </span>
@@ -254,7 +224,7 @@ const LeaderboardPage = () => {
                           <div className="bg-black bg-opacity-80 text-white px-2 py-1 rounded mt-1">
                             <div className="text-xs font-medium text-center">{player.firstName?.charAt(0)} {player.lastName}</div>
                           </div>
-                          <div className="text-white text-xs font-bold mt-1 bg-green-600 px-2 py-1 rounded">
+                          <div className="text-white text-xs font-medium mt-1">
                             {player.fantasyPoints} pts
                           </div>
                         </div>
@@ -279,10 +249,10 @@ const LeaderboardPage = () => {
                               <img 
                                 src={`${BACKEND_URL}${player.imgLink}`} 
                                 alt={`${player.firstName} ${player.lastName}`}
-                                className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-lg"
+                                className="w-14 h-14 object-cover rounded-full"
                               />
                             ) : (
-                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg">
                                 <span className="text-xs font-bold text-white">
                                   {player.firstName?.charAt(0)}{player.lastName?.charAt(0)}
                                 </span>
@@ -300,7 +270,7 @@ const LeaderboardPage = () => {
                           <div className="bg-black bg-opacity-80 text-white px-2 py-1 rounded mt-1">
                             <div className="text-xs font-medium text-center">{player.firstName?.charAt(0)} {player.lastName}</div>
                           </div>
-                          <div className="text-white text-xs font-bold mt-1 bg-green-600 px-2 py-1 rounded">
+                          <div className="text-white text-xs font-medium mt-1">
                             {player.fantasyPoints} pts
                           </div>
                         </div>
@@ -325,10 +295,10 @@ const LeaderboardPage = () => {
                               <img 
                                 src={`${BACKEND_URL}${player.imgLink}`} 
                                 alt={`${player.firstName} ${player.lastName}`}
-                                className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-lg"
+                                className="w-14 h-14 object-cover rounded-full"
                               />
                             ) : (
-                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                              <div className="w-14 h-14 bg-gray-400 rounded-full flex items-center justify-center shadow-lg">
                                 <span className="text-xs font-bold text-white">
                                   {player.firstName?.charAt(0)}{player.lastName?.charAt(0)}
                                 </span>
@@ -346,7 +316,7 @@ const LeaderboardPage = () => {
                           <div className="bg-black bg-opacity-80 text-white px-2 py-1 rounded mt-1">
                             <div className="text-xs font-medium text-center">{player.firstName?.charAt(0)} {player.lastName}</div>
                           </div>
-                          <div className="text-white text-xs font-bold mt-1 bg-green-600 px-2 py-1 rounded">
+                          <div className="text-white text-xs font-medium mt-1">
                             {player.fantasyPoints} pts
                           </div>
                         </div>

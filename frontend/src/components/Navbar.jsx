@@ -25,14 +25,14 @@ const Navbar = () => {
           )}
         
         {/* Center - Logo/Brand */}
-        <div className="flex items-center justify-center space-x-2">
+        <Link to="/fantasy-sport" className="flex items-center justify-center space-x-2 cursor-pointer">
           <div className="bg-white bg-opacity-20 p-2 rounded-lg">
             <Trophy className="w-6 h-6 text-yellow-300" />
           </div>
           <h1 className="text-white text-xl font-bold tracking-wide">
             MySeries<span className="text-yellow-300">11</span>
           </h1>
-        </div>
+        </Link>
         
         {/* Right side - Wallet (only for logged-in users) */}
         {user ? (

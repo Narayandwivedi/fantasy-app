@@ -36,25 +36,12 @@ const Wallet = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col overflow-x-hidden">
+    <div className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col overflow-hidden">
       <Navbar />
 
-      {/* Enhanced Header with Balance */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 sm:p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold truncate">Add Money</h1>
-            <p className="text-blue-100 text-sm mt-1">Add funds to your wallet</p>
-          </div>
-          <div className="text-right ml-4 flex-shrink-0">
-            <p className="text-blue-100 text-xs">Current Balance</p>
-            <p className="text-xl sm:text-2xl font-bold">₹{user?.balance || 0}</p>
-          </div>
-        </div>
-      </div>
 
       {/* Main Content with Better Mobile Layout */}
-      <div className="flex-1 p-3 sm:p-4 pb-24 overflow-y-auto overflow-x-hidden">
+      <div className="flex-1 p-3 sm:p-4 pb-20 overflow-hidden flex flex-col justify-center">
         {/* Amount Input Card */}
         <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg mb-4 sm:mb-6 w-full max-w-full">
           <h3 className="text-gray-800 font-semibold text-base sm:text-lg mb-4 sm:mb-6">Choose Amount</h3>
@@ -104,8 +91,8 @@ const Wallet = () => {
 
         {/* Payment Info Card */}
         <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg w-full max-w-full">
-          <h4 className="font-semibold text-gray-800 mb-3 sm:mb-4 text-sm sm:text-base">Payment Information</h4>
-          <div className="space-y-2 sm:space-y-3">
+          <h4 className="font-semibold text-gray-800 mb-2 sm:mb-3 text-sm sm:text-base">Payment Information</h4>
+          <div className="space-y-1.5 sm:space-y-2">
             <div className="flex items-center text-xs sm:text-sm text-gray-600">
               <div className="w-2 h-2 bg-green-500 rounded-full mr-3 flex-shrink-0"></div>
               <span>100% Safe & Secure</span>
