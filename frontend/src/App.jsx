@@ -25,8 +25,8 @@ import ContactUs from './pages/ContactUs'
 import CustomerSupport from './pages/CustomerSupport'
 import Terms from './pages/Terms'
 import PrivacyPolicy from './pages/PrivacyPolicy'
-import BlogsPage from './pages/BlogsPage'
-import BlogDetailPage from './pages/BlogDetailPage'
+import BlogsPage from './pages/blog/BlogsPage'
+import BlogDetailPage from './pages/blog/BlogDetailPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import { ToastContainer } from 'react-toastify'
@@ -75,8 +75,7 @@ const App = () => {
             } />
             
             <Route path='/' element = {
-              
-                <HomePage/>
+              user ? <Navigate to="/fantasy-sport" replace /> : <HomePage/>
             } />
 
 

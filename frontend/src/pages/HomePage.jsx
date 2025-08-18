@@ -1,20 +1,60 @@
-import React, { useContext, useEffect } from 'react'
+import React from 'react'
 import LandingNavbar from "../components/LandingNavbar"
 import Footer from "../components/Footer"
-import { Link, useNavigate } from 'react-router-dom'
-import { AppContext } from '../context/AppContext'
+import { Link } from 'react-router-dom'
 
 const HomePage = () => {
-  const { user } = useContext(AppContext)
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    if (user) {
-      navigate('/fantasy-sport')
-    }
-  }, [user, navigate])
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+      {/* Additional Structured Data for Homepage */}
+      <script 
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://myseries11.com/"
+              },
+              {
+                "@type": "ListItem", 
+                "position": 2,
+                "name": "Login",
+                "item": "https://myseries11.com/login"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Blog",
+                "item": "https://myseries11.com/blog"
+              },
+              {
+                "@type": "ListItem",
+                "position": 4, 
+                "name": "Game Rules",
+                "item": "https://myseries11.com/game-rules"
+              },
+              {
+                "@type": "ListItem",
+                "position": 5,
+                "name": "About Us",
+                "item": "https://myseries11.com/about"
+              },
+              {
+                "@type": "ListItem",
+                "position": 6,
+                "name": "Contact Us", 
+                "item": "https://myseries11.com/contact"
+              }
+            ]
+          })
+        }}
+      />
+      
       <LandingNavbar/> 
       
       {/* Hero Section - Mobile Layout */}

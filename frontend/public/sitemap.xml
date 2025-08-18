@@ -1,67 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Primary Pages - High Priority -->
+  
   <!-- Homepage - Main fantasy sports platform -->
   <url>
     <loc>https://myseries11.com/</loc>
-    <lastmod>2025-01-09</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+  </url>
+  
+  <!-- Login - User entry point (High priority for user flow) -->
+  <url>
+    <loc>https://myseries11.com/login</loc>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Blog - Content hub (High priority for SEO and engagement) -->
+  <url>
+    <loc>https://myseries11.com/blog</loc>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Secondary Pages - Important for Site Structure -->
+  
+  <!-- Game Rules - How to play fantasy cricket -->
+  <url>
+    <loc>https://myseries11.com/game-rules</loc>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   
   <!-- About Us - Company information -->
   <url>
     <loc>https://myseries11.com/about</loc>
-    <lastmod>2025-01-09</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   
   <!-- Contact Us - Support and contact information -->
   <url>
     <loc>https://myseries11.com/contact</loc>
-    <lastmod>2025-01-09</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
+  
+  <!-- Legal Pages - Required but lower priority -->
   
   <!-- Terms and Conditions - Legal terms -->
   <url>
     <loc>https://myseries11.com/terms-and-conditions</loc>
-    <lastmod>2025-01-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>quarterly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <!-- Privacy Policy - Data protection and privacy -->
   <url>
     <loc>https://myseries11.com/privacy-policy</loc>
-    <lastmod>2025-01-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  
-  <!-- Game Rules - How to play fantasy cricket -->
-  <url>
-    <loc>https://myseries11.com/game-rules</loc>
-    <lastmod>2025-01-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <!-- Login - Public login page -->
-  <url>
-    <loc>https://myseries11.com/login</loc>
-    <lastmod>2025-01-09</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>quarterly</changefreq>
     <priority>0.6</priority>
-  </url>
-  
-  <!-- Blog - Main blog page -->
-  <url>
-    <loc>https://myseries11.com/blog</loc>
-    <lastmod>2025-01-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
   </url>
 </urlset>

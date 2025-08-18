@@ -156,7 +156,45 @@ const Login = () => {
   }
 
   return (
-    <div className={`bg-gradient-to-br from-gray-900 via-slate-900 to-black ${isLogin && !showForgotPassword ? 'h-screen' : 'min-h-screen'} max-w-md mx-auto relative overflow-hidden`}>
+    <>
+      {/* Schema markup for Login page */}
+      <script 
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Login - MySeries11",
+            "description": "Login to MySeries11 fantasy cricket platform",
+            "url": "https://myseries11.com/login",
+            "mainEntity": {
+              "@type": "WebApplication",
+              "name": "MySeries11 Login",
+              "applicationCategory": "GameApplication",
+              "operatingSystem": "Web Browser"
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://myseries11.com/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Login",
+                  "item": "https://myseries11.com/login"
+                }
+              ]
+            }
+          })
+        }}
+      />
+    
+      <div className={`bg-gradient-to-br from-gray-900 via-slate-900 to-black ${isLogin && !showForgotPassword ? 'h-screen' : 'min-h-screen'} max-w-md mx-auto relative overflow-hidden`}>
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-16 left-8 w-32 h-32 bg-yellow-300 rounded-full blur-3xl"></div>
@@ -505,6 +543,7 @@ const Login = () => {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

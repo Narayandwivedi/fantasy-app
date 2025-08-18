@@ -40,14 +40,14 @@ const LandingNavbar = () => {
           </div>
         
           {/* Center - Logo/Brand */}
-          <div className="flex items-center space-x-3 md:space-x-4 md:justify-center">
+          <Link to="/" className="flex items-center space-x-3 md:space-x-4 md:justify-center hover:opacity-90 transition-opacity duration-200 cursor-pointer">
             <div className="bg-white bg-opacity-20 p-2 md:p-3 rounded-lg">
               <Trophy className="w-7 h-7 md:w-8 md:h-8 lg:w-9 lg:h-9 text-yellow-300" />
             </div>
             <h1 className="text-white text-xl md:text-2xl lg:text-3xl font-bold tracking-wide">
               MySeries<span className="text-yellow-300">11</span>
             </h1>
-          </div>
+          </Link>
         
           {/* Desktop Navigation Links - Right */}
           <div className="hidden md:flex items-center space-x-6 md:justify-end">

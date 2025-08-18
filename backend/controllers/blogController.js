@@ -231,7 +231,7 @@ const getPublishedBlogs = async (req, res) => {
       .sort({ publishedAt: -1 })
       .skip(skip)
       .limit(actualLimit)
-      .select("title excerpt author category tags featuredImage slug publishedAt readTime views likes");
+      .select("title excerpt author category tags featuredImage featuredImageAlt slug publishedAt readTime views likes createdAt updatedAt");
 
     // Get total count for pagination (only for non-featured)
     let pagination = null;

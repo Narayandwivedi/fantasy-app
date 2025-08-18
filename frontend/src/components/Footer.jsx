@@ -22,12 +22,31 @@ const Footer = () => {
               India's premier fantasy sports platform. Play smart, win big, and claim your series with the best cricket fantasy experience.
             </p>
             <div className="flex space-x-4 justify-center md:justify-start">
-              <div className="bg-white bg-opacity-10 hover:bg-opacity-20 p-2 rounded-lg cursor-pointer transition-all duration-200">
-                <Mail className="w-5 h-5 text-yellow-300" />
-              </div>
-              <div className="bg-white bg-opacity-10 hover:bg-opacity-20 p-2 rounded-lg cursor-pointer transition-all duration-200">
-                <Phone className="w-5 h-5 text-yellow-300" />
-              </div>
+              <a 
+                href="mailto:myseries11assist@gmail.com" 
+                className="inline-block bg-white bg-opacity-10 hover:bg-opacity-20 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105"
+                style={{ pointerEvents: 'auto' }}
+              >
+                <Mail className="w-5 h-5 text-yellow-300 pointer-events-none" />
+              </a>
+              <a 
+                href="https://x.com/myseries11" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-block bg-white bg-opacity-10 hover:bg-opacity-20 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105"
+                style={{ pointerEvents: 'auto' }}
+              >
+                <Twitter className="w-5 h-5 text-yellow-300 pointer-events-none" />
+              </a>
+              <a 
+                href="https://www.instagram.com/myseries11official" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-block bg-white bg-opacity-10 hover:bg-opacity-20 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105"
+                style={{ pointerEvents: 'auto' }}
+              >
+                <Instagram className="w-5 h-5 text-yellow-300 pointer-events-none" />
+              </a>
             </div>
           </div>
 
@@ -113,19 +132,9 @@ const Footer = () => {
         <div className="border-t border-gray-700 mt-12 pt-8 max-w-7xl mx-auto">
           
           {/* Bottom Bar */}
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="flex justify-center items-center">
             <div className="text-gray-400 text-sm">
               © {new Date().getFullYear()} MySeries11. All rights reserved.
-            </div>
-            <div className="flex space-x-6 text-sm">
-              <a href="https://x.com/myseries11" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors cursor-pointer">
-                <Twitter className="w-4 h-4" />
-                <span>Twitter</span>
-              </a>
-              <a href="https://www.instagram.com/myseries11official" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors cursor-pointer">
-                <Instagram className="w-4 h-4" />
-                <span>Instagram</span>
-              </a>
             </div>
           </div>
         </div>

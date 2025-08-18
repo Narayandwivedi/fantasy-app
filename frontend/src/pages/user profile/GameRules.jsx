@@ -104,7 +104,66 @@ const GameRules = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      {/* Schema markup for Game Rules page */}
+      <script 
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Game Rules - MySeries11",
+            "description": "Learn how to play fantasy cricket on MySeries11. Complete guide to scoring points, batting rules, bowling rules, fielding points, and captain selection for T20, ODI, Test, and T10 formats.",
+            "url": "https://myseries11.com/game-rules",
+            "mainEntity": {
+              "@type": "HowTo", 
+              "name": "How to Play Fantasy Cricket on MySeries11",
+              "description": "Complete guide to fantasy cricket scoring system and game rules",
+              "step": [
+                {
+                  "@type": "HowToStep",
+                  "name": "Understanding Batting Points",
+                  "text": "Players earn points for runs, boundaries, milestones like 50s and 100s, with bonus points for strike rate performance"
+                },
+                {
+                  "@type": "HowToStep", 
+                  "name": "Understanding Bowling Points",
+                  "text": "Bowlers earn points for wickets, bowling figures like 3-wicket hauls, maiden overs, and economy rate bonuses"
+                },
+                {
+                  "@type": "HowToStep",
+                  "name": "Understanding Fielding Points", 
+                  "text": "Players earn points for catches, run-outs, and stumpings during the match"
+                },
+                {
+                  "@type": "HowToStep",
+                  "name": "Captain and Vice-Captain Selection",
+                  "text": "Choose captain (2x points) and vice-captain (1.5x points) to maximize your fantasy team score"
+                }
+              ]
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://myseries11.com/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Game Rules",
+                  "item": "https://myseries11.com/game-rules"
+                }
+              ]
+            }
+          })
+        }}
+      />
+      
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black py-6 px-6 shadow-xl">
         <div className="flex items-center justify-center">
@@ -329,7 +388,8 @@ const GameRules = () => {
         {/* Bottom padding for navigation */}
         <div className="h-20"></div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

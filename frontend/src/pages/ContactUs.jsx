@@ -77,7 +77,65 @@ const ContactUs = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      {/* Schema markup for Contact page */}
+      <script 
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Contact Us - MySeries11",
+            "description": "Contact MySeries11 customer support. Call +91-6264682508 or +91-9202469725, email myseries11assist@gmail.com. Get help with fantasy cricket gaming, account issues, and withdrawals.",
+            "url": "https://myseries11.com/contact",
+            "mainEntity": {
+              "@type": "ContactPage",
+              "name": "MySeries11 Contact Information",
+              "contactPoint": [
+                {
+                  "@type": "ContactPoint",
+                  "telephone": "+91-6264682508",
+                  "contactType": "customer service",
+                  "areaServed": "IN",
+                  "availableLanguage": ["English", "Hindi"]
+                },
+                {
+                  "@type": "ContactPoint",
+                  "telephone": "+91-9202469725", 
+                  "contactType": "customer service",
+                  "areaServed": "IN",
+                  "availableLanguage": ["English", "Hindi"]
+                },
+                {
+                  "@type": "ContactPoint",
+                  "email": "myseries11assist@gmail.com",
+                  "contactType": "customer service",
+                  "areaServed": "IN"
+                }
+              ]
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://myseries11.com/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Contact Us",
+                  "item": "https://myseries11.com/contact"
+                }
+              ]
+            }
+          })
+        }}
+      />
+      
+      <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       {user ? (
         // Back button for logged-in users
@@ -319,7 +377,8 @@ const ContactUs = () => {
 
       {/* Footer - Only show for non-logged-in users */}
       {!user && <Footer />}
-    </div>
+      </div>
+    </>
   );
 };
 

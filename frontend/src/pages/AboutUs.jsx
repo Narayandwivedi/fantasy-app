@@ -53,7 +53,47 @@ const AboutUs = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      {/* Schema markup for About page */}
+      <script 
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "About Us - MySeries11",
+            "description": "Learn about MySeries11, India's premier skill-based fantasy cricket gaming platform. Discover our mission, values, and commitment to fair, transparent, and legal fantasy sports gaming.",
+            "url": "https://myseries11.com/about",
+            "mainEntity": {
+              "@type": "Organization",
+              "name": "MySeries11",
+              "description": "India's premier skill-based fantasy cricket gaming platform",
+              "foundingDate": "2024",
+              "legalName": "MySeries11",
+              "url": "https://myseries11.com"
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://myseries11.com/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "About Us",
+                  "item": "https://myseries11.com/about"
+                }
+              ]
+            }
+          })
+        }}
+      />
+      
+      <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       {user ? (
         // Back button for logged-in users
@@ -235,7 +275,8 @@ const AboutUs = () => {
 
       {/* Footer - Only show for non-logged-in users */}
       {!user && <Footer />}
-    </div>
+      </div>
+    </>
   );
 };
 

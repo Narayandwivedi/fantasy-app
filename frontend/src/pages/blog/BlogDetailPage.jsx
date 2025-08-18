@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import LandingNavbar from '../components/LandingNavbar';
-import Footer from '../components/Footer';
+import LandingNavbar from '../../components/LandingNavbar';
+import Footer from '../../components/Footer';
 
 const BlogDetailPage = () => {
   const { slug } = useParams();
@@ -144,7 +144,19 @@ const BlogDetailPage = () => {
   }, [blog]);
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    if (!dateString) {
+      return 'No date available';
+    }
+    
+    const date = new Date(dateString);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date received:', dateString);
+      return 'Invalid date';
+    }
+    
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
