@@ -53,16 +53,15 @@ const Contest = () => {
     fetchUserTeams();
   }, [matchId, user]);
 
-  // Handle browser back button behavior
+  // Handle proper navigation flow
   useEffect(() => {
-    // Push the fantasy sports page to history so back button goes there
-    window.history.pushState(null, '', window.location.href);
-    
-    const handlePopState = () => {
-      // When back button is pressed, navigate to fantasy sports
+    const handlePopState = (event) => {
+      // Prevent default browser back behavior and redirect to fantasy sport page
+      event.preventDefault();
       navigate('/fantasy-sport', { replace: true });
     };
 
+    // Only add the listener, don't manipulate history immediately
     window.addEventListener('popstate', handlePopState);
 
     return () => {
@@ -281,7 +280,7 @@ const Contest = () => {
       <div className="fixed left-1/2 transform -translate-x-1/2 w-full max-w-[440px] bg-white border-t border-gray-100 px-4 py-3 z-40 bottom-0">
         <div className="flex space-x-3">
           <button 
-            onClick={() => navigate(`/${matchId}/my-teams?from=contest`, { replace: true })}
+            onClick={() => navigate(`/${matchId}/my-teams?from=contest`)}
             className="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold text-center hover:bg-gray-700 transition-colors shadow-lg"
           >
             My Teams {userTeams.length > 0 && `(${userTeams.length})`}

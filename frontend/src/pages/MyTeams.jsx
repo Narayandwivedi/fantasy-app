@@ -18,7 +18,7 @@ const MyTeams = () => {
         return `/${matchId}/contest`
       case 'fantasy':
       default:
-        return `/fantasy-sports` // Go to fantasy sport page
+        return `/fantasy-sport` // Corrected path to fantasy sport page
     }
   }
   
@@ -55,24 +55,6 @@ const MyTeams = () => {
     fetchUserTeams();
   }, [matchId, user]);
 
-  // Handle browser back button behavior
-  useEffect(() => {
-    if (fromPage === 'contest') {
-      // Push current page to history to handle back button
-      window.history.pushState(null, '', window.location.href);
-      
-      const handlePopState = () => {
-        // When back button is pressed, navigate based on fromPage
-        navigate(getBackNavigationPath(), { replace: true });
-      };
-
-      window.addEventListener('popstate', handlePopState);
-
-      return () => {
-        window.removeEventListener('popstate', handlePopState);
-      };
-    }
-  }, [fromPage, navigate, getBackNavigationPath]);
 
   const getPlayersByPosition = (team) => {
     const positions = {

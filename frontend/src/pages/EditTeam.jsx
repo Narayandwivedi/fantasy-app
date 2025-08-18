@@ -46,6 +46,12 @@ const EditTeam = () => {
     }
   }
   
+  const handleBackNavigation = () => {
+    // Use navigate(-1) to go back in browser history instead of navigating to a specific path
+    // This ensures proper browser back button behavior
+    navigate(-1)
+  }
+  
   const [matchData, setMatchData] = useState(null)
   const [teamData, setTeamData] = useState(null)
   const [selectedPlayers, setSelectedPlayers] = useState([])
@@ -107,22 +113,6 @@ const EditTeam = () => {
     }
   }, [teamId, matchId])
 
-  // Handle browser back button behavior
-  useEffect(() => {
-    // Push current page to history to handle back button
-    window.history.pushState(null, '', window.location.href);
-    
-    const handlePopState = () => {
-      // When back button is pressed, navigate to correct back path
-      navigate(getBackNavigationPath(), { replace: true });
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [navigate, getBackNavigationPath])
 
   const handlePlayerSelect = (player, teamType) => {
     const isSelected = selectedPlayers.some(p => p._id === player._id)
@@ -340,7 +330,7 @@ const EditTeam = () => {
       const response = await axios.put(`${BACKEND_URL}/api/userteam/${teamId}`, updateData)
       console.log('Team updated:', response.data)
       
-      navigate(getBackNavigationPath(), { replace: true })
+      navigate(-1)
       
       toast.success('Team updated successfully! 🎉', {
         position: "top-center",
@@ -384,7 +374,7 @@ const EditTeam = () => {
       {/* Header - Dark Theme */}
       <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-black shadow-xl p-4">
         <div className="flex items-center">
-          <button onClick={() => navigate(getBackNavigationPath(), { replace: true })} className="mr-3">
+          <button onClick={handleBackNavigation} className="mr-3">
             <ArrowLeft size={24} className="text-white" />
           </button>
           <div className="flex-1">
