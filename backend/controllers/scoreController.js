@@ -216,7 +216,7 @@ async function setMatchPlaying11AndCreateScores(req, res) {
   }
 }
 
-// get playing 11 from player scores
+// get playing\ 11 from player scores
 async function getMatchPlaying11(req, res) {
   const { matchId } = req.params;
 

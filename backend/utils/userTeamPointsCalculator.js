@@ -2,15 +2,12 @@ const Userteam = require("../models/Userteam");
 const PlayerScore = require("../models/PlayerScore");
 const Contest = require("../models/Contest");
 
-/**
- * Update fantasy points for all user teams in a specific match
- * @param {String} matchId - MongoDB ObjectId of the match
- * @returns {Object} - Update results
- */
+
 const updateUserTeamPointsForMatch = async (matchId) => {
   try {
     // Get all player scores for the match
     const playerScores = await PlayerScore.find({ match: matchId });
+    
     
     if (playerScores.length === 0) {
       return { success: false, message: "No player scores found for this match" };
@@ -42,23 +39,25 @@ const updateUserTeamPointsForMatch = async (matchId) => {
         const playerId = playerEntry.player.toString();
         const newPoints = playerPointsMap[playerId] || 0;
         
-        if (playerEntry.fantasyPoints !== newPoints) {
+        // Apply captain/vice-captain multipliers to calculate final points for team total
+        let finalPoints = newPoints;
+        if (userTeam.captain && userTeam.captain.toString() === playerId) {
+          finalPoints = newPoints * 2; // Captain gets 2x points
+        } else if (userTeam.viceCaptain && userTeam.viceCaptain.toString() === playerId) {
+          finalPoints = newPoints * 1.5; // Vice-captain gets 1.5x points
+        }
+        
+        // Check if points have changed (compare with final points)
+        if (playerEntry.fantasyPoints !== finalPoints) {
           hasUpdates = true;
         }
 
-        // Apply captain/vice-captain multipliers
-        let finalPoints = newPoints;
-        if (userTeam.captain.toString() === playerId) {
-          finalPoints = newPoints * 2; // Captain gets 2x points
-        } else if (userTeam.viceCaptain.toString() === playerId) {
-          finalPoints = newPoints * 1.5; // Vice-captain gets 1.5x points
-        }
-
+        // Add this player's final points to team total
         totalTeamPoints += finalPoints;
 
         return {
           ...playerEntry.toObject(),
-          fantasyPoints: newPoints // Store base points, multiplier applied to total
+          fantasyPoints: finalPoints // Store final points with multiplier applied
         };
       });
 

@@ -36,7 +36,7 @@ const Wallet = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden">
       <Navbar />
 
       {/* Header */}
@@ -58,7 +58,7 @@ const Wallet = () => {
       </div>
 
       {/* Main Content */}
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-6 pb-24">
 
         {/* Amount Selection */}
         <div className="bg-white rounded-xl p-4 shadow-sm">
@@ -104,7 +104,7 @@ const Wallet = () => {
 
       {/* Proceed to Payment Button */}
       {selectedAmount && (
-        <div className="fixed bottom-20 left-0 right-0 p-4 bg-white shadow-lg border-t">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white shadow-lg border-t">
           <button
             onClick={handleProceedToPayment}
             className="w-full py-4 bg-green-600 text-white font-bold text-lg rounded-lg hover:bg-green-700 transition-colors"
@@ -116,7 +116,7 @@ const Wallet = () => {
 
       {/* Add Cash Button (when no amount selected) */}
       {!selectedAmount && (
-        <div className="fixed bottom-20 left-0 right-0 p-4 bg-white shadow-lg">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white shadow-lg">
           <button
             disabled
             className="w-full py-4 rounded-lg font-bold text-lg bg-gray-300 text-gray-500 cursor-not-allowed"

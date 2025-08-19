@@ -26,6 +26,7 @@ import Terms from './pages/publicPages/Terms'
 import PrivacyPolicy from './pages/publicPages/PrivacyPolicy'
 import BlogsPage from './pages/blog/BlogsPage'
 import BlogDetailPage from './pages/blog/BlogDetailPage'
+import VerifyUser from './pages/VerifyUser'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import { ToastContainer } from 'react-toastify'
@@ -172,6 +173,12 @@ const App = () => {
             <Route path='/privacy-policy' element = {<PrivacyPolicy/>} />
             <Route path='/blog' element = {<BlogsPage/>} />
             <Route path='/blog/:slug' element = {<BlogDetailPage/>} />
+
+            <Route path='/verify-user' element = {
+              <ProtectedRoute>
+                <VerifyUser/>
+              </ProtectedRoute>
+            } />
 
           </Routes>
           {!hideBottomNav && <BottomNav/>}

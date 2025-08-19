@@ -10,18 +10,18 @@ const calculateFantasyPoints = (playerData, updates = {}, matchType = '') => {
   let bonusPoints = 0;
 
   // Batting points calculation
-  if (batting.runs) {
+  if (batting.runs && batting.runs > 0) {
     battingPoints += batting.runs * 1; // 1 point per run
     if (batting.runs >= 25) bonusPoints += 5; // 25+ bonus
     if (batting.runs >= 50) bonusPoints += 10; // 50+ bonus
     if (batting.runs >= 75) bonusPoints += 12; // 75+ bonus
     if (batting.runs >= 100) bonusPoints += 15; // 100+ bonus
   }
-  if (batting.fours) battingPoints += batting.fours * 1; // 1 point per four
-  if (batting.sixes) battingPoints += batting.sixes * 2; // 2 points per six
-  if (batting.ballsFaced > 0 && batting.runs > 0) {
-    const sr = (batting.runs / batting.ballsFaced) * 100;
-    if (sr >= 150) bonusPoints += 5; // Strike rate bonus
+  if (batting.fours && batting.fours > 0) {
+    battingPoints += batting.fours * 1; // 1 point per four
+  }
+  if (batting.sixes && batting.sixes > 0) {
+    battingPoints += batting.sixes * 2; // 2 points per six
   }
 
   // Bowling points calculation
@@ -31,13 +31,6 @@ const calculateFantasyPoints = (playerData, updates = {}, matchType = '') => {
     if (bowling.wicketsTaken >= 5) bonusPoints += 15; // 5+ wickets bonus
   }
   if (bowling.maidenOvers) bowlingPoints += bowling.maidenOvers * 12; // 12 points per maiden
-
-  // Economy rate bonus/penalty for bowlers
-  if (bowling.oversBowled > 0 && bowling.runsGiven !== undefined) {
-    const economyRate = calculateEconomyRate(bowling.runsGiven, bowling.oversBowled);
-    if (economyRate <= 4) bonusPoints += 10; // Economy rate bonus
-    else if (economyRate >= 10) bonusPoints -= 5; // Economy rate penalty
-  }
 
   // Fielding points calculation
   if (fielding.catches) fieldingPoints += fielding.catches * 8; // 8 points per catch
