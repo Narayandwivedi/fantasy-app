@@ -7,7 +7,6 @@ const Live = ({ matches = [] }) => {
   const navigate = useNavigate()
 
   const handleMatchClick = (matchId) => {
-    console.log('Clicking live match with ID:', matchId)
     navigate(`/my-contests/${matchId}`)
   }
 

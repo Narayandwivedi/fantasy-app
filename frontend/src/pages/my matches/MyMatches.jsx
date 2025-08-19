@@ -15,18 +15,15 @@ const MyMatches = () => {
   useEffect(() => {
     const fetchMatches = async () => {
       if (!user?._id) {
-        console.log('No user ID available')
         setLoading(false)
         return
       }
       
       try {
         setLoading(true)
-        console.log('Fetching matches for user:', user._id)
         const result = await getUserMatches(user._id)
         
         if (result.success) {
-          console.log('Matches fetched successfully:', result.data)
           setMatchesData(result.data)
         } else {
           console.error('Failed to fetch matches:', result.error)

@@ -24,7 +24,6 @@ const Contest = () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`${BACKEND_URL}/api/contests/${matchId}`);
-      console.log(data);
       if (data.success) {
         setContests(data.data);
       }
@@ -126,19 +125,9 @@ const Contest = () => {
     };
 
     // Console log the payload
-    console.log('Join Contest Payload:', payload);
-    console.log('Contest Details:', {
-      contestName: selectedContest.name,
-      entryFee: selectedContest.entryFee,
-      prizePool: selectedContest.prizePool,
-      totalSpots: selectedContest.totalSpots
-    });
-    console.log('Selected Team:', selectedTeam);
     
     setJoining(true);
     try {
-      console.log('Making API call to:', `${BACKEND_URL}/api/contests/join`);
-      console.log('Payload being sent:', payload);
       
       const {data} = await axios.post(`${BACKEND_URL}/api/contests/join`, {
       contestId: selectedContest._id,
@@ -147,7 +136,6 @@ const Contest = () => {
       matchId: matchId
       })
       
-      console.log('API Response:', data);
       
       // Update the contest's current participants count in the UI
       setContests(prevContests => 
@@ -277,16 +265,16 @@ const Contest = () => {
       )}
       
       {/* Fixed Team Buttons - always visible at bottom */}
-      <div className="fixed left-1/2 transform -translate-x-1/2 w-full max-w-[440px] bg-white border-t border-gray-100 px-4 py-3 z-40 bottom-0">
+      <div className="fixed left-1/2 transform -translate-x-1/2 w-full max-w-[440px] bg-white border-t border-gray-100 px-4 py-3 z-40 bottom-0 safe-area-bottom">
         <div className="flex space-x-3">
           <button 
             onClick={() => navigate(`/${matchId}/my-teams?from=contest`)}
-            className="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold text-center hover:bg-gray-700 transition-colors shadow-lg"
+            className="flex-1 bg-gray-600 text-white py-4 px-4 rounded-lg font-semibold text-center hover:bg-gray-700 transition-colors shadow-lg touch-target touch-feedback"
           >
             My Teams {userTeams.length > 0 && `(${userTeams.length})`}
           </button>
           <Link to={`/${matchId}/create-team`} className="flex-1">
-            <button className="w-full bg-black text-white py-3 px-4 rounded-lg font-semibold text-center hover:bg-gray-800 transition-colors shadow-lg">
+            <button className="w-full bg-black text-white py-4 px-4 rounded-lg font-semibold text-center hover:bg-gray-800 transition-colors shadow-lg touch-target touch-feedback">
               Create Team
             </button>
           </Link>

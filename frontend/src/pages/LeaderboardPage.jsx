@@ -440,7 +440,17 @@ const LeaderboardPage = () => {
           <div className="space-y-0">
             {/* Leaderboard Entries */}
             {leaderboardData.map((entry, index) => {
-              const rank = index + 1
+              // Calculate actual rank based on points (handle ties)
+              let rank = 1;
+              for (let i = 0; i < index; i++) {
+                const prevPoints = leaderboardData[i].team?.totalPoints || 0;
+                const currentPoints = entry.team?.totalPoints || 0;
+                if (prevPoints > currentPoints) {
+                  rank = i + 2;
+                  break;
+                }
+              }
+              
               const isCurrentUser = entry.user?._id === user?._id
               const userName = getUserDisplayName(entry.user)
               const teamName = getTeamDisplayName(entry.team, index)

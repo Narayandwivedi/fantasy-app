@@ -7,7 +7,6 @@ const Completed = ({ matches = [] }) => {
   const navigate = useNavigate()
 
   const handleMatchClick = (matchId) => {
-    console.log('Clicking completed match with ID:', matchId)
     navigate(`/my-contests/${matchId}`)
   }
 

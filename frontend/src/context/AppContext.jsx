@@ -33,14 +33,12 @@ export const AppContextProvider = (props) => {
       if (response.data.isLoggedIn) {
         setIsAuthenticated(true)
         setUser(response.data.user)
-        console.log(response.data.user);
         
       } else {
         setIsAuthenticated(false)
         setUser(null)
       }
     } catch (error) {
-      console.log('Auth check failed:', error)
       setIsAuthenticated(false)
       setUser(null)
     } finally {
@@ -68,7 +66,6 @@ export const AppContextProvider = (props) => {
       if (response.data.success) {
         setIsAuthenticated(true)
         setUser(response.data.userData)
-        console.log('Login successful, user data set:', response.data.userData)
         return { success: true }
       } else {
         return { 
@@ -94,7 +91,6 @@ export const AppContextProvider = (props) => {
       if (response.data.success) {
         setIsAuthenticated(true)
         setUser(response.data.userData) // Now consistent with login
-        console.log('Signup successful, user data set:', response.data.userData)
         return { success: true }
       } else {
         return { 
@@ -117,7 +113,6 @@ export const AppContextProvider = (props) => {
         withCredentials: true
       })
     } catch (error) {
-      console.log('Logout error:', error)
     } finally {
       setIsAuthenticated(false)
       setUser(null)

@@ -31,8 +31,6 @@ const GoogleLogin = () => {
     }
 
     try {
-      console.log('Initializing Google Sign-In with client ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID);
-      console.log('Current domain:', window.location.origin);
       
       window.google.accounts.id.initialize({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
@@ -41,7 +39,6 @@ const GoogleLogin = () => {
         cancel_on_tap_outside: true,
       });
 
-      console.log('Google Sign-In initialized successfully');
 
       // Render the Google button
       if (googleButtonRef.current) {
@@ -56,7 +53,6 @@ const GoogleLogin = () => {
             logo_alignment: 'center'
           }
         );
-        console.log('Google button rendered successfully');
       }
     } catch (error) {
       console.error('Google initialization error:', error);
@@ -71,12 +67,6 @@ const GoogleLogin = () => {
 
   const handleCredentialResponse = async (response) => {
     try {
-      console.log('Google credential received:', response);
-      console.log('Credential details:', {
-        hasCredential: !!response.credential,
-        credentialLength: response.credential?.length,
-        backendUrl: BACKEND_URL
-      });
       
       // Get referral code from URL params
       const urlParams = new URLSearchParams(window.location.search);
@@ -94,14 +84,10 @@ const GoogleLogin = () => {
         }),
       });
 
-      console.log('Backend response status:', result.status);
-      console.log('Backend response headers:', Object.fromEntries(result.headers.entries()));
 
       const data = await result.json();
-      console.log('Backend response data:', data);
 
       if (data.success) {
-        console.log('Login successful, updating auth state');
         // Update auth state and redirect
         await checkAuthStatus();
         navigate('/');
@@ -127,7 +113,6 @@ const GoogleLogin = () => {
       window.google.accounts.id.prompt((notification) => {
         if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
           // If one-tap is not available, try popup
-          console.log('One-tap not available, trying popup');
         }
       });
     } else {

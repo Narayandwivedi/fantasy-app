@@ -328,7 +328,6 @@ const EditTeam = () => {
     
     try {
       const response = await axios.put(`${BACKEND_URL}/api/userteam/${teamId}`, updateData)
-      console.log('Team updated:', response.data)
       
       navigate(-1)
       

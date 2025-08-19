@@ -7,7 +7,6 @@ const Upcoming = ({ matches = [] }) => {
   const navigate = useNavigate()
 
   const handleMatchClick = (matchId) => {
-    console.log('Clicking match with ID:', matchId)
     navigate(`/my-contests/${matchId}`)
   }
 

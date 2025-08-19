@@ -142,6 +142,8 @@ const ImprovedScoreCard = memo(({ matchId }) => {
         oversBowled: player.bowling.oversBowled || 0,
         runsGiven: player.bowling.runsGiven || 0,
         wicketsTaken: player.bowling.wicketsTaken || 0,
+        lbw: player.bowling.lbw || 0,
+        bowled: player.bowling.bowled || 0,
         catches: player.fielding.catches || 0,
         stumpings: player.fielding.stumpings || 0,
         runOuts: player.fielding.runOuts || 0
@@ -221,11 +223,13 @@ const ImprovedScoreCard = memo(({ matchId }) => {
         };
       }
       
-      if (data.oversBowled !== undefined || data.runsGiven !== undefined || data.wicketsTaken !== undefined) {
+      if (data.oversBowled !== undefined || data.runsGiven !== undefined || data.wicketsTaken !== undefined || data.lbw !== undefined || data.bowled !== undefined) {
         update.bowling = {
           oversBowled: data.oversBowled || 0,
           runsGiven: data.runsGiven || 0,
-          wicketsTaken: data.wicketsTaken || 0
+          wicketsTaken: data.wicketsTaken || 0,
+          lbw: data.lbw || 0,
+          bowled: data.bowled || 0
         };
       }
       
@@ -309,7 +313,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
     const isBattingPlayer = battingPlayers.some(p => p._id === playerId);
     
     const battingFields = ['runs', 'ballsFaced', 'fours', 'sixes', 'isOut'];
-    const bowlingFields = ['oversBowled', 'runsGiven', 'wicketsTaken'];
+    const bowlingFields = ['oversBowled', 'runsGiven', 'wicketsTaken', 'lbw', 'bowled'];
     const fieldingFields = ['catches', 'stumpings', 'runOuts'];
     
     let currentFields = [];
@@ -465,8 +469,8 @@ const ImprovedScoreCard = memo(({ matchId }) => {
       {/* Quick Update Modal */}
       {showQuickUpdate && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-auto">
-            <div className="sticky top-0 bg-white border-b p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] flex flex-col">
+            <div className="sticky top-0 bg-white border-b p-4 z-10">
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-2xl font-bold text-gray-800">Quick Score Update</h2>
                 <div className="flex gap-2">
@@ -500,7 +504,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
               </div>
             </div>
             
-            <div className="p-6">
+            <div className="flex-1 overflow-auto p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Batting Team */}
                 <div className="bg-blue-50 rounded-lg p-4">
@@ -657,7 +661,7 @@ const ImprovedScoreCard = memo(({ matchId }) => {
                               </span>
                             )}
                           </div>
-                          <div className="grid grid-cols-3 gap-3">
+                          <div className="grid grid-cols-5 gap-3">
                             <div>
                               <label className="block text-xs font-medium text-gray-700 mb-1">Overs</label>
                               <input
@@ -700,6 +704,36 @@ const ImprovedScoreCard = memo(({ matchId }) => {
                                 onFocus={(e) => handleInputFocus(e, `${player._id}-wicketsTaken`)}
                                 className={`w-full p-2 border rounded-md text-center font-bold text-red-600 ${
                                   focusedField === `${player._id}-wicketsTaken` ? 'ring-2 ring-blue-500' : ''
+                                }`}
+                                min="0"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">LBW</label>
+                              <input
+                                ref={el => inputRefs.current[`${player._id}-lbw`] = el}
+                                type="number"
+                                value={data.lbw || 0}
+                                onChange={(e) => updateQuickData(player._id, 'lbw', e.target.value)}
+                                onKeyDown={(e) => handleKeyDown(e, player._id, 'lbw')}
+                                onFocus={(e) => handleInputFocus(e, `${player._id}-lbw`)}
+                                className={`w-full p-2 border rounded-md text-center ${
+                                  focusedField === `${player._id}-lbw` ? 'ring-2 ring-blue-500' : ''
+                                }`}
+                                min="0"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Bowled</label>
+                              <input
+                                ref={el => inputRefs.current[`${player._id}-bowled`] = el}
+                                type="number"
+                                value={data.bowled || 0}
+                                onChange={(e) => updateQuickData(player._id, 'bowled', e.target.value)}
+                                onKeyDown={(e) => handleKeyDown(e, player._id, 'bowled')}
+                                onFocus={(e) => handleInputFocus(e, `${player._id}-bowled`)}
+                                className={`w-full p-2 border rounded-md text-center ${
+                                  focusedField === `${player._id}-bowled` ? 'ring-2 ring-blue-500' : ''
                                 }`}
                                 min="0"
                               />
@@ -901,6 +935,8 @@ const ImprovedScoreCard = memo(({ matchId }) => {
                   <th className="p-3 text-center">O</th>
                   <th className="p-3 text-center">R</th>
                   <th className="p-3 text-center">W</th>
+                  <th className="p-3 text-center">LBW</th>
+                  <th className="p-3 text-center">Bowled</th>
                   <th className="p-3 text-center">Eco</th>
                   <th className="p-3 text-center">Points</th>
                 </tr>
@@ -922,6 +958,12 @@ const ImprovedScoreCard = memo(({ matchId }) => {
                       </td>
                       <td className="p-3 text-center font-bold text-red-600">
                         {bowlingStats.wicketsTaken}
+                      </td>
+                      <td className="p-3 text-center font-bold text-orange-600">
+                        {bowlingStats.lbw || 0}
+                      </td>
+                      <td className="p-3 text-center font-bold text-purple-600">
+                        {bowlingStats.bowled || 0}
                       </td>
                       <td className="p-3 text-center">
                         {bowlingStats.oversBowled > 0 ? (bowlingStats.runsGiven / bowlingStats.oversBowled).toFixed(2) : '0.00'}

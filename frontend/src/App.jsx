@@ -60,8 +60,8 @@ const App = () => {
   const isPrivacyPage = location.pathname === '/privacy-policy'
   const isBlogsPage = location.pathname === '/blog' || location.pathname.startsWith('/blog/')
   const containerClasses = (isHomePage || isContactPage || isAboutPage || isTermPage || isPrivacyPage || isBlogsPage)
-    ? 'w-full min-h-screen relative overflow-hidden' 
-    : 'max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden'
+    ? 'w-full min-h-screen relative overflow-hidden safe-area-top' 
+    : 'max-w-[440px] mx-auto bg-white min-h-screen rounded-lg shadow relative overflow-hidden safe-area-top'
 
   return (
     <ErrorBoundary>

@@ -139,11 +139,11 @@ const CaptainSelectionModal = ({
         </div>
 
         {/* Bottom Save Button */}
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 p-4">
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 p-4 safe-area-bottom">
           <button
             onClick={handleSaveTeam}
             disabled={!captain || !viceCaptain || saving}
-            className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
+            className={`w-full py-4 px-6 rounded-lg font-medium transition-colors touch-target touch-feedback ${
               captain && viceCaptain && !saving
                 ? 'bg-green-500 text-white hover:bg-green-600'
                 : 'bg-gray-500 text-gray-300 cursor-not-allowed'

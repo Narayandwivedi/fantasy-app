@@ -26,7 +26,6 @@ const MyContests = () => {
       const { data } = await axios.get(`${BACKEND_URL}/api/contests/user/${user._id}/match/${matchId}`)
       
       if (data.success) {
-        console.log('MyContests API Response:', data.data)
         setUserContests(data.data.contests)
         setUserTeams(data.data.teams)
         if (data.data.contests.length > 0) {

@@ -155,19 +155,19 @@ const PlayerScoreSchema = new mongoose.Schema({
         return this.sport === "cricket" ? 0 : undefined;
       },
     },
-    wides: {
-      type: Number,
-      default: function () {
-        return this.sport === "cricket" ? 0 : undefined;
-      },
-    },
-    noBalls: {
-      type: Number,
-      default: function () {
-        return this.sport === "cricket" ? 0 : undefined;
-      },
-    },
     economyRate: {
+      type: Number,
+      default: function () {
+        return this.sport === "cricket" ? 0 : undefined;
+      },
+    },
+    lbw: {
+      type: Number,
+      default: function () {
+        return this.sport === "cricket" ? 0 : undefined;
+      },
+    },
+    bowled: {
       type: Number,
       default: function () {
         return this.sport === "cricket" ? 0 : undefined;
@@ -189,6 +189,8 @@ const PlayerScoreSchema = new mongoose.Schema({
 
 
   // COMMON FIELDS
+  isPlayingXI: { type: Boolean, default: true }, // Default true since we only create scores for playing players
+  playingXIBonusGiven: { type: Boolean, default: false }, // Track if Playing XI bonus has been awarded
   isManOfMatch: { type: Boolean, default: false },
   isDuckOut: {
     type: Boolean,

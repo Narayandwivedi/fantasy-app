@@ -48,7 +48,6 @@ const CreateTeam = () => {
       setLoading(true)
       setError(null)
       const { data } = await axios.get(`${BACKEND_URL}/api/matches/${matchId}/players`)
-      console.log(data)
       if (data.success) {
         setMatchData(data.data)
       } else {
@@ -67,6 +66,26 @@ const CreateTeam = () => {
   useEffect(() => {
     fetchAllPlayers()
   }, [])
+
+  // Handle browser back button for captain selection modal
+  useEffect(() => {
+    const handlePopState = (event) => {
+      if (showCaptainSelection) {
+        event.preventDefault()
+        setShowCaptainSelection(false)
+      }
+    }
+
+    if (showCaptainSelection) {
+      // Push a new history entry when modal opens
+      window.history.pushState({ modalOpen: true }, '', '')
+      window.addEventListener('popstate', handlePopState)
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [showCaptainSelection])
 
   const handlePlayerSelect = (player, teamType) => {
     const isSelected = selectedPlayers.some(p => p._id === player._id)
@@ -284,7 +303,6 @@ const CreateTeam = () => {
     
     try {
       const response = await axios.post(`${BACKEND_URL}/api/userteam`, teamData)
-      console.log('Team saved:', response.data)
       // Replace history entry so back button goes to home instead of create-team page
       navigate(`/${matchId}/contest`, { replace: true })
       // Show success toast with quick duration
@@ -418,10 +436,10 @@ const CreateTeam = () => {
       />
 
       {/* Fixed Bottom Buttons */}
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 p-4 shadow-lg md:border-l md:border-r md:rounded-t-lg">
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 p-4 shadow-lg md:border-l md:border-r md:rounded-t-lg safe-area-bottom">
         <div className="flex space-x-4">
           <button
-            className="flex-1 bg-slate-700 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center space-x-2 hover:bg-slate-800 transition-colors"
+            className="flex-1 bg-slate-700 text-white py-4 px-6 rounded-lg font-medium flex items-center justify-center space-x-2 hover:bg-slate-800 transition-colors touch-target touch-feedback"
             onClick={() => setShowPreview(true)}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -431,7 +449,7 @@ const CreateTeam = () => {
             <span>PREVIEW</span>
           </button>
           <button
-            className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors ${
+            className={`flex-1 py-4 px-6 rounded-lg font-medium transition-colors touch-target touch-feedback ${
               isValidTeam() 
                 ? 'bg-green-500 text-white hover:bg-green-600' 
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'

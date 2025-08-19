@@ -95,6 +95,8 @@ async function setMatchPlaying11AndCreateScores(req, res) {
           wides: 0,
           noBalls: 0,
           economyRate: 0,
+          lbw: 0,
+          bowled: 0,
         };
 
         playerScoreData.fielding = {
@@ -161,6 +163,8 @@ async function setMatchPlaying11AndCreateScores(req, res) {
           wides: 0,
           noBalls: 0,
           economyRate: 0,
+          lbw: 0,
+          bowled: 0,
         };
 
         playerScoreData.fielding = {
@@ -473,8 +477,18 @@ async function updateMatchScore(req, res) {
       updateData["fantasyPoints.battingPoints"] = fantasyPoints.battingPoints;
       updateData["fantasyPoints.bowlingPoints"] = fantasyPoints.bowlingPoints;
       updateData["fantasyPoints.fieldingPoints"] = fantasyPoints.fieldingPoints;
-      updateData["fantasyPoints.bonusPoints"] = fantasyPoints.bonusPoints;
-      updateData["fantasyPoints.totalPoints"] = fantasyPoints.totalPoints;
+      
+      // Add Playing XI bonus only once per match
+      let playingXIBonus = 0;
+      if (existingPlayerScore.isPlayingXI && !existingPlayerScore.playingXIBonusGiven) {
+        playingXIBonus = 4;
+        updateData["playingXIBonusGiven"] = true; // Mark as given
+      } else if (existingPlayerScore.playingXIBonusGiven) {
+        playingXIBonus = 4; // Keep the bonus if already given
+      }
+      
+      updateData["fantasyPoints.bonusPoints"] = fantasyPoints.bonusPoints + playingXIBonus;
+      updateData["fantasyPoints.totalPoints"] = fantasyPoints.totalPoints + playingXIBonus;
 
       // Check for duck out (0 runs and out)
       if (

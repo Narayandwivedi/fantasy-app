@@ -246,11 +246,18 @@ const MatchDetail = () => {
     )
 
     const PlayerCard = memo(({ player, isInPlaying11, battingOrder, onToggle, onMoveUp, onMoveDown, showActions = false, teamKey, canAdd = true, canMoveUp = false, canMoveDown = false }) => (
-        <div className={`group relative bg-white rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
-            isInPlaying11 
-                ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 shadow-sm' 
-                : 'border-slate-200 hover:border-slate-300'
-        }`}>
+        <div 
+            className={`group relative bg-white rounded-xl border-2 transition-all duration-300 hover:shadow-lg cursor-pointer ${
+                isInPlaying11 
+                    ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 shadow-sm' 
+                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+            } ${showActions && (!isInPlaying11 && !canAdd) ? 'cursor-not-allowed opacity-60' : ''}`}
+            onClick={() => {
+                if (showActions && (canAdd || isInPlaying11)) {
+                    onToggle(player._id, teamKey)
+                }
+            }}
+        >
             {/* Batting order badge */}
             {isInPlaying11 && (
                 <div className="absolute -top-2 -left-2 z-10">
@@ -291,39 +298,50 @@ const MatchDetail = () => {
                     {/* Action buttons */}
                     {showActions && (
                         <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            {/* Batting order controls */}
+                            {/* Batting order controls - arranged vertically */}
                             {isInPlaying11 && (
-                                <>
+                                <div className="flex flex-col space-y-1 relative" onClick={(e) => e.stopPropagation()}>
                                     <button
-                                        onClick={() => onMoveUp(player._id, teamKey)}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            onMoveUp(player._id, teamKey)
+                                        }}
                                         disabled={!canMoveUp}
-                                        className={`p-2 rounded-lg transition-all duration-200 ${
+                                        className={`p-1.5 rounded-lg transition-all duration-200 z-20 relative ${
                                             canMoveUp
-                                                ? 'hover:bg-indigo-100 text-indigo-600 hover:scale-105'
+                                                ? 'hover:bg-indigo-100 text-indigo-600 hover:scale-105 cursor-pointer'
                                                 : 'text-slate-400 cursor-not-allowed'
                                         }`}
+                                        style={{ cursor: canMoveUp ? 'pointer' : 'not-allowed' }}
                                         title="Move up in batting order"
                                     >
-                                        <ArrowUp size={14} />
+                                        <ArrowUp size={12} />
                                     </button>
                                     <button
-                                        onClick={() => onMoveDown(player._id, teamKey)}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            onMoveDown(player._id, teamKey)
+                                        }}
                                         disabled={!canMoveDown}
-                                        className={`p-2 rounded-lg transition-all duration-200 ${
+                                        className={`p-1.5 rounded-lg transition-all duration-200 z-20 relative ${
                                             canMoveDown
-                                                ? 'hover:bg-indigo-100 text-indigo-600 hover:scale-105'
+                                                ? 'hover:bg-indigo-100 text-indigo-600 hover:scale-105 cursor-pointer'
                                                 : 'text-slate-400 cursor-not-allowed'
                                         }`}
+                                        style={{ cursor: canMoveDown ? 'pointer' : 'not-allowed' }}
                                         title="Move down in batting order"
                                     >
-                                        <ArrowDown size={14} />
+                                        <ArrowDown size={12} />
                                     </button>
-                                </>
+                                </div>
                             )}
                             
                             {/* Add/Remove button */}
                             <button
-                                onClick={() => onToggle(player._id, teamKey)}
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    onToggle(player._id, teamKey)
+                                }}
                                 disabled={!isInPlaying11 && !canAdd}
                                 className={`p-2 rounded-lg transition-all duration-200 ${
                                     isInPlaying11 
@@ -482,8 +500,8 @@ const MatchDetail = () => {
                                                     isInPlaying11={true}
                                                     battingOrder={playerData.battingOrder}
                                                     onToggle={togglePlayer}
-                                                    onMoveUp={moveBattingOrder}
-                                                    onMoveDown={moveBattingOrder}
+                                                    onMoveUp={(playerId, teamKey) => moveBattingOrder(playerId, teamKey, 'up')}
+                                                    onMoveDown={(playerId, teamKey) => moveBattingOrder(playerId, teamKey, 'down')}
                                                     showActions={isEditing}
                                                     teamKey={teamKey}
                                                     canAdd={true}
@@ -522,23 +540,34 @@ const MatchDetail = () => {
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                {team.squad.map(player => {
-                                    const playerInPlaying11 = currentPlaying11.find(p => p.playerId === player._id)
-                                    const isInPlaying11 = !!playerInPlaying11
-                                    
-                                    return (
-                                        <PlayerCard
-                                            key={player._id}
-                                            player={player}
-                                            isInPlaying11={isInPlaying11}
-                                            battingOrder={playerInPlaying11?.battingOrder}
-                                            onToggle={togglePlayer}
-                                            showActions={isEditing}
-                                            teamKey={teamKey}
-                                            canAdd={canAddMore || isInPlaying11}
-                                        />
-                                    )
-                                })}
+                                {team.squad
+                                    .sort((a, b) => {
+                                        // Define role order: batsman, wicket-keeper, all-rounder, bowler
+                                        const roleOrder = {
+                                            'batsman': 1,
+                                            'wicket-keeper': 2,
+                                            'all-rounder': 3,
+                                            'bowler': 4
+                                        }
+                                        return roleOrder[a.position] - roleOrder[b.position]
+                                    })
+                                    .map(player => {
+                                        const playerInPlaying11 = currentPlaying11.find(p => p.playerId === player._id)
+                                        const isInPlaying11 = !!playerInPlaying11
+                                        
+                                        return (
+                                            <PlayerCard
+                                                key={player._id}
+                                                player={player}
+                                                isInPlaying11={isInPlaying11}
+                                                battingOrder={playerInPlaying11?.battingOrder}
+                                                onToggle={togglePlayer}
+                                                showActions={isEditing}
+                                                teamKey={teamKey}
+                                                canAdd={canAddMore || isInPlaying11}
+                                            />
+                                        )
+                                    })}
                             </div>
                         </div>
                     )}

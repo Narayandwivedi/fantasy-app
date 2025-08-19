@@ -25,8 +25,7 @@ const GameRules = () => {
       { rule: '50 Runs Bonus', points: 8 },
       { rule: '75 Runs Bonus', points: 12 },
       { rule: '100 Runs Bonus', points: 16 },
-      { rule: 'Dismissal for Duck (excluding bowlers)', points: -2 },
-      { rule: 'Strike Rate (Min 10 balls)', points: 'Variable' }
+      { rule: 'Dismissal for Duck (excluding bowlers)', points: -2 }
     ],
     ODI: [
       { rule: 'Runs', points: 1 },
@@ -34,8 +33,9 @@ const GameRules = () => {
       { rule: 'Six Bonus', points: 6 },
       { rule: '50 Runs Bonus', points: 8 },
       { rule: '100 Runs Bonus', points: 16 },
-      { rule: 'Dismissal for Duck (excluding bowlers)', points: -2 },
-      { rule: 'Strike Rate (Min 20 balls)', points: 'Variable' }
+      { rule: '125 Runs Bonus', points: 20 },
+      { rule: '150 Runs Bonus', points: 24 },
+      { rule: 'Dismissal for Duck (excluding bowlers)', points: -2 }
     ],
     Test: [
       { rule: 'Runs', points: 1 },
@@ -43,6 +43,8 @@ const GameRules = () => {
       { rule: 'Six Bonus', points: 6 },
       { rule: '50 Runs Bonus', points: 8 },
       { rule: '100 Runs Bonus', points: 16 },
+      { rule: '125 Runs Bonus', points: 20 },
+      { rule: '150 Runs Bonus', points: 24 },
       { rule: 'Dismissal for Duck (excluding bowlers)', points: -4 }
     ],
     T10: [
@@ -57,32 +59,29 @@ const GameRules = () => {
 
   const bowlingRules = {
     T20: [
-      { rule: 'Wickets', points: 25 },
+      { rule: 'Wickets', points: 28 },
       { rule: 'LBW/Bowled Bonus', points: 8 },
       { rule: '3 Wicket Bonus', points: 4 },
       { rule: '4 Wicket Bonus', points: 8 },
       { rule: '5+ Wicket Bonus', points: 16 },
-      { rule: 'Maiden Over', points: 12 },
-      { rule: 'Economy Rate (Min 2 overs)', points: 'Variable' }
+      { rule: 'Maiden Over', points: 12 }
     ],
     ODI: [
-      { rule: 'Wickets', points: 25 },
+      { rule: 'Wickets', points: 28 },
       { rule: 'LBW/Bowled Bonus', points: 8 },
       { rule: '3 Wicket Bonus', points: 4 },
       { rule: '4 Wicket Bonus', points: 8 },
       { rule: '5+ Wicket Bonus', points: 16 },
-      { rule: 'Maiden Over', points: 12 },
-      { rule: 'Economy Rate (Min 5 overs)', points: 'Variable' }
+      { rule: 'Maiden Over', points: 12 }
     ],
     Test: [
       { rule: 'Wickets', points: 16 },
       { rule: 'LBW/Bowled Bonus', points: 8 },
       { rule: '5+ Wicket Bonus (Innings)', points: 8 },
-      { rule: '10+ Wicket Bonus (Match)', points: 16 },
-      { rule: 'Maiden Over', points: 4 }
+      { rule: '10+ Wicket Bonus (Match)', points: 16 }
     ],
     T10: [
-      { rule: 'Wickets', points: 25 },
+      { rule: 'Wickets', points: 28 },
       { rule: 'LBW/Bowled Bonus', points: 8 },
       { rule: '2 Wicket Bonus', points: 4 },
       { rule: '3+ Wicket Bonus', points: 8 },
@@ -93,8 +92,7 @@ const GameRules = () => {
   const fieldingRules = [
     { rule: 'Catch', points: 8 },
     { rule: 'Stumping', points: 12 },
-    { rule: 'Run Out (Direct Hit)', points: 12 },
-    { rule: 'Run Out (Indirect)', points: 6 }
+    { rule: 'Run Out (Direct/Indirect)', points: 12 }
   ];
 
   const othersRules = [
