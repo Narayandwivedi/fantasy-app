@@ -1,7 +1,9 @@
 import React from 'react'
 import LandingNavbar from "../components/LandingNavbar"
 import Footer from "../components/Footer"
+import PWAInstall from "../components/PWAInstall"
 import { Link } from 'react-router-dom'
+import { Download, Smartphone } from 'lucide-react'
 
 const HomePage = () => {
   return (
@@ -80,11 +82,18 @@ const HomePage = () => {
           </div>
         </div>
         
-        {/* CTA Button - Mobile Only */}
-        <div className="mt-12">
+        {/* CTA Buttons - Mobile Only */}
+        <div className="mt-12 space-y-4">
+          <PWAInstall className="block bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg touch-target touch-feedback">
+            <>
+              <Download className="w-5 h-5 mr-2 inline" />
+              Download App
+            </>
+          </PWAInstall>
+          
           <Link 
             to="/login"
-            className="inline-block bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white font-semibold py-3 px-6 rounded-full transition-all duration-200"
+            className="inline-block bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white font-semibold py-3 px-6 rounded-full transition-all duration-200 touch-target touch-feedback"
           >
             Login / Sign Up
           </Link>
@@ -189,14 +198,14 @@ const HomePage = () => {
       </div>
       
       {/* Fixed Bottom CTA Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent safe-area-bottom">
         <div className="max-w-[440px] mx-auto">
-          <Link 
-            to="/fantasy-sport"
-            className="block w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-full text-lg transition-all duration-200 transform hover:scale-105 shadow-lg text-center"
-          >
-            Start Playing Now
-          </Link>
+          <PWAInstall className="block w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-full text-lg transition-all duration-200 transform hover:scale-105 shadow-lg text-center touch-target touch-feedback">
+            <>
+              <Download className="w-5 h-5 mr-2 inline" />
+              Download App
+            </>
+          </PWAInstall>
         </div>
       </div>
 

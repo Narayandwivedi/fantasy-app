@@ -29,6 +29,7 @@ import BlogDetailPage from './pages/blog/BlogDetailPage'
 import VerifyUser from './pages/VerifyUser'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
+import InstallPrompt from './components/InstallPrompt'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -197,6 +198,9 @@ const App = () => {
           pauseOnHover
           theme="light"
         />
+        
+        {/* PWA Install Prompt - shows across the app */}
+        <InstallPrompt />
         
       </div>
     </ErrorBoundary>
