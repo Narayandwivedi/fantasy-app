@@ -11,12 +11,11 @@ const PWAInstall = ({ className = "", children }) => {
     // Try native install first
     if (isInstallable) {
       const success = await installApp()
-      if (success) {
-        return // Successfully installed natively
-      }
+      // If user accepted or cancelled native install, don't show modal
+      return
     }
     
-    // If native install fails or not available, show modal
+    // If native install not available, show modal
     setShowModal(true)
   }
 
