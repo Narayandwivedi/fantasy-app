@@ -82,22 +82,7 @@ const HomePage = () => {
           </div>
         </div>
         
-        {/* CTA Buttons - Mobile Only */}
-        <div className="mt-12 space-y-4">
-          <PWAInstall className="block bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg touch-target touch-feedback">
-            <>
-              <Download className="w-5 h-5 mr-2 inline" />
-              Download App
-            </>
-          </PWAInstall>
-          
-          <Link 
-            to="/login"
-            className="inline-block bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white font-semibold py-3 px-6 rounded-full transition-all duration-200 touch-target touch-feedback"
-          >
-            Login / Sign Up
-          </Link>
-        </div>
+       
         
         {/* Features - Mobile */}
         <div className="mt-12 grid grid-cols-1 gap-8">

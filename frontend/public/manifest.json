@@ -2,9 +2,9 @@
   "name": "MySeries11 - Fantasy Cricket",
   "short_name": "MySeries11",
   "description": "India's premier skill-based fantasy cricket gaming platform",
-  "start_url": "/",
+  "start_url": "/login?source=pwa",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#1f2937",
   "theme_color": "#1f2937",
   "orientation": "portrait-primary",
   "scope": "/",
@@ -25,6 +25,18 @@
     }
   ],
   "shortcuts": [
+    {
+      "name": "Login",
+      "short_name": "Login",
+      "url": "/login",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
     {
       "name": "My Matches",
       "short_name": "Matches",
@@ -48,7 +60,24 @@
           "type": "image/svg+xml"
         }
       ]
+    },
+    {
+      "name": "Fantasy Sport",
+      "short_name": "Fantasy",
+      "url": "/fantasy-sport",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
     }
   ],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "display_override": ["window-controls-overlay"],
+  "edge_side_panel": {},
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }

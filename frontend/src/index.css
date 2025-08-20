@@ -2,6 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* PWA Install Modal Animations */
+@layer utilities {
+  .animate-in {
+    animation-duration: 150ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: both;
+  }
+  
+  .zoom-in-95 {
+    animation-name: zoom-in-95;
+  }
+  
+  @keyframes zoom-in-95 {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 /* Mobile-first improvements */
 @layer base {
   html {

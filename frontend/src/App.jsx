@@ -37,6 +37,11 @@ const App = () => {
   const location = useLocation()
   const { user } = useContext(AppContext)
   
+  // Check if app is running as PWA
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone || 
+                document.referrer.includes('android-app://')
+  
   const hideBottomNav = useMemo(() => {
     // Hide bottom nav for all public users (not logged in)
     if (!user) {
@@ -75,7 +80,8 @@ const App = () => {
             } />
             
             <Route path='/' element = {
-              user ? <Navigate to="/fantasy-sport" replace /> : <HomePage/>
+              user ? <Navigate to="/fantasy-sport" replace /> : 
+              isPWA ? <Navigate to="/login" replace /> : <HomePage/>
             } />
 
 

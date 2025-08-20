@@ -1,75 +1,35 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Download, Smartphone } from 'lucide-react'
+import { usePWA } from '../hooks/usePWA'
+import InstallModal from './InstallModal'
 
 const PWAInstall = ({ className = "", children }) => {
-  const [deferredPrompt, setDeferredPrompt] = useState(null)
-  const [isInstallable, setIsInstallable] = useState(false)
-  const [isInstalled, setIsInstalled] = useState(false)
-
-  useEffect(() => {
-    // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true)
-      return
-    }
-
-    // Listen for the beforeinstallprompt event
-    const handleBeforeInstallPrompt = (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault()
-      // Store the event so it can be triggered later
-      setDeferredPrompt(e)
-      setIsInstallable(true)
-    }
-
-    // Listen for successful app installation
-    const handleAppInstalled = () => {
-      setIsInstalled(true)
-      setIsInstallable(false)
-      setDeferredPrompt(null)
-    }
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    window.addEventListener('appinstalled', handleAppInstalled)
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-      window.removeEventListener('appinstalled', handleAppInstalled)
-    }
-  }, [])
+  const { isAppInstalled, isInstallable, installApp } = usePWA()
+  const [showModal, setShowModal] = useState(false)
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      // Fallback for browsers that don't support install prompt
-      if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-        alert('To install MySeries11:\n1. Tap the Share button\n2. Select "Add to Home Screen"\n3. Tap "Add"')
-      } else {
-        alert('To install MySeries11:\n1. Tap the menu (⋮) in your browser\n2. Select "Add to Home screen"\n3. Tap "Add"')
+    // Try native install first
+    if (isInstallable) {
+      const success = await installApp()
+      if (success) {
+        return // Successfully installed natively
       }
-      return
     }
+    
+    // If native install fails or not available, show modal
+    setShowModal(true)
+  }
 
-    // Show the install prompt
-    deferredPrompt.prompt()
-    
-    // Wait for the user's response
-    const { outcome } = await deferredPrompt.userChoice
-    
-    if (outcome === 'accepted') {
-      setIsInstalled(true)
-    }
-    
-    // Clear the deferredPrompt
-    setDeferredPrompt(null)
-    setIsInstallable(false)
+  const handleModalInstall = async () => {
+    await installApp()
   }
 
   // If already installed, show "Open App" button
-  if (isInstalled) {
+  if (isAppInstalled) {
     return (
       <button 
         className={className}
-        onClick={() => window.location.href = '/fantasy-sport'}
+        onClick={() => window.location.href = '/login'}
       >
         {children || (
           <>
@@ -83,17 +43,26 @@ const PWAInstall = ({ className = "", children }) => {
 
   // Show install button
   return (
-    <button 
-      className={className}
-      onClick={handleInstallClick}
-    >
-      {children || (
-        <>
-          <Download className="w-5 h-5 mr-2" />
-          {isInstallable ? 'Install App' : 'Download App'}
-        </>
-      )}
-    </button>
+    <>
+      <button 
+        className={className}
+        onClick={handleInstallClick}
+      >
+        {children || (
+          <>
+            <Download className="w-5 h-5 mr-2" />
+            {isInstallable ? 'Install App' : 'Download App'}
+          </>
+        )}
+      </button>
+      
+      <InstallModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onInstall={handleModalInstall}
+        canInstallNatively={isInstallable}
+      />
+    </>
   )
 }
 
